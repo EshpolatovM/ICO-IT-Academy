@@ -19,3 +19,13 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Fayllar:** `.claude/agents/*.md`, `CLAUDE.md`, `docs/01, 02, 05, 08, 10, 12, 13, 99`, `docs/STATE.md`, `docs/PROGRESS.md`, `.gitignore`.
 - **Testlar:** kod hali yo'q.
 - **Keyingi qadam:** Claude Code'ni qayta ishga tushirish, 1-bosqich rejasini tasdiqlash.
+
+## 2026-11-10 — 1-bosqich boshlandi
+- **Nima qilindi:**
+  - Egasi rejani tasdiqladi. Dizayn oddiy standart token'lar bilan qilinadi.
+  - S-67 (kod = token) va S-68 (Podman) qarorlari yozildi.
+  - pnpm 10.34.9 `~/.local` ga o'rnatildi.
+  - `feature/01-poydevor` branch'i ochildi.
+  - 1.1 topshirig'i `docs/tasks/` ga saqlandi.
+  - `backend-developer` agenti hali yuklanmagan (Claude Code qayta ishga tushirilishi kerak).
+- **Fayllar:** `docs/99-ochiq-savollar.md`, `docs/STATE.md`, `docs/PROGRESS.md`, `docs/tasks/01-1.1-monorepo-skeleti.md`.

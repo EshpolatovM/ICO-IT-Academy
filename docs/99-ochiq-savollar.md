@@ -16,7 +16,7 @@ Savol hal qilinganda: javobni shu yerga yozing, tegishli hujjatdagi "Taxmin:" be
 | 4 | **S-61** Hosting va ma'lumotlar lokalizatsiyasi | ✔️ Hal qilindi: hosting'ga bog'lanmagan arxitektura |
 | 5 | **S-45** Meeting provayderi | ✔️ LiveKit (10-bosqichda yakuniy tasdiq) |
 | 6 | **S-65** Jamoa, muddat, MVP tarkibi | ⏳ Egasining javobi kutilmoqda |
-| 7 | **S-67** Ota-ona "kodi" — token o'zimi yoki qisqa kod? | ⏳ Yangi savol (1-bosqichga ta'sir qiladi) |
+| 7 | **S-67** Ota-ona "kodi" — token o'zimi yoki qisqa kod? | ✔️ A: tokenning o'zi (2026-11-10) |
 
 ---
 
@@ -79,7 +79,7 @@ Savol hal qilinganda: javobni shu yerga yozing, tegishli hujjatdagi "Taxmin:" be
 **S-16** 🟢 Ota-ona tokeni muddati va brauzerdagi cookie muddati?
 - ✅ A) Token muddatsiz (bekor qilinguncha), brauzerdagi `parent_tokens` cookie 180 kun. B) Token 1 yil. C) Mentor tanlaydi.
 
-**S-67** 🔴 Ota-ona saytda kiritadigan "kod" — bu havoladagi uzun tokenning o'zimi yoki alohida qisqa kodmi?
+**S-67** ✔️ **HAL QILINDI (2026-11-10): A — tokenning o'zi.** Ota-ona saytda kiritadigan "kod" — bu havoladagi uzun tokenning o'zimi yoki alohida qisqa kodmi?
 - ✅ A) Tokenning o'zi (43 belgi, nusxa ko'chirib qo'yiladi). Eng xavfsiz variant.
 - B) Alohida qisqa kod (masalan 8 belgi `K7P2-QX9M`). Qo'lda yozish oson, lekin entropiya past, shuning uchun qattiq rate limit va kodga muddat qo'yish kerak.
 - C) Ikkalasi ham: havolada uzun token, qo'shimcha ravishda mentor bir martalik qisqa kod (24 soat) beradi.
@@ -231,7 +231,7 @@ Savol hal qilinganda: javobni shu yerga yozing, tegishli hujjatdagi "Taxmin:" be
 
 **S-61** ✔️ **HAL QILINDI (2026-11-10):** egasining ma'lumotiga ko'ra, 2026-yil martidan keyin majburiy lokalizatsiya faqat biometrik, genetik va telekom ma'lumotlariga tegishli (huquqshunos tasdiqlaydi). Arxitektura hosting'ga bog'lanmaydi: Docker, env orqali sozlanadi, S3-compatible API ishlatiladi. Hosting keyin tanlanadi. Hujjat: 13 §4.
 
-**S-68** 🟡 Lokal ishlab chiqish muhiti: mashinada Docker yo'q, lekin Podman bor. Dev uchun `podman compose` ishlatsak bo'ladimi yoki Docker o'rnatiladimi?
+**S-68** ✔️ **HAL QILINDI (2026-11-10): A — Podman** (`podman compose` uchun provayder o'rnatilishi kerak). Lokal ishlab chiqish muhiti: mashinada Docker yo'q, lekin Podman bor. Dev uchun `podman compose` ishlatsak bo'ladimi yoki Docker o'rnatiladimi?
 - ✅ A) Podman (Docker'ga mos `compose.yaml`, CI'da Docker). B) Docker o'rnatiladi.
 
 **S-62** 🟢 Bildirishnomalar va audit loglar qancha saqlanadi?
