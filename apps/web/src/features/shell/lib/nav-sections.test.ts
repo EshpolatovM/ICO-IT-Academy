@@ -5,7 +5,7 @@ import { ADMIN_NAV, MENTOR_NAV, STUDENT_NAV } from '../config/nav.config';
 import { findSectionEntry, isNavEntryActive, sectionEntries } from './nav-sections';
 
 describe('nav-sections', () => {
-  it("student bo'limlari: bosh sahifa va disabled 'Mentor' bandisiz", () => {
+  it("student bo'limlari: bosh sahifasiz, 'Mentor' — /my-mentor (S-69)", () => {
     const sections = sectionEntries(STUDENT_NAV, '/', '/path').map(({ segments }) =>
       segments.join('/'),
     );
@@ -17,9 +17,11 @@ describe('nav-sections', () => {
       'playground',
       'portfolio',
       'blog',
+      'my-mentor',
       'shop',
     ]);
-    expect(STUDENT_NAV.find((entry) => entry.label === 'Mentor')?.href).toBeUndefined();
+    expect(findSectionEntry(STUDENT_NAV, '/', ['my-mentor'])?.label).toBe('Mentor');
+    expect(findSectionEntry(STUDENT_NAV, '/', ['mentor'])).toBeUndefined();
   });
 
   it("admin bo'limlari — ko'p segmentli yo'l bilan", () => {

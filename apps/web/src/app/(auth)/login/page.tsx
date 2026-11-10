@@ -1,6 +1,6 @@
-import Link from 'next/link';
+import { PARENT_LINK_PATH } from '@lms/shared';
 
-import { Stack, Text } from '@/components/ui';
+import { Stack, Text, TextLink } from '@/components/ui';
 import { AuthCard, AuthGuard, AuthPath, LoginForm } from '@/features/auth';
 
 import type { Metadata } from 'next';
@@ -16,10 +16,10 @@ export default function StudentLoginPage() {
           <LoginForm kind="student" />
         </AuthCard>
         <Text variant="muted">
-          Xodimmisiz? <Link href={AuthPath.STAFF_LOGIN}>Telefon raqam bilan kirish</Link>
+          Xodimmisiz? <TextLink href={AuthPath.STAFF_LOGIN}>Telefon raqam bilan kirish</TextLink>
         </Text>
         <Text variant="muted">
-          Ota-onamisiz? <Link href="/parent">Ota-ona kirishi</Link>
+          Ota-onamisiz? <TextLink href={PARENT_LINK_PATH}>Ota-ona kirishi</TextLink>
         </Text>
       </Stack>
     </AuthGuard>

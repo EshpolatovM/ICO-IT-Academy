@@ -9,14 +9,15 @@ import { useCurrentUser } from '@/features/auth';
 
 import { isNavEntryActive } from '../lib/nav-sections';
 
-import { DisabledNavItem } from './DisabledNavItem';
-
 import type { NavEntry } from '../types/nav.types';
 
 export interface SidebarNavProps {
   entries: readonly NavEntry[];
   homePath: string;
 }
+
+/** Yo'li hali aniqlanmagan band yonidagi izoh. */
+const DISABLED_HINT = 'Tez orada';
 
 /** Rol menyusi: joriy sahifa ajratiladi, super admin bandlari faqat super admin'ga ko'rinadi. */
 export function SidebarNav({ entries, homePath }: SidebarNavProps) {
@@ -28,7 +29,9 @@ export function SidebarNav({ entries, homePath }: SidebarNavProps) {
     <>
       {visible.map((entry) =>
         entry.href === undefined ? (
-          <DisabledNavItem key={entry.label} label={entry.label} />
+          <NavItem key={entry.label} disabled hint={DISABLED_HINT}>
+            {entry.label}
+          </NavItem>
         ) : (
           <NavItem
             key={entry.href}

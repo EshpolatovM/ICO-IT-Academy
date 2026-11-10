@@ -111,3 +111,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Nima qilindi:** NavItem disabled + hint, TextLink, mobil AppShell/Sidebar (menyu tugmasi, panel, Esc, fokus), design-preview namunalari, testlar.
 - **Fayllar:** `apps/web/src/components/ui/{NavItem,AppShell,AppShellContext,MenuToggleButton,useMobileNav,Sidebar,TopBar,TextLink,index}.ts(x)`, testlar, `apps/web/src/app/design-preview/_components/LayoutSection.tsx`; `docs/tasks/01-1.8c…, 01-1.8d…, 01-1.9…`.
 - **Testlar:** `pnpm check` (web 89), `format:check` — o'tdi.
+
+## 2026-11-11 — 1.8d: frontend ulashlari (avtonom rejim)
+- **Nima qilindi:** NavItem disabled, TextLink, `/my-mentor`, parent logout yangi endpoint, ShellTopBar mobil.
+- **Fayllar:** `apps/web/src/app/{page.tsx,(auth)/login/**}`, `apps/web/src/features/{parent-access,shell}/**`.
+- **Testlar:** `pnpm check` (web 94), `format:check` — o'tdi.

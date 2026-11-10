@@ -13,8 +13,8 @@ export const STUDENT_NAV: readonly NavEntry[] = [
   { label: 'Kod maydoni', href: '/playground' },
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'Blog', href: '/blog' },
-  // S-69: student `/mentor` mentor paneli `/mentor` bilan to'qnashadi — egasi qaroriga qadar disabled.
-  { label: 'Mentor' },
+  // S-69: student mentor sahifasi — `/my-mentor` (mentor paneli `/mentor/*` da), docs/03 §2.11.
+  { label: 'Mentor', href: '/my-mentor' },
   { label: 'Shop', href: '/shop' },
 ];
 

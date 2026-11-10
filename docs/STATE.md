@@ -7,7 +7,7 @@
 | Maydon | Qiymat |
 |---|---|
 | Joriy modul | 1-bosqich: Poydevor (reja tasdiqlangan 2026-11-10) |
-| Joriy bosqich | 1.8c tugadi va commit qilindi; 1.8d (`birchka-frontend`, `docs/tasks/01-1.8d-frontend-ulash.md`) boshlanmoqda |
+| Joriy bosqich | 1.8d tugadi va commit qilindi; 1.9 (`sinchkov-tester`, `docs/tasks/01-1.9-test.md`) boshlanmoqda |
 | Joriy git branch | `feature/01-poydevor` |
 | Ish rejimi | **2026-11-11 kechasi: avtonom** — egasi uxlayapti, savol so'ralmaydi, Tech Lead o'zi hal qiladi; 1-bosqich oxirigacha (1.8c → 1.8d → 1.9 → 1.10 + tuzatishlar), har vazifadan keyin commit; oxirida bitta hisobot `docs/HISOBOT-2026-11-11.md`. `main` ga merge, 2-bosqich, baza o'chirish — QILINMAYDI. Egasi qaytgach rejim yana "sekin". |
 
@@ -29,10 +29,10 @@
 - Agentlarga ism berildi: usta-baza (DB), oga-backend, rassom-dizayner (UI), birchka-frontend, sinchkov-tester (QA), domla-reviewer (review).
 
 ## Oxirgi bajarilgan vazifa
-**1.8c — UI qo'shimchalari** (`rassom-dizayner`, Tech Lead tekshirdi): `NavItem` disabled (+`hint`, discriminated union props), `TextLink` (default/muted, external), mobil `AppShell` (`useMobileNav`, `AppShellContext`, `MenuToggleButton` TopBar'da avtomatik, Esc/havola yopadi, fokus panel ichida), Sidebar mobilda `w-full bg-bg`, main `p-4 md:p-6`. Web 89 test.
+**1.8d — frontend ulashlari** (`birchka-frontend`, Tech Lead tekshirdi): DisabledNavItem → `NavItem disabled hint`, matnli havolalar → `TextLink`, student "Mentor" → `/my-mentor` ("Tez orada"), ota-ona chiqishi → `POST /auth/parent/logout` (aylanma yo'l olib tashlandi), ShellTopBar mobil moslash. Web 94 test.
 
 ## Keyingi aniq vazifa
-**1.8d** (`birchka-frontend`, `docs/tasks/01-1.8d-frontend-ulash.md`): `DisabledNavItem` → `NavItem disabled`, login havolalari → `TextLink`, mobil menyu ulash, student "Mentor" bandi → `/my-mentor` ("Tez orada"), ota-ona logout → `POST /auth/parent/logout` (+ `X-Requested-With`). Keyin **1.9** `sinchkov-tester` (`docs/tasks/01-1.9-test.md` tayyor), **1.10** `domla-reviewer`.
+**1.9 — testlar** (`sinchkov-tester`, `docs/tasks/01-1.9-test.md`): qamrov auditi, RBAC matritsasi e2e, yetishmagan backend testlar, Playwright e2e (7 ssenariy, o'z portlari 3200/3201). Keyin **1.10** `domla-reviewer` (butun 1-bosqich), topilmalarni tuzatish, yakuniy to'liq test va `docs/HISOBOT-2026-11-11.md`.
 
 ## 2-bosqich uchun eslatmalar
 - `RoleBasedStudentScopeResolver` MENTOR tarmog'i → `group_members` asosida (scope tashqarisi 404).

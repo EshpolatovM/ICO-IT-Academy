@@ -1,7 +1,6 @@
-import { ErrorCode } from '@lms/shared';
 import type { ParentExchangeRequest, ParentExchangeResponse, ParentMeResponse } from '@lms/shared';
 
-import { apiRequest, isApiError } from '@/lib/api';
+import { apiRequest } from '@/lib/api';
 
 /**
  * Ota-ona endpointlari (docs/12 §1, docs/02 §5.1). Hammasi `auth: false`: Bearer yuborilmaydi,
@@ -21,32 +20,9 @@ export const parentAccessApi = {
 
   me: () => apiRequest<ParentMeResponse>('/auth/me', { auth: false }),
 
-  logout: () => apiRequest<undefined>('/auth/logout', { method: 'POST', auth: false }),
+  /**
+   * "Chiqish" (docs/12 §1): `@Public`, sessiya talab qilinmaydi — `ps` muddati o'tgan bo'lsa ham
+   * ikkala cookie (`ps`, `parent_tokens`) o'chiriladi, 204. CSRF sarlavhasini `apiRequest` qo'shadi.
+   */
+  logout: () => apiRequest<undefined>('/auth/parent/logout', { method: 'POST', auth: false }),
 };
-
-function isUnauthorized(error: unknown): boolean {
-  return isApiError(error) && error.code === ErrorCode.UNAUTHORIZED;
-}
-
-/**
- * "Chiqish" — ikkala cookie ham o'chirilishi kerak (docs/02 §5.1). `ps` muddati o'tgan bo'lsa
- * logout 401 qaytaradi va `parent_tokens` qolib ketadi — shunda avval body'siz exchange
- * (sessiyani yangilash yoki yaroqsiz cookie'larni server tozalaydi), so'ng qayta logout.
- */
-export async function logoutParent(): Promise<void> {
-  try {
-    await parentAccessApi.logout();
-  } catch (error) {
-    if (!isUnauthorized(error)) {
-      throw error;
-    }
-    try {
-      await parentAccessApi.exchange();
-      await parentAccessApi.logout();
-    } catch (retryError) {
-      if (!isUnauthorized(retryError)) {
-        throw retryError;
-      }
-    }
-  }
-}

@@ -1,6 +1,4 @@
-import Link from 'next/link';
-
-import { Stack, Text } from '@/components/ui';
+import { Stack, Text, TextLink } from '@/components/ui';
 import { AuthCard, AuthGuard, AuthPath, LoginForm } from '@/features/auth';
 
 import type { Metadata } from 'next';
@@ -16,7 +14,7 @@ export default function StaffLoginPage() {
           <LoginForm kind="staff" />
         </AuthCard>
         <Text variant="muted">
-          Studentmisiz? <Link href={AuthPath.STUDENT_LOGIN}>Student ID bilan kirish</Link>
+          Studentmisiz? <TextLink href={AuthPath.STUDENT_LOGIN}>Student ID bilan kirish</TextLink>
         </Text>
       </Stack>
     </AuthGuard>
