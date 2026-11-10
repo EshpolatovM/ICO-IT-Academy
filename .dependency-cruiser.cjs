@@ -120,9 +120,10 @@ module.exports = {
     {
       name: 'repository-not-to-upper-layers',
       severity: 'error',
-      comment: "Repository faqat baza bilan ishlaydi: service yoki controller'ni import qilmaydi.",
+      comment:
+        "Repository faqat baza bilan ishlaydi: domen service yoki controller'ni import qilmaydi. Istisno — infra adapter servislari (src/infra/**: PrismaService va h.k.), repository aynan ular orqali bazaga ulanadi.",
       from: { path: '\\.repository\\.ts$' },
-      to: { path: '\\.(service|controller)\\.ts$' },
+      to: { path: '\\.(service|controller)\\.ts$', pathNot: `${API_SRC}infra/` },
     },
     {
       name: 'prisma-only-in-repository',

@@ -67,3 +67,10 @@ Yangi yozuvlar pastga qo'shiladi.
 ## 2026-11-10 — Dev muhit: Postgres porti va bazani tozalash
 - **Nima qilindi:** `.env.example` da `POSTGRES_PORT`/`DATABASE_URL` 5433 ga (host 5432 band). Egasi ruxsati bilan `podman compose down -v`, so'ng toza bazaga `db:migrate:deploy` + `db:seed` (mentor, `ST-10001`) — o'tdi. 1.4 topshirig'i yozildi va `oga-backend`ga berildi.
 - **Fayllar:** `.env.example`, `docs/STATE.md`, `docs/tasks/01-1.4-backend-poydevori.md`.
+
+## 2026-11-10 — 1.4: backend poydevori
+- **Nima qilindi:** zod env config, PrismaService + soft delete extension, BaseRepository (pagination), Redis moduli, global exception filter (docs/12 formati, Prisma xatolari mapper), zod validatsiya pipe, pino logger (requestId, redact), health endpoint (DB+Redis), seed logikasining DRY ko'chirilishi (`@lms/shared` sxemalari, `PasswordHasher`, `StudentCodeRepository`), e2e infratuzilmasi va CI service konteynerlari.
+- **Fayllar:** `apps/api/src/{common,infra,modules}/**`, `apps/api/test/**`, `apps/api/prisma/seed/**`, `packages/shared/src/{auth,errors,health,pagination}/**`, `.dependency-cruiser.cjs`, `.github/workflows/ci.yml`, `.env.example`, `turbo.json`, `package.json`, `pnpm-lock.yaml`.
+- **Testlar:** 87 unit, 4 e2e — Tech Lead qayta yurgizdi (`pnpm check`, `build`, `format:check`, `test:e2e`), hammasi o'tdi.
+- **Qarorlar:** `@nestjs/config`, terminus, nestjs-zod o'rniga kichik o'z yechimlar; pagination `pageSize` (docs/12), default 20 / max 100; e2e alohida `test:e2e`.
+- **Savollar:** depcruise istisnosi, `/ready`, dev bazadagi sinov yozuvlari.

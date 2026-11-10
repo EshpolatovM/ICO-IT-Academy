@@ -1,14 +1,19 @@
-import { Prisma, Role, UserStatus } from '../../../src/infra/prisma/generated/client.js';
+import { passwordSchema, phoneSchema } from '@lms/shared';
 
-import { hashPassword, normalizePhone } from './credentials.js';
+import { Argon2PasswordHasher } from '../../../src/common/security/argon2-password-hasher.js';
+import { Prisma, Role, UserStatus } from '../../../src/infra/prisma/generated/client.js';
+import { StudentCodeRepository } from '../../../src/modules/users/repositories/student-code.repository.js';
+
 import { ScriptError } from './errors.js';
+import { parseOrFail } from './validate.js';
 
 import type { PrismaClient, User } from '../../../src/infra/prisma/generated/client.js';
 
-/** Student kodi prefiksi (docs/02 §2, docs/11 §1). */
-const STUDENT_CODE_PREFIX = 'ST-';
 /** Prisma unique constraint buzilishi kodi. */
 const UNIQUE_VIOLATION = 'P2002';
+
+const passwordHasher = new Argon2PasswordHasher();
+const studentCodes = new StudentCodeRepository();
 
 type StaffRole = typeof Role.SUPER_ADMIN | typeof Role.ADMIN | typeof Role.MENTOR;
 
@@ -25,6 +30,21 @@ export interface CreateStaffInput extends PersonName {
 
 export interface CreateStudentInput extends PersonName {
   password: string;
+}
+
+/** Telefonni normalizatsiya qiladi va E.164 ni tekshiradi (`@lms/shared` `phoneSchema`). */
+export function normalizePhone(rawPhone: string): string {
+  return parseOrFail(phoneSchema, rawPhone, `Telefon "${rawPhone}"`);
+}
+
+/** Parol siyosatini tekshiradi (`@lms/shared` `passwordSchema`, docs/02 §6). */
+export function assertPasswordPolicy(password: string): void {
+  parseOrFail(passwordSchema, password, 'Parol');
+}
+
+async function hashPassword(password: string): Promise<string> {
+  assertPasswordPolicy(password);
+  return passwordHasher.hash(password);
 }
 
 export function findUserByPhone(prisma: PrismaClient, rawPhone: string): Promise<User | null> {
@@ -57,17 +77,6 @@ export async function createStaffUser(
   }
 }
 
-/** Keyingi student kodini `student_code_seq` dan oladi (poyga holatisiz, docs/02 §2). */
-async function nextStudentCode(tx: Prisma.TransactionClient): Promise<string> {
-  const [row] = await tx.$queryRaw<
-    { value: bigint }[]
-  >`SELECT nextval('student_code_seq') AS value`;
-  if (!row) {
-    throw new ScriptError('student_code_seq dan qiymat olinmadi.');
-  }
-  return `${STUDENT_CODE_PREFIX}${row.value.toString()}`;
-}
-
 /** Student yaratadi: kod sequence'dan, birinchi kirishda parolni almashtirish majburiy (docs/02 §2). */
 export async function createStudentUser(
   prisma: PrismaClient,
@@ -78,7 +87,7 @@ export async function createStudentUser(
     tx.user.create({
       data: {
         role: Role.STUDENT,
-        studentCode: await nextStudentCode(tx),
+        studentCode: await studentCodes.next(tx),
         passwordHash,
         mustChangePassword: true,
         firstName: input.firstName,

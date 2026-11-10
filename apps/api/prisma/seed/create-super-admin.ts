@@ -10,11 +10,10 @@ import { parseArgs } from 'node:util';
 
 import { Role } from '../../src/infra/prisma/generated/client.js';
 
-import { assertPasswordPolicy } from './lib/credentials.js';
 import { ScriptError } from './lib/errors.js';
 import { promptHidden } from './lib/prompt.js';
 import { runScript } from './lib/run-script.js';
-import { createStaffUser } from './lib/users.js';
+import { assertPasswordPolicy, createStaffUser } from './lib/users.js';
 
 import type { PrismaClient } from '../../src/infra/prisma/generated/client.js';
 

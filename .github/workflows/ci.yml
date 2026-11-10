@@ -19,6 +19,32 @@ jobs:
     timeout-minutes: 20
     env:
       TURBO_TELEMETRY_DISABLED: '1'
+      # E2E testlar uchun (service konteynerlar; faqat CI, haqiqiy sir emas).
+      DATABASE_URL: postgresql://lms:lms_ci@localhost:5432/lms?schema=public
+      REDIS_URL: redis://localhost:6379/0
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: lms
+          POSTGRES_PASSWORD: lms_ci
+          POSTGRES_DB: lms
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U lms -d lms"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -57,6 +83,9 @@ jobs:
 
       - name: Testlar
         run: pnpm test
+
+      - name: E2E testlar (PostgreSQL + Redis)
+        run: pnpm test:e2e
 
       - name: Build
         run: pnpm build

@@ -7,7 +7,7 @@
 | Maydon | Qiymat |
 |---|---|
 | Joriy modul | 1-bosqich: Poydevor (reja tasdiqlangan 2026-11-10) |
-| Joriy bosqich | 1.4 — backend poydevori: `oga-backend`ga berildi (`docs/tasks/01-1.4-backend-poydevori.md`), bajarilmoqda |
+| Joriy bosqich | 1.4 tugadi va commit qilindi; keyingisi 1.5 (auth backend), egasining ruxsati kutilmoqda |
 | Joriy git branch | `feature/01-poydevor` |
 | Ish rejimi | Sekin: har bir vazifadan keyin hisobot va "Davom etaymi?" |
 
@@ -24,12 +24,15 @@
 - Agentlarga ism berildi: usta-baza (DB), oga-backend, rassom-dizayner (UI), birchka-frontend, sinchkov-tester (QA), domla-reviewer (review).
 
 ## Oxirgi bajarilgan vazifa
-**1.3 — 1-bosqich bazasi** (`usta-baza`, Tech Lead tekshirdi): Prisma 7.10.1 (`prisma.config.ts`, `@prisma/adapter-pg`), 7 model (`users`, `refresh_tokens`, `parent_access_tokens`, `parent_access_logs`, `audit_logs`, `system_settings`, `files`), migratsiya `20261110152528_init_foundation` (+ qo'lda: `student_code_seq` 10001, CHECK `chk_users_login_by_role`, pg_trgm GIN, partial index, identity id'lar; drift yo'q). Client `apps/api/src/infra/prisma/generated/` (gitignore). Seed: `create-super-admin` CLI (Argon2id, E.164), idempotent `db:seed` (1 mentor, `ST-10001`), production'da rad etadi. Umumiy kod `apps/api/prisma/seed/lib/`.
+**1.4 — backend poydevori** (`oga-backend`, Tech Lead tekshirdi): `AppConfigModule` (zod env), `PrismaService` (`db` soft delete extension bilan, `dbIncludingDeleted`), `BaseRepository`/`SoftDeletableBaseRepository` (page/pageSize, docs/12 §0), `RedisModule`/`RedisService`, `AppException` + `AllExceptionsFilter` (docs/12 formati, Prisma P2002→409, P2025→404 mapper), global `ZodValidationPipe` + `createZodDto`, nestjs-pino (requestId, redact), `GET /api/v1/health` (DB+Redis, 503). DRY: parol/telefon zod sxemalari va `formatStudentCode` → `@lms/shared`, `Argon2PasswordHasher` (`common/security`), `StudentCodeRepository` (`modules/users`). 87 unit + 4 e2e (`pnpm test:e2e`, compose kerak; CI'da service konteynerlar). depcruise: `repository-not-to-upper-layers` ga `src/infra/` istisnosi (egasiga aytildi).
 
 ## Keyingi aniq vazifa
-**1.4 — backend poydevori** (`oga-backend`): docs/14 §1 "Backend" qatoridan birinchi qism — PrismaService (`PrismaPg` adapter, soft delete extension `users.deleted_at`), BaseRepository (umumiy CRUD, pagination, soft delete), Redis moduli, ConfigModule + env validatsiya (zod), global exception filter va xatolik formati (docs/12), pino logger, health check endpoint. DRY: `seed/lib` dagi parol hash, parol siyosati, telefon normalizatsiyasi, `nextStudentCode` ni `src` dagi umumiy joyga / `@lms/shared` (zod) ga ko'chirib, seed'larni shundan import qildirish. Auth/guard'lar — 1.5+. Topshiriq: `docs/tasks/01-1.4-backend-poydevori.md`.
+**1.5 — auth backend** (`oga-backend`): docs/02 va docs/12 §1 bo'yicha — JWT (access + refresh rotation, reuse detection), staff login (telefon+parol), student login (ID+parol), logout, me, change-password, sessions, `PasswordChangeRequiredGuard`, `JwtAuthGuard`, `RolesGuard` + `@Roles`, `@Public` (health uchun), throttler (Redis). Parent exchange, `ParentReadOnlyGuard`, `ScopeGuard` karkasi, audit servisi — 1.6 bo'lishi mumkin (hajmga qarab bo'linadi). Avval topshiriq `docs/tasks/01-1.5-auth-backend.md` ga yoziladi va egasiga qisqa reja ko'rsatiladi.
 
 ## Egasidan kutilayotgan javoblar
+- depcruise qoidasi o'zgarishini tasdiqlash (`repository-not-to-upper-layers` → `src/infra/` istisno).
+- `/ready` endpointi hozir kerakmi (docs/12 da bor)?
+- Dev bazadagi sinov yozuvlari (mentor `+998900000098`, `ST-10002`) — tozalaymi?
 - **S-01 / S-02** Yo'llar soni, guruh yo'lga qanday biriktiriladi, student bir vaqtda nechta guruhda bo'ladi. 1-bosqichga ta'sir qilmaydi, 2-bosqichdan oldin kerak.
 - **S-65** Jamoa hajmi, muddat, MVP tarkibi.
 - **GitHub repo:** CI (GitHub Actions) uchun remote repo bormi?

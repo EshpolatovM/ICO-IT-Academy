@@ -11,6 +11,7 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
     "dup": "jscpd --config .jscpd.json",
     "depcheck": "depcruise apps/api/src apps/web/src packages/shared/src --config .dependency-cruiser.cjs",
     "check": "pnpm lint && pnpm typecheck && pnpm dup && pnpm depcheck && pnpm test",
