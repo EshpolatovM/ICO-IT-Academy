@@ -1,3 +1,3 @@
-import { baseConfig } from '@lms/config/eslint';
+import { createBaseConfig } from '@lms/config/eslint';
 
-export default baseConfig;
+export default createBaseConfig({ tsconfigRootDir: import.meta.dirname });

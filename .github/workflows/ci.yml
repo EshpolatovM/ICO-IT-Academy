@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Sifat nazorati
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TURBO_TELEMETRY_DISABLED: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # pnpm versiyasi ildizdagi package.json "packageManager" maydonidan olinadi (pnpm@10.34.9).
+      - name: pnpm o'rnatish
+        uses: pnpm/action-setup@v6
+
+      - name: Node.js 22
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Turbo kesh
+        uses: actions/cache@v6
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: turbo-${{ runner.os }}-
+
+      - name: Bog'liqliklarni o'rnatish
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Takroriy kod (jscpd)
+        run: pnpm dup
+
+      - name: Arxitektura qoidalari (dependency-cruiser)
+        run: pnpm depcheck
+
+      - name: Testlar
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build

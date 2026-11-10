@@ -1,0 +1,15 @@
+{
+  "//": "Faqat dependency-cruiser uchun: apps/web `@/*` alias'lari va `@lms/shared` manbasini (dist emas) ildizdan resolve qilish.",
+  "compilerOptions": {
+    "allowJs": true,
+    "jsx": "preserve",
+    "paths": {
+      "@lms/shared": ["./packages/shared/src/index.ts"],
+      "@/components/*": ["./apps/web/src/components/*"],
+      "@/features/*": ["./apps/web/src/features/*"],
+      "@/stores/*": ["./apps/web/src/stores/*"],
+      "@/lib/*": ["./apps/web/src/lib/*"]
+    }
+  },
+  "include": ["apps/*/src", "packages/*/src"]
+}

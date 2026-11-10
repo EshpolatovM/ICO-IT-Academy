@@ -43,3 +43,10 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Testlar:** install, build, lint, typecheck, test — Tech Lead qayta tekshirdi, hammasi o'tdi. `podman compose config` o'tdi.
 - **Qarorlar:** TS 5.9.3 va ESLint 9 (typescript-eslint/Next mosligi uchun); compose ildizda; Redis paroli bilan; `.prettierignore` da docs.
 - **Muammolar:** MinIO image'i registry'dan pull qilinmayapti — egasi qarori kerak.
+
+## 2026-11-10 — 1.2: avtomatik sifat nazorati
+- **Nima qilindi:** ESLint qat'iy rejim (`strictTypeChecked`, `QUALITY_LIMITS`, `noInlineConfig`, `--max-warnings 0`, import-x, no-magic-numbers, web `../../` taqiqi; testlarda fn-uzunligi/magic yumshatilgan), jscpd (threshold 3%), dependency-cruiser (controller→service→repository, Prisma faqat repository/infra, features izolyatsiyasi, web↔api, shared→apps, sikl), Husky + lint-staged pre-commit, GitHub Actions CI, `pnpm check`/`dup`/`depcheck`, README bo'limi.
+- **Fayllar:** `.dependency-cruiser.cjs`, `tsconfig.depcruise.json`, `.jscpd.json`, `lint-staged.config.mjs`, `.husky/pre-commit`, `.github/workflows/ci.yml`, `packages/config/*`, `apps/*/eslint.config.mjs`, `*/package.json`, `pnpm-lock.yaml`, `README.md`.
+- **Testlar:** `pnpm check`, `build`, `format:check` — Tech Lead qayta tekshirdi, o'tdi. Qoidalar buzilgan namunalar bilan isbotlandi (any, disable-komment, magic number — qo'lda ham tekshirildi).
+- **Versiyalar:** eslint-plugin-import-x 4.17.1, jscpd 5.4.2, dependency-cruiser 18.7.0, husky 9.1.7, lint-staged 17.6.0.
+- **Savollar:** max-params 5 yoki 4; jscpd chegarasi.

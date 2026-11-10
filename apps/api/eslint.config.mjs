@@ -1,8 +1,9 @@
-import { baseConfig } from '@lms/config/eslint';
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 
-export default defineConfig(baseConfig, {
+import { createBaseConfig } from '@lms/config/eslint';
+
+export default defineConfig(createBaseConfig({ tsconfigRootDir: import.meta.dirname }), {
   languageOptions: {
     globals: { ...globals.node, ...globals.jest },
   },
