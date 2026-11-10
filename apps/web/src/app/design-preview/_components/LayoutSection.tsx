@@ -7,6 +7,7 @@ import {
   Sidebar,
   Stack,
   Text,
+  TextLink,
   TopBar,
 } from '@/components/ui';
 
@@ -33,7 +34,12 @@ function ShellPreview() {
               Aktiv bo&apos;lim
             </NavItem>
             <NavItem href="/design-preview#layout">Oddiy bo&apos;lim</NavItem>
-            <NavItem href="/design-preview#layout">Yana bir bo&apos;lim</NavItem>
+            <NavItem href="/design-preview#layout" hint="3">
+              Izohli bo&apos;lim (hint)
+            </NavItem>
+            <NavItem disabled hint="Tez orada">
+              Bosilmaydigan (disabled)
+            </NavItem>
           </Sidebar>
         }
       >
@@ -44,6 +50,37 @@ function ShellPreview() {
         />
       </AppShell>
     </div>
+  );
+}
+
+function MobileMenuNote() {
+  return (
+    <Text variant="muted">
+      Mobil menyu: brauzer oynasini <code className="font-mono">md</code> (768px) dan toraytiring —
+      yon panel yashirinadi, yuqori panelda &quot;Menyu&quot; tugmasi chiqadi. Panel kontent ustida
+      ochiladi; Esc yoki havola bosilganda yopiladi, ochiq paytda Tab fokusni panel ichida
+      aylantiradi.
+    </Text>
+  );
+}
+
+function TextLinkPreview() {
+  return (
+    <Stack gap="2">
+      <Text>
+        Matn ichida <TextLink href="/design-preview#layout">oddiy havola (default)</TextLink> va{' '}
+        <TextLink href="/design-preview#layout" variant="muted">
+          xira havola (muted)
+        </TextLink>
+        .
+      </Text>
+      <Text>
+        Tashqi havola:{' '}
+        <TextLink href="https://nextjs.org" external>
+          nextjs.org (yangi oynada)
+        </TextLink>
+      </Text>
+    </Stack>
   );
 }
 
@@ -66,16 +103,18 @@ function StackPreview() {
   );
 }
 
-/** Layout karkasi: AppShell, TopBar, Sidebar/NavItem, EmptyState, Container, Stack. */
+/** Layout karkasi: AppShell (mobil menyu), TopBar, Sidebar/NavItem, TextLink, EmptyState, Container, Stack. */
 export function LayoutSection() {
   return (
     <PreviewSection
       id="layout"
       title="Layout"
-      description="Rol panellari uchun bo'sh karkas: TopBar + Sidebar + kontent."
+      description="Rol panellari uchun bo'sh karkas: TopBar + Sidebar + kontent, mobil menyu va havolalar."
     >
       <Stack gap="6">
         <ShellPreview />
+        <MobileMenuNote />
+        <TextLinkPreview />
         <StackPreview />
       </Stack>
     </PreviewSection>

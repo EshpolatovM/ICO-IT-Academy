@@ -106,3 +106,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Nima qilindi:** `TRUST_PROXY` (zod sxema, `configureApp` da), cookie'siz exchange failure sanalmaydi, `POST /auth/parent/logout` (public, CSRF header). README "Reverse proxy va mijoz IP'si", docs/12 §1.
 - **Fayllar:** `apps/api/src/{main.ts,app.setup.ts}`, `apps/api/src/common/config/{env.schema,trust-proxy.schema}*.ts`, `apps/api/src/modules/auth/{controllers/parent-auth.controller,services/parent-exchange.service}*.ts`, `apps/api/test/**`, `.env.example`, `README.md`, `docs/{03,12,99}*.md`.
 - **Testlar:** 276 unit, 31 e2e — Tech Lead qayta yurgizdi, o'tdi.
+
+## 2026-11-11 — 1.8c: UI qo'shimchalari (avtonom rejim)
+- **Nima qilindi:** NavItem disabled + hint, TextLink, mobil AppShell/Sidebar (menyu tugmasi, panel, Esc, fokus), design-preview namunalari, testlar.
+- **Fayllar:** `apps/web/src/components/ui/{NavItem,AppShell,AppShellContext,MenuToggleButton,useMobileNav,Sidebar,TopBar,TextLink,index}.ts(x)`, testlar, `apps/web/src/app/design-preview/_components/LayoutSection.tsx`; `docs/tasks/01-1.8c…, 01-1.8d…, 01-1.9…`.
+- **Testlar:** `pnpm check` (web 89), `format:check` — o'tdi.

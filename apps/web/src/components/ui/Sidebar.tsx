@@ -9,12 +9,18 @@ export interface SidebarProps {
   className?: string;
 }
 
-/** Yon panel (navigatsiya ro'yxati). Ichiga `NavItem` lar qo'yiladi. */
+/**
+ * Yon panel (navigatsiya ro'yxati). Ichiga `NavItem` lar qo'yiladi.
+ * Mobil menyu panelida (`AppShell`) to'liq kenglikda, `md` dan boshlab 256px ustun.
+ */
 export function Sidebar({ label = 'Asosiy navigatsiya', children, className }: SidebarProps) {
   return (
     <nav
       aria-label={label}
-      className={cn('h-full w-64 border-r border-border bg-surface p-3', className)}
+      className={cn(
+        'h-full w-full border-border bg-bg p-3 md:w-64 md:border-r md:bg-surface',
+        className,
+      )}
     >
       <ul className="flex flex-col gap-1">{children}</ul>
     </nav>

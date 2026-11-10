@@ -28,6 +28,8 @@ export type { SpinnerProps, SpinnerSize } from './Spinner';
 export { Stack } from './Stack';
 export type { StackAlign, StackDirection, StackGap, StackJustify, StackProps } from './Stack';
 export { Text } from './Text';
+export { TextLink } from './TextLink';
+export type { TextLinkProps, TextLinkVariant } from './TextLink';
 export type { TextElement, TextProps, TextVariant } from './Text';
 export { TopBar } from './TopBar';
 export type { TopBarProps } from './TopBar';
