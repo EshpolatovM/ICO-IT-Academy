@@ -7,7 +7,7 @@
 | Maydon | Qiymat |
 |---|---|
 | Joriy modul | 1-bosqich: Poydevor (reja tasdiqlangan 2026-11-10) |
-| Joriy bosqich | 1.7 tugadi va commit qilindi; egasi `/design-preview` ni ko'rib chiqishi va 1.8 (birchka-frontend) ga ruxsat kutilmoqda |
+| Joriy bosqich | 1.8 tugadi va commit qilindi; keyingisi 1.8b (backend tuzatishlari: trust proxy, exchange failure, parent logout), egasining ruxsati kutilmoqda |
 | Joriy git branch | `feature/01-poydevor` |
 | Ish rejimi | Sekin: har bir vazifadan keyin hisobot va "Davom etaymi?" |
 
@@ -18,6 +18,7 @@
 - depcruise `src/infra/` istisnosi tasdiqlandi; `/ready` deploy bosqichiga qoldirildi (egasi "ha", 2026-11-10).
 - Dev bazadagi sinov yozuvlarini (mentor `+998900000098`, `ST-10002`) o'chirish egasi tomonidan RAD ETILDI — tegilmaydi.
 - S-12 tasdiqlandi (access 15 daq, refresh student 30 kun / staff 7 kun). Parollar qora ro'yxati kerak (~1000 ta, ochiq manba) — 1.6 ga kiritildi. Login uchun fixed window yetarli, progressiv kechikish yo'q (egasi "ha", 2026-11-10).
+- Dizayn (2026-11-11, egasi "ha"): primary `#2563EB` qoladi; danger tugma hozirgi `hover:opacity-90` bilan; wireframe ko'rinishi va rassom-dizayner o'lchamlari ma'qul.
 - `compose.yaml` ildizda qoladi; docs/13 §3 shunga moslab tuzatiladi.
 - 1-bosqich rejasi tasdiqlandi. Mentor uchun parent-token endpointlari 2-bosqichda qo'shiladi.
 - Dizayn: oddiy standart wireframe token'lar (ko'k `#2563EB`, oq fon + neutral kulranglar, `system-ui`, hozircha faqat yorug' tema), keyin egasi to'g'rilaydi.
@@ -27,10 +28,14 @@
 - Agentlarga ism berildi: usta-baza (DB), oga-backend, rassom-dizayner (UI), birchka-frontend, sinchkov-tester (QA), domla-reviewer (review).
 
 ## Oxirgi bajarilgan vazifa
-**1.7 — design token'lar va UI** (`rassom-dizayner`, Tech Lead tekshirdi): Tailwind 4.3.3 (`@tailwindcss/postcss`), `src/styles/tokens.css` (`@theme static`, Tailwind standart klasslari `initial` bilan bloklangan), semantik klasslar (`bg-primary`, `text-text-muted`, `border-border`, `bg-danger-bg` ...), `components/ui` (Button, Input, PasswordInput, Label, FormField, Card*, Alert, Spinner, Heading, Text, Container, Stack, AppShell, TopBar, Sidebar, NavItem, EmptyState, `classes.ts`), `src/lib/cn.ts`, `/design-preview` (production'da 404, `ENABLE_DESIGN_PREVIEW`), ESLint: palitra klasslari, hex/rgb/oklch, `style`, arbitrary qiymatlar taqiqi. Vitest + Testing Library: 26 test.
+**1.8 — frontend auth va panellar** (`birchka-frontend`, Tech Lead tekshirdi): Next rewrites `/api/v1` → `API_INTERNAL_URL`; `src/lib/api` (ApiError, single-flight refresh, 401 retry), `src/lib/query`, `src/lib/forms`; `stores/auth.store.ts`, `stores/parent-session.store.ts`; `features/auth`, `features/parent-access`, `features/shell`; sahifalar `/login`, `/login/staff`, `/change-password`, `/parent`, `/parent/[studentId]`, `/path`, `/mentor`, `/admin` + menyu bo'limlari ("Tez orada"); client route guard (`resolveAccess`). Web 80 test. Headless Chrome bilan 14 qadamli oqim sinalgan. `next.config.ts` da `NEXT_DIST_DIR` (ixtiyoriy).
 
 ## Keyingi aniq vazifa
-**1.8 — frontend: auth sahifalari va panellar** (`birchka-frontend`): api client (access token xotirada, refresh bitta so'rovga yig'iladi, `X-Requested-With`), TanStack Query, `stores/auth.store.ts` (Zustand), login sahifalari (staff, student, parent `/parent?t=` + kod kiritish), majburiy parol almashtirish, rol bo'yicha route guard'lar, bo'sh layout'lar (student/mentor/admin/super admin/parent) `AppShell` bilan. Faqat `components/ui` va token'lar. Topshiriq `docs/tasks/01-1.8-frontend-auth.md` ga yoziladi.
+**1.8b — backend tuzatishlari** (`oga-backend`, 1.8 hisobotidan):
+1. `trust proxy` (env bilan sozlanadigan, dev default `loopback`) — aks holda rewrites ortida barcha IP 127.0.0.1, rate limit/blok global bo'ladi.
+2. Cookie'siz body'siz `POST /auth/parent/exchange` failure hisoblanmasin (saqlangan token yo'q = xato emas).
+3. `POST /auth/logout` sessiyasiz ham parent cookie'larini (`ps`, `parent_tokens`) tozalasin (yoki alohida `@Public` parent logout).
+Keyin **1.8c** (`rassom-dizayner`): `NavItem` disabled holati, `TextLink`, mobil `AppShell`/`Sidebar` (ota-ona paneli mobile-first, docs/10 §5). So'ng **1.9** `sinchkov-tester` (Playwright e2e + RBAC matritsasi), **1.10** `domla-reviewer`.
 
 ## 2-bosqich uchun eslatmalar
 - `RoleBasedStudentScopeResolver` MENTOR tarmog'i → `group_members` asosida (scope tashqarisi 404).
@@ -39,9 +44,7 @@
 - Frontend: refresh so'rovlarini bitta so'rovga yig'ish (parallel refresh → reuse detection).
 
 ## Egasidan kutilayotgan javoblar
-- Asosiy rang: `#2563EB` (egasi bergan, Tailwind v3 blue-600) qolsinmi yoki v4 blue-600 (`oklch(54.6% 0.245 262.881)` ≈ `#155DFC`)?
-- Danger tugma uchun alohida `--color-danger-hover` / `--color-danger-fg` token'lari kerakmi (hozir `hover:opacity-90`)?
-- `/design-preview` ni ko'rib, wireframe ko'rinishini tasdiqlash.
+- **S-69 (yangi):** docs/03 da student "Mentor sahifasi" `/mentor` va mentor paneli dashboard'i `/mentor` — bir xil yo'l. Taklif: mentor paneli `/mentor/*` qoladi, student sahifasi `/my-mentor`. Hozir student menyusida "Mentor" bandi disabled.
 - **S-01 / S-02** Yo'llar soni, guruh yo'lga qanday biriktiriladi, student bir vaqtda nechta guruhda bo'ladi. 1-bosqichga ta'sir qilmaydi, 2-bosqichdan oldin kerak.
 - **S-65** Jamoa hajmi, muddat, MVP tarkibi.
 - **GitHub repo:** CI (GitHub Actions) uchun remote repo bormi?

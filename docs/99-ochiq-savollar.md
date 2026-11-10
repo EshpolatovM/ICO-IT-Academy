@@ -250,3 +250,6 @@ Savol hal qilinganda: javobni shu yerga yozing, tegishli hujjatdagi "Taxmin:" be
 
 **S-66** 🟢 AI mentor vazifalari va qachon boshlanishi?
 - Variantlar: dars bo'yicha savol-javob, kod tushuntirish, shaxsiy takrorlash rejasi, mentorga yordamchi.
+
+**S-69** 🟡 Student "Mentor sahifasi" va mentor paneli bir xil yo'lda (`/mentor`, docs/03 §2.11 va §3). Qaysi biri o'zgaradi?
+- A) Mentor paneli `/mentor/*` qoladi, student sahifasi `/my-mentor` bo'ladi (tavsiya). B) Student sahifasi `/mentor` qoladi, mentor paneli `/m/*` yoki `/mentor-panel/*`.

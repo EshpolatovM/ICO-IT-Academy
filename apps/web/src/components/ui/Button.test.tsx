@@ -45,7 +45,7 @@ describe('Button', () => {
   it('asChild bilan bola elementni tugma klasslari bilan chiqaradi', () => {
     render(
       <Button asChild variant="secondary">
-        <a href="/login">Kirish</a>
+        <a href="#kirish">Kirish</a>
       </Button>,
     );
     const link = screen.getByRole('link', { name: 'Kirish' });

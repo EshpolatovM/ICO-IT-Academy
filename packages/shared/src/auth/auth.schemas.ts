@@ -29,6 +29,20 @@ export const changePasswordSchema = z.object({
   newPassword: passwordSchema,
 });
 
+export const PASSWORD_MISMATCH_MESSAGE = 'Parollar bir xil emas.';
+
+/**
+ * Parolni almashtirish FORMASI (docs/02 §4.2: "yangi parol x2"): API sxemasi + tasdiqlash maydoni.
+ * Serverga faqat `oldPassword` va `newPassword` yuboriladi.
+ */
+export const changePasswordFormSchema = changePasswordSchema
+  .extend({ confirmPassword: z.string() })
+  .refine((values) => values.newPassword === values.confirmPassword, {
+    message: PASSWORD_MISMATCH_MESSAGE,
+    path: ['confirmPassword'],
+  });
+
 export type StaffLoginRequest = z.input<typeof staffLoginSchema>;
 export type StudentLoginRequest = z.input<typeof studentLoginSchema>;
 export type ChangePasswordRequest = z.input<typeof changePasswordSchema>;
+export type ChangePasswordFormValues = z.input<typeof changePasswordFormSchema>;

@@ -1,0 +1,48 @@
+import { Role } from '@lms/shared';
+import type { AuthUser, MeResponse } from '@lms/shared';
+
+import { refreshAccessToken } from '@/lib/api';
+import { useAuthStore } from '@/stores/auth.store';
+
+import { authApi } from './auth.api';
+
+function isAccountUser(me: MeResponse): me is AuthUser {
+  return me.role !== Role.PARENT;
+}
+
+/** Store'dagi access token bilan `GET /auth/me` → sessiya identifikatsiyasini (rol, `mcp`) yangilaydi. */
+export async function loadSessionUser(): Promise<AuthUser | null> {
+  const me = await authApi.me();
+  const { accessToken, setSession, clear } = useAuthStore.getState();
+  if (!isAccountUser(me) || accessToken === null) {
+    clear();
+    return null;
+  }
+  setSession(accessToken, me);
+  return me;
+}
+
+async function performRestore(): Promise<void> {
+  if ((await refreshAccessToken()) === null) {
+    return;
+  }
+  try {
+    await loadSessionUser();
+  } catch (_error) {
+    useAuthStore.getState().clear();
+  }
+}
+
+let inflightRestore: Promise<void> | null = null;
+
+/**
+ * Sahifa yangilanganda sessiyani tiklash (docs/02 §3): access token faqat xotirada, shuning uchun
+ * `rt` cookie bilan `POST /auth/refresh` → `GET /auth/me`. Single-flight: bir vaqtda bir nechta
+ * guard (yoki React StrictMode'ning qayta effektlari) bitta tiklashni kutadi.
+ */
+export function restoreSession(): Promise<void> {
+  inflightRestore ??= performRestore().finally(() => {
+    inflightRestore = null;
+  });
+  return inflightRestore;
+}

@@ -93,3 +93,10 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Fayllar:** `apps/web/{postcss.config.mjs,vitest.config.mts,vitest.setup.ts,eslint.config.mjs,package.json,tsconfig.json}`, `apps/web/src/{styles,components/ui,lib,app}/**`, `pnpm-lock.yaml`.
 - **Testlar:** `pnpm check` (api 252, web 26), `format:check` — Tech Lead qayta yurgizdi, o'tdi; `/design-preview` dev'da 200, prod build'da 404 (agent tekshirdi).
 - **Savollar:** primary `#2563EB` vs v4 blue-600; danger hover/fg token'lari.
+
+## 2026-11-11 — 1.8: frontend auth va panellar
+- **Nima qilindi:** rewrites, API client (single-flight refresh), TanStack Query, Zustand auth/parent store'lari, RHF + shared zod sxemalari (uz locale), login (student/staff), majburiy parol almashtirish, ota-ona kirishi (`?t=` tozalanadi, merge, chiqish), 4 ta rol layout'i, "Tez orada" bo'limlari, client route guard'lar. `changePasswordFormSchema` shared'ga qo'shildi. S-69 ochiq savol qo'shildi.
+- **Fayllar:** `apps/web/src/{lib,stores,features,app}/**`, `apps/web/{next.config.ts,package.json,vitest.setup.ts}`, `packages/shared/src/auth/auth.schemas.ts`, `.env.example`, `docs/99-ochiq-savollar.md`, `pnpm-lock.yaml`.
+- **Testlar:** `pnpm check` (api 252, web 80), `format:check`, `next build` (alohida distDir) — Tech Lead qayta yurgizdi, o'tdi.
+- **Topilgan backend muammolari:** trust proxy yo'q, cookie'siz exchange failure sanaladi, parent logout sessiyasiz ishlamaydi → 1.8b.
+- **UI yetishmovchiliklari:** NavItem disabled, TextLink, mobil AppShell → 1.8c.

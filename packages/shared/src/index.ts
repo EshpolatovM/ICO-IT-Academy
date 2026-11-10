@@ -1,12 +1,15 @@
 export { AuditAction, AuditEntityType } from './audit/audit.js';
 export { CSRF_HEADER_NAME, CSRF_HEADER_VALUE } from './auth/auth.constants.js';
 export {
+  changePasswordFormSchema,
   changePasswordSchema,
+  PASSWORD_MISMATCH_MESSAGE,
   STUDENT_CODE_MAX_LENGTH,
   staffLoginSchema,
   studentLoginSchema,
 } from './auth/auth.schemas.js';
 export type {
+  ChangePasswordFormValues,
   ChangePasswordRequest,
   StaffLoginRequest,
   StudentLoginRequest,
