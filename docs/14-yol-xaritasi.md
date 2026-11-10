@@ -50,7 +50,7 @@ flowchart LR
 
 | Qatlam | Vazifalar |
 |---|---|
-| Infra | Monorepo (pnpm + Turborepo), `apps/web`, `apps/api`, `packages/shared`, docker compose (Postgres, Redis, MinIO), ESLint/Prettier, CI (lint, typecheck, test), env konfiguratsiyasi |
+| Infra | Monorepo (pnpm + Turborepo), `apps/web`, `apps/api`, `packages/shared`, compose (Postgres, Redis, SeaweedFS S3), ESLint/Prettier, CI (lint, typecheck, test), env konfiguratsiyasi |
 | Baza | `users`, `refresh_tokens`, `parent_access_tokens`, `parent_access_logs`, `audit_logs`, `files`, `system_settings`; `student_code_seq`; seed: super admin (CLI) |
 | Backend | Prisma moduli, Redis moduli, global exception filter va xatolik formati, logger (pino), `JwtAuthGuard`, `RolesGuard`, `ScopeGuard` karkasi, `ParentReadOnlyGuard`, `PasswordChangeRequiredGuard`, throttler; auth endpointlari (staff/student login, refresh rotation, logout, me, change-password, sessions, parent exchange); parent token CRUD; audit servisi; health check |
 | Frontend | Next.js karkasi, dizayn tizimi asoslari (ranglar, tipografiya, tugmalar, inputlar), API client (access token xotirada, refresh), route guard'lar rol bo'yicha, login sahifalari (staff, student, parent), parolni majburiy almashtirish, bo'sh layout'lar (student/mentor/admin/parent) |

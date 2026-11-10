@@ -22,9 +22,23 @@ Onlayn, o'yinlashtirilgan IT ta'lim platformasi. Loyiha hujjatlari: [`docs/`](do
 ```bash
 pnpm install
 cp .env.example .env          # qiymatlarni o'zgartiring
-podman compose up -d          # PostgreSQL, Redis, MinIO
+podman compose up -d          # PostgreSQL, Redis, SeaweedFS S3 (compose.yaml, ildizda)
 pnpm dev                      # api: http://localhost:3001/api/v1, web: http://localhost:3000
 ```
+
+### Fayl saqlash (S3)
+
+Ilova faqat S3-compatible API bilan ishlaydi (`S3_*` o'zgaruvchilari, S-61). Dev muhitda `compose.yaml` dagi `s3` servisi — [SeaweedFS](https://github.com/seaweedfs/seaweedfs) (`weed server -s3`), S3 API `http://localhost:${S3_PORT}` (faqat `127.0.0.1`). Production'da istalgan S3-compatible xizmat ishlatiladi, faqat env qiymatlari o'zgaradi.
+
+Bucket bir marta yaratiladi (curl ≥ 7.75, SigV4 imzo bilan):
+
+```bash
+set -a; . ./.env; set +a
+curl --fail-with-body --aws-sigv4 "aws:amz:${S3_REGION}:s3" --user "${S3_ACCESS_KEY}:${S3_SECRET_KEY}" \
+  -X PUT "${S3_ENDPOINT}/${S3_BUCKET}"
+```
+
+Bucket allaqachon bo'lsa `409 BucketAlreadyOwnedByYou` qaytadi — bu normal. `podman compose down -v` ma'lumotlarni (va bucket'ni) o'chiradi.
 
 ## Skriptlar (ildizdan, Turborepo orqali)
 

@@ -23,13 +23,13 @@
 | Background jobs | **BullMQ** | Cron va delayed job'lar |
 | Real-time | **Socket.IO** + `@socket.io/redis-adapter` | Chat, bellashuv, bildirishnoma |
 | Auth | JWT (`@nestjs/jwt`), Argon2id | 02 |
-| Fayl saqlash | S3-compatible object storage (dev: MinIO; prod: istalgan S3-compatible provayder, env orqali) | S-61 |
+| Fayl saqlash | S3-compatible object storage (dev: SeaweedFS S3, `compose.yaml` dagi `s3` servisi; prod: istalgan S3-compatible provayder, env orqali) | S-61 |
 | PDF | Playwright (HTML → PDF) worker'da | Sertifikat, portfolio |
 | Meeting | LiveKit (Cloud → self-host) | 08 |
 | Monorepo | pnpm workspaces + Turborepo | **Taxmin** → S-64 |
 | Test | Vitest/Jest, Supertest, Playwright (e2e), Testcontainers (Postgres/Redis) | |
 | CI/CD | GitHub Actions (Taxmin) | |
-| Konteyner | Docker, docker compose (dev, kichik prod) | Kattalashganda Kubernetes |
+| Konteyner | Docker/Podman, compose (dev: ildizdagi `compose.yaml`, S-68; kichik prod) | Kattalashganda Kubernetes |
 
 ## 2. Backend arxitekturasi: modulli monolit
 
@@ -136,7 +136,7 @@ ico-it-academy/
 │   └── config/                       # eslint, tsconfig
 ├── infra/
 │   ├── docker/                       # Dockerfile'lar
-│   ├── compose/                      # docker-compose.dev.yml, prod.yml
+│   ├── compose/                      # prod.yml (dev compose ildizda: compose.yaml)
 │   └── nginx/
 ├── docs/
 ├── CLAUDE.md
@@ -164,7 +164,7 @@ flowchart LR
     U -. WebRTC .-> LK
 ```
 
-- **Muhitlar:** `dev` (docker compose), `staging`, `production`.
+- **Muhitlar:** `dev` (ildizdagi `compose.yaml`: PostgreSQL, Redis, SeaweedFS S3; `podman compose` yoki `docker compose`), `staging`, `production`.
 - **Socket.IO:** load balancer'da sticky session (yoki faqat WebSocket transport) va Redis adapter.
 - **Worker:** cron job'lar bitta nusxada ishlaydi (BullMQ repeatable jobs bunga o'zi kafolat beradi).
 - **Migratsiyalar:** CI'da `prisma migrate deploy` deploy'dan oldin alohida qadam sifatida bajariladi.

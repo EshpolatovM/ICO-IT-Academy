@@ -50,3 +50,9 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Testlar:** `pnpm check`, `build`, `format:check` — Tech Lead qayta tekshirdi, o'tdi. Qoidalar buzilgan namunalar bilan isbotlandi (any, disable-komment, magic number — qo'lda ham tekshirildi).
 - **Versiyalar:** eslint-plugin-import-x 4.17.1, jscpd 5.4.2, dependency-cruiser 18.7.0, husky 9.1.7, lint-staged 17.6.0.
 - **Savollar:** max-params 5 yoki 4; jscpd chegarasi.
+
+## 2026-11-10 — 1.2b: dev S3 MinIO → SeaweedFS
+- **Nima qilindi:** `compose.yaml` da `minio` o'rniga `s3` (SeaweedFS 4.51, `weed server -s3`, kalitlar `AWS_*` env orqali, port faqat 127.0.0.1); `.env.example` S3_* bloki; README "Fayl saqlash (S3)"; docs/13 (dev compose ildizda, SeaweedFS, Docker/Podman) va docs/14 §1.
+- **Fayllar:** `compose.yaml`, `.env.example`, `README.md`, `docs/13-arxitektura-va-stack.md`, `docs/14-yol-xaritasi.md`, `docs/tasks/01-1.2b-seaweedfs.md`.
+- **Testlar:** `podman compose config`, haqiqiy S3 so'rovlari (create/list/put/get/403/409), `pnpm check`, `format:check` — o'tdi.
+- **Ochiq:** prod compose joyi (`infra/compose/prod.yml`) keyinroq tasdiqlanadi.
