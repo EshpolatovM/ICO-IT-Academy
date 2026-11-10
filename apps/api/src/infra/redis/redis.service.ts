@@ -54,4 +54,13 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async del(key: string): Promise<number> {
     return this.client.del(key);
   }
+
+  /**
+   * Hisoblagichni oshiradi. Kalit yangi bo'lsa — `ttlSeconds` muddat bilan yaratiladi (oyna boshidan
+   * hisoblanadi, keyingi oshirishlar muddatni uzaytirmaydi). `INCR` mavjud TTL'ni saqlaydi.
+   */
+  async incrementWithTtl(key: string, ttlSeconds: number): Promise<number> {
+    await this.client.set(key, '0', 'EX', ttlSeconds, 'NX');
+    return this.client.incr(key);
+  }
 }

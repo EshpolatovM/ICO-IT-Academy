@@ -1,0 +1,100 @@
+import { Injectable } from '@nestjs/common';
+
+import { Role } from '@lms/shared';
+
+import { STAFF_ROLES } from '../../../common/constants/roles.constants.js';
+import { SoftDeletableBaseRepository } from '../../../common/repository/base.repository.js';
+import { PrismaService } from '../../../infra/prisma/prisma.service.js';
+
+import type { RepositoryTypes } from '../../../common/repository/repository.types.js';
+import type { Prisma, User } from '../../../infra/prisma/generated/client.js';
+import type { PasswordChangeResult, UserAuthRecord } from '../users.types.js';
+
+interface UserRepositoryTypes extends RepositoryTypes {
+  model: User;
+  where: Prisma.UserWhereInput;
+  create: Prisma.UserCreateInput;
+  update: Prisma.UserUpdateInput;
+  orderBy: Prisma.UserOrderByWithRelationInput;
+}
+
+/** Auth uchun tanlanadigan ustunlar — `UserAuthRecord` bilan bir xil. */
+const AUTH_SELECT = {
+  id: true,
+  role: true,
+  phone: true,
+  studentCode: true,
+  passwordHash: true,
+  mustChangePassword: true,
+  tokenVersion: true,
+  firstName: true,
+  lastName: true,
+  status: true,
+} as const satisfies Prisma.UserSelect;
+
+export interface PasswordChangeData {
+  passwordHash: string;
+  /** Shu vaqt bilan foydalanuvchining barcha faol refresh tokenlari bekor qilinadi. */
+  revokedAt: Date;
+}
+
+/** `users` jadvali. O'chirilgan (soft delete) foydalanuvchilar avtomatik yashiriladi. */
+@Injectable()
+export class UsersRepository extends SoftDeletableBaseRepository<UserRepositoryTypes> {
+  protected readonly delegate: PrismaService['db']['user'];
+  protected readonly defaultOrderBy = { createdAt: 'desc' } as const;
+
+  constructor(prisma: PrismaService) {
+    super();
+    this.delegate = prisma.db.user;
+  }
+
+  /** Staff (SA, A, M) — telefon bo'yicha (docs/02 §4.1). */
+  findStaffByPhone(phone: string): Promise<UserAuthRecord | null> {
+    return this.delegate.findFirst({
+      where: { phone, role: { in: [...STAFF_ROLES] } },
+      select: AUTH_SELECT,
+    });
+  }
+
+  /** Student — `student_code` bo'yicha (docs/02 §4.2). */
+  findStudentByCode(studentCode: string): Promise<UserAuthRecord | null> {
+    return this.delegate.findFirst({
+      where: { studentCode, role: Role.STUDENT },
+      select: AUTH_SELECT,
+    });
+  }
+
+  findAuthById(id: string): Promise<UserAuthRecord | null> {
+    return this.delegate.findUnique({ where: { id }, select: AUTH_SELECT });
+  }
+
+  /** Faqat faol (o'chirilmagan) foydalanuvchi uchun `token_version`; topilmasa — `null`. */
+  async findTokenVersion(id: string): Promise<number | null> {
+    const user = await this.delegate.findUnique({ where: { id }, select: { tokenVersion: true } });
+    return user?.tokenVersion ?? null;
+  }
+
+  async markLoggedIn(id: string, at: Date): Promise<void> {
+    await this.delegate.update({ where: { id }, data: { lastLoginAt: at }, select: { id: true } });
+  }
+
+  /**
+   * Parolni almashtirish — bitta atomar yozuvda (docs/02 §4.2): yangi hash,
+   * `must_change_password = false`, `token_version++` va barcha faol refresh tokenlar bekor.
+   */
+  async changePassword(id: string, data: PasswordChangeData): Promise<PasswordChangeResult> {
+    return this.delegate.update({
+      where: { id },
+      data: {
+        passwordHash: data.passwordHash,
+        mustChangePassword: false,
+        tokenVersion: { increment: 1 },
+        refreshTokens: {
+          updateMany: { where: { revokedAt: null }, data: { revokedAt: data.revokedAt } },
+        },
+      },
+      select: { tokenVersion: true },
+    });
+  }
+}

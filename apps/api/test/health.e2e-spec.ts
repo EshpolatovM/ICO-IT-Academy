@@ -1,9 +1,6 @@
-import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
-import { AppModule } from '../src/app.module.js';
-import { configureApp } from '../src/app.setup.js';
-import { RedisService } from '../src/infra/redis/redis.service.js';
+import { createTestApp } from './support/create-test-app.js';
 
 import type { INestApplication } from '@nestjs/common';
 import type { App } from 'supertest/types.js';
@@ -11,24 +8,11 @@ import type { App } from 'supertest/types.js';
 const HEALTH_PATH = '/api/v1/health';
 const REQUEST_ID_HEADER = 'x-request-id';
 
-async function createApp(redisOverride?: Partial<RedisService>): Promise<INestApplication<App>> {
-  const builder = Test.createTestingModule({ imports: [AppModule] });
-  if (redisOverride) {
-    builder.overrideProvider(RedisService).useValue(redisOverride);
-  }
-  const app = (await builder.compile()).createNestApplication<INestApplication<App>>({
-    bufferLogs: true,
-  });
-  configureApp(app);
-  await app.init();
-  return app;
-}
-
 describe('GET /api/v1/health (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeAll(async () => {
-    app = await createApp();
+    app = await createTestApp();
   });
 
   afterAll(async () => {
@@ -65,10 +49,12 @@ describe('GET /api/v1/health (e2e) — Redis ishlamaganda', () => {
   let app: INestApplication<App>;
 
   beforeAll(async () => {
-    app = await createApp({
-      ping: () => Promise.reject(new Error('ECONNREFUSED')),
-      onModuleInit: () => Promise.resolve(),
-      onModuleDestroy: () => Promise.resolve(),
+    app = await createTestApp({
+      redisOverride: {
+        ping: () => Promise.reject(new Error('ECONNREFUSED')),
+        onModuleInit: () => Promise.resolve(),
+        onModuleDestroy: () => Promise.resolve(),
+      },
     });
   });
 

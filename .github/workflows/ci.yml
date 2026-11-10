@@ -22,6 +22,14 @@ jobs:
       # E2E testlar uchun (service konteynerlar; faqat CI, haqiqiy sir emas).
       DATABASE_URL: postgresql://lms:lms_ci@localhost:5432/lms?schema=public
       REDIS_URL: redis://localhost:6379/0
+      # Auth (faqat CI uchun soxta sir; muddatlar .env.example dagi S-12 taxmini bilan bir xil).
+      JWT_ACCESS_SECRET: ci-only-not-a-real-secret-0123456789abcdef
+      JWT_ACCESS_TTL_SECONDS: '900'
+      REFRESH_TTL_STUDENT_SECONDS: '2592000'
+      REFRESH_TTL_STAFF_SECONDS: '604800'
+      COOKIE_SECURE: 'false'
+      LOGIN_RATE_LIMIT_MAX_ATTEMPTS: '5'
+      LOGIN_RATE_LIMIT_WINDOW_SECONDS: '900'
     services:
       postgres:
         image: postgres:16-alpine
@@ -83,6 +91,9 @@ jobs:
 
       - name: Testlar
         run: pnpm test
+
+      - name: Migratsiyalar (e2e uchun)
+        run: pnpm --filter @lms/api db:migrate:deploy
 
       - name: E2E testlar (PostgreSQL + Redis)
         run: pnpm test:e2e

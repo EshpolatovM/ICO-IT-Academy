@@ -9,6 +9,13 @@ import { STAFF_ROLES } from './common/constants/roles.constants.js';
 const TEST_ENV = {
   DATABASE_URL: 'postgresql://user:pass@localhost:5433/db',
   REDIS_URL: 'redis://localhost:6379/0',
+  JWT_ACCESS_SECRET: 'test-secret-'.padEnd(32, 'x'),
+  JWT_ACCESS_TTL_SECONDS: '900',
+  REFRESH_TTL_STUDENT_SECONDS: '2592000',
+  REFRESH_TTL_STAFF_SECONDS: '604800',
+  COOKIE_SECURE: 'false',
+  LOGIN_RATE_LIMIT_MAX_ATTEMPTS: '5',
+  LOGIN_RATE_LIMIT_WINDOW_SECONDS: '900',
 };
 
 describe('AppModule (smoke)', () => {
@@ -30,7 +37,7 @@ describe('AppModule (smoke)', () => {
   });
 
   it("noto'g'ri env bilan modul ishga tushmaydi", async () => {
-    process.env = { ...originalEnv, DATABASE_URL: '', REDIS_URL: TEST_ENV.REDIS_URL };
+    process.env = { ...originalEnv, ...TEST_ENV, DATABASE_URL: '' };
 
     await expect(Test.createTestingModule({ imports: [AppModule] }).compile()).rejects.toThrow(
       /DATABASE_URL/,

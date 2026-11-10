@@ -12,6 +12,7 @@ function createFakeClient(status = 'ready') {
     get: jest.fn().mockResolvedValue('qiymat'),
     set: jest.fn().mockResolvedValue('OK'),
     del: jest.fn().mockResolvedValue(1),
+    incr: jest.fn().mockResolvedValue(3),
     disconnect: jest.fn(),
   };
 }
@@ -68,5 +69,13 @@ describe('RedisService', () => {
 
     expect(client.set).toHaveBeenNthCalledWith(1, 'k', 'v');
     expect(client.set).toHaveBeenNthCalledWith(2, 'k', 'v', 'EX', 60);
+  });
+
+  it("incrementWithTtl: kalit yo'q bo'lsa TTL bilan yaratadi (NX), so'ng INCR", async () => {
+    const { client, service } = createService();
+
+    expect(await service.incrementWithTtl('k', 900)).toBe(3);
+    expect(client.set).toHaveBeenCalledWith('k', '0', 'EX', 900, 'NX');
+    expect(client.incr).toHaveBeenCalledWith('k');
   });
 });

@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import { DEFAULT_API_PORT } from '../constants/app.constants.js';
 
+import { assertSecureCookieInProduction, authEnvShape } from './auth-env.schema.js';
+
 /**
  * Ilova env o'zgaruvchilari sxemasi — yagona joy (docs/13 §4: barcha tashqi manzillar env orqali).
  * Yangi o'zgaruvchi qo'shilsa: shu sxema + `.env.example`.
@@ -15,13 +17,16 @@ export const LOG_LEVELS = ['fatal', 'error', 'warn', 'info', 'debug', 'trace', '
 const POSTGRES_PROTOCOL = /^postgres(ql)?$/;
 const REDIS_PROTOCOL = /^rediss?$/;
 
-export const envSchema = z.object({
-  NODE_ENV: z.enum(NODE_ENVS).default('development'),
-  API_PORT: z.coerce.number().int().min(MIN_PORT).max(MAX_PORT).default(DEFAULT_API_PORT),
-  DATABASE_URL: z.url({ protocol: POSTGRES_PROTOCOL }),
-  REDIS_URL: z.url({ protocol: REDIS_PROTOCOL }),
-  LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
-});
+export const envSchema = z
+  .object({
+    NODE_ENV: z.enum(NODE_ENVS).default('development'),
+    API_PORT: z.coerce.number().int().min(MIN_PORT).max(MAX_PORT).default(DEFAULT_API_PORT),
+    DATABASE_URL: z.url({ protocol: POSTGRES_PROTOCOL }),
+    REDIS_URL: z.url({ protocol: REDIS_PROTOCOL }),
+    LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
+    ...authEnvShape,
+  })
+  .superRefine(assertSecureCookieInProduction);
 
 export type Env = z.output<typeof envSchema>;
 

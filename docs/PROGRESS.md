@@ -74,3 +74,10 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Testlar:** 87 unit, 4 e2e — Tech Lead qayta yurgizdi (`pnpm check`, `build`, `format:check`, `test:e2e`), hammasi o'tdi.
 - **Qarorlar:** `@nestjs/config`, terminus, nestjs-zod o'rniga kichik o'z yechimlar; pagination `pageSize` (docs/12), default 20 / max 100; e2e alohida `test:e2e`.
 - **Savollar:** depcruise istisnosi, `/ready`, dev bazadagi sinov yozuvlari.
+
+## 2026-11-10 — 1.5: auth backend
+- **Nima qilindi:** staff/student login, refresh rotation + reuse detection (family), logout, me, change-password, sessions; global JwtAuth/PasswordChangeRequired/Roles guard'lar, CSRF header guard, dekoratorlar; token_version Redis keshi; Redis login rate limiter; auth zod sxemalari va tiplari `@lms/shared` da; CI'da e2e oldidan migrate.
+- **Fayllar:** `apps/api/src/modules/auth/**`, `apps/api/src/common/{decorators,guards,auth}/**`, `apps/api/src/modules/users/**`, `apps/api/test/**`, `packages/shared/src/auth/**`, `.env.example`, `.github/workflows/ci.yml`, `pnpm-lock.yaml`.
+- **Testlar:** 152 unit, 16 e2e — Tech Lead qayta yurgizdi, hammasi o'tdi.
+- **Qarorlar:** `@nestjs/jwt` 11.0.2 (12.x ESM-only); throttler o'rniga o'z limiter (muvaffaqiyatsiz urinishlar sanaladi); refresh sliding; eski parol xato → 400; S-12 qiymatlari env'da docs taxmini bo'yicha.
+- **Savollar:** S-12 tasdig'i, parollar qora ro'yxati, progressiv kechikish, proxy ortida IP (hosting bilan).

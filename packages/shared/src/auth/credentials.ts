@@ -2,9 +2,12 @@ import { z } from 'zod';
 
 /**
  * Parol siyosati — docs/02-auth.md §6 (S-19 ✅): kamida 8 belgi, harf va raqam bo'lishi shart.
- * Qora ro'yxat (eng keng tarqalgan parollar) — auth modulida (1.5+).
+ * Qora ro'yxat (eng keng tarqalgan parollar) — docs/02 §6 da bor, lekin S-19 javobida yo'q va
+ * ro'yxatning o'zi berilmagan: egasi qaroriga qadar qo'llanmaydi.
  */
 export const PASSWORD_MIN_LENGTH = 8;
+/** Kiritish chegarasi (DoS'dan himoya: Argon2'ga juda uzun satr yuborilmasin). Siyosat emas. */
+export const PASSWORD_MAX_LENGTH = 128;
 
 const HAS_LETTER = /\p{L}/u;
 const HAS_DIGIT = /\d/;
@@ -14,6 +17,7 @@ export const PASSWORD_POLICY_MESSAGE = `Parol kamida ${PASSWORD_MIN_LENGTH} belg
 export const passwordSchema = z
   .string()
   .min(PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE)
+  .max(PASSWORD_MAX_LENGTH)
   .regex(HAS_LETTER, PASSWORD_POLICY_MESSAGE)
   .regex(HAS_DIGIT, PASSWORD_POLICY_MESSAGE);
 
