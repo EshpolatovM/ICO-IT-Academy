@@ -8,13 +8,22 @@
     "start": "node --env-file-if-exists=../../.env dist/main.js",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "create-super-admin": "tsx --env-file-if-exists=../../.env prisma/seed/create-super-admin.ts"
   },
   "dependencies": {
     "@lms/shared": "workspace:*",
     "@nestjs/common": "11.2.9",
     "@nestjs/core": "11.2.9",
     "@nestjs/platform-express": "11.2.9",
+    "@node-rs/argon2": "2.2.2",
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2"
   },
@@ -27,7 +36,9 @@
     "eslint": "9.39.5",
     "globals": "17.14.0",
     "jest": "30.5.2",
+    "prisma": "7.10.1",
     "ts-jest": "29.4.15",
+    "tsx": "4.23.15",
     "typescript": "5.9.3"
   },
   "jest": {

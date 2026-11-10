@@ -7,7 +7,7 @@
 | Maydon | Qiymat |
 |---|---|
 | Joriy modul | 1-bosqich: Poydevor (reja tasdiqlangan 2026-11-10) |
-| Joriy bosqich | 1.2b tugadi va commit qilindi; keyingisi 1.3 (baza: Prisma schema, `usta-baza`), egasining ruxsati kutilmoqda |
+| Joriy bosqich | 1.3 tugadi va commit qilindi; keyingisi 1.4 (backend poydevori, `oga-backend`), egasining ruxsati kutilmoqda |
 | Joriy git branch | `feature/01-poydevor` |
 | Ish rejimi | Sekin: har bir vazifadan keyin hisobot va "Davom etaymi?" |
 
@@ -23,12 +23,14 @@
 - Agentlarga ism berildi: usta-baza (DB), oga-backend, rassom-dizayner (UI), birchka-frontend, sinchkov-tester (QA), domla-reviewer (review).
 
 ## Oxirgi bajarilgan vazifa
-**1.2b — dev S3: MinIO → SeaweedFS** (`oga-backend`, Tech Lead tekshirdi): `compose.yaml` da `s3` servisi (`chrislusf/seaweedfs:4.51`, `weed server -s3`, kalitlar env'dan, faqat 127.0.0.1:8333), `.env.example` S3_* bloki, README "Fayl saqlash (S3)" bo'limi (bucket `curl --aws-sigv4` bilan), docs/13 §1/§3/§4 va docs/14 §1 yangilandi. Haqiqiy S3 so'rovlari (create/list/put/get, 403, 409) o'tdi; konteyner va volume tozalandi.
+**1.3 — 1-bosqich bazasi** (`usta-baza`, Tech Lead tekshirdi): Prisma 7.10.1 (`prisma.config.ts`, `@prisma/adapter-pg`), 7 model (`users`, `refresh_tokens`, `parent_access_tokens`, `parent_access_logs`, `audit_logs`, `system_settings`, `files`), migratsiya `20261110152528_init_foundation` (+ qo'lda: `student_code_seq` 10001, CHECK `chk_users_login_by_role`, pg_trgm GIN, partial index, identity id'lar; drift yo'q). Client `apps/api/src/infra/prisma/generated/` (gitignore). Seed: `create-super-admin` CLI (Argon2id, E.164), idempotent `db:seed` (1 mentor, `ST-10001`), production'da rad etadi. Umumiy kod `apps/api/prisma/seed/lib/`.
 
 ## Keyingi aniq vazifa
-**1.3 — 1-bosqich bazasi** (`usta-baza`): docs/14 §1 "Baza" qatori — `users`, `refresh_tokens`, `parent_access_tokens`, `parent_access_logs`, `audit_logs`, `files`, `system_settings`, `student_code_seq`; seed: super admin (CLI) + dev seed (1 mentor, 1 student). Manba: `docs/11-database.md`, `docs/01`, `docs/02`, `docs/13`. Avval topshiriqni `docs/tasks/01-1.3-baza.md` ga yozib, egasiga qisqa reja ko'rsatib, "ha"dan keyin `usta-baza`ga berish. Postgres `podman compose up -d postgres` bilan ko'tariladi.
+**1.4 — backend poydevori** (`oga-backend`): docs/14 §1 "Backend" qatoridan birinchi qism — PrismaService (`PrismaPg` adapter, soft delete extension `users.deleted_at`), BaseRepository (umumiy CRUD, pagination, soft delete), Redis moduli, ConfigModule + env validatsiya (zod), global exception filter va xatolik formati (docs/12), pino logger, health check endpoint. DRY: `seed/lib` dagi parol hash, parol siyosati, telefon normalizatsiyasi, `nextStudentCode` ni `src` dagi umumiy joyga / `@lms/shared` (zod) ga ko'chirib, seed'larni shundan import qildirish. Auth/guard'lar — 1.5+. Avval `docs/tasks/01-1.4-backend-poydevori.md` yoziladi.
 
 ## Egasidan kutilayotgan javoblar
+- **Host 5432 band** (tizim PostgreSQL servisi). Lokal `.env` da `POSTGRES_PORT=5433`. `.env.example` ni 5433 ga o'zgartiraymi yoki README'da eslatma yetarlimi?
+- **Dev baza test yozuvlari** (3 test super admin + seed): `podman compose down -v` bilan tozalashga ruxsat?
 - **S-01 / S-02** Yo'llar soni, guruh yo'lga qanday biriktiriladi, student bir vaqtda nechta guruhda bo'ladi. 1-bosqichga ta'sir qilmaydi, 2-bosqichdan oldin kerak.
 - **S-65** Jamoa hajmi, muddat, MVP tarkibi.
 - **GitHub repo:** CI (GitHub Actions) uchun remote repo bormi?

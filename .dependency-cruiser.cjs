@@ -156,7 +156,9 @@ module.exports = {
     },
   ],
   options: {
-    doNotFollow: { path: ['node_modules'] },
+    // Prisma Client (`prisma generate` natijasi, git'da yo'q) — ichiga kirilmaydi, lekin unga
+    // qilingan importlar `prisma-service-only-in-repository` qoidasi bilan tekshiriladi.
+    doNotFollow: { path: ['node_modules', `${API_SRC}infra/prisma/generated/`] },
     exclude: { path: ['^(apps|packages)/[^/]+/(dist|\\.next|\\.turbo|coverage)/'] },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: 'tsconfig.depcruise.json' },

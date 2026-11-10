@@ -26,6 +26,22 @@ podman compose up -d          # PostgreSQL, Redis, SeaweedFS S3 (compose.yaml, i
 pnpm dev                      # api: http://localhost:3001/api/v1, web: http://localhost:3000
 ```
 
+### Baza (PostgreSQL + Prisma)
+
+Sxema: `apps/api/prisma/schema.prisma` (manba: `docs/11-database.md`), migratsiyalar: `apps/api/prisma/migrations/`, Prisma CLI konfiguratsiyasi: `apps/api/prisma.config.ts` (ildizdagi `.env` ni o'qiydi). Prisma Client `src/infra/prisma/generated/` ga generatsiya qilinadi (git'da yo'q; `build`/`typecheck`/`lint`/`test` dan oldin turbo avtomatik `db:generate` ni ishga tushiradi).
+
+```bash
+podman compose up -d postgres                       # faqat PostgreSQL
+pnpm --filter @lms/api db:migrate:deploy            # migratsiyalarni qo'llash
+pnpm --filter @lms/api db:seed                      # dev seed: 1 mentor + 1 student (SEED_* env, production'da ishlamaydi)
+pnpm --filter @lms/api create-super-admin -- --phone +998901234567 --first-name Ali --last-name Valiyev
+```
+
+- `create-super-admin`: parol `SUPER_ADMIN_PASSWORD` env'dan olinadi, bo'lmasa terminalda ko'rinmas holda ikki marta so'raladi. Telefon band bo'lsa xato beradi.
+- Dev seed idempotent: qayta ishga tushirilganda mavjud mentor/student qayta yaratilmaydi. Student kodi `student_code_seq` dan (`ST-10001`, ...), birinchi kirishda parolni almashtirish majburiy.
+- Boshqa buyruqlar: `db:migrate` (yangi migratsiya, `prisma migrate dev --name <nom>`), `db:generate`, `db:studio`.
+- Mavjud migratsiya fayllari tahrirlanmaydi, faqat yangisi qo'shiladi.
+
 ### Fayl saqlash (S3)
 
 Ilova faqat S3-compatible API bilan ishlaydi (`S3_*` o'zgaruvchilari, S-61). Dev muhitda `compose.yaml` dagi `s3` servisi — [SeaweedFS](https://github.com/seaweedfs/seaweedfs) (`weed server -s3`), S3 API `http://localhost:${S3_PORT}` (faqat `127.0.0.1`). Production'da istalgan S3-compatible xizmat ishlatiladi, faqat env qiymatlari o'zgaradi.

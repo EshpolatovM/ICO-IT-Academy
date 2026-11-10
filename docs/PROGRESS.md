@@ -56,3 +56,10 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Fayllar:** `compose.yaml`, `.env.example`, `README.md`, `docs/13-arxitektura-va-stack.md`, `docs/14-yol-xaritasi.md`, `docs/tasks/01-1.2b-seaweedfs.md`.
 - **Testlar:** `podman compose config`, haqiqiy S3 so'rovlari (create/list/put/get/403/409), `pnpm check`, `format:check` — o'tdi.
 - **Ochiq:** prod compose joyi (`infra/compose/prod.yml`) keyinroq tasdiqlanadi.
+
+## 2026-11-10 — 1.3: 1-bosqich bazasi
+- **Nima qilindi:** Prisma 7.10.1 schema (7 jadval, 4 enum, snake_case map, uuid(7), timestamptz, idx_/uq_ nomlar), `init_foundation` migratsiyasi + qo'lda SQL (student_code_seq, CHECK, pg_trgm, partial index, identity), `create-super-admin` CLI va idempotent dev seed (Argon2id), db:* skriptlar, turbo `db:generate`, README "Baza" bo'limi.
+- **Fayllar:** `apps/api/prisma/**`, `apps/api/prisma.config.ts`, `apps/api/{package.json,tsconfig*.json,eslint.config.mjs}`, `turbo.json`, `.dependency-cruiser.cjs`, `.gitignore`, `.prettierignore`, `.env.example`, `README.md`, `pnpm-lock.yaml`.
+- **Testlar:** toza bazada migrate deploy, CHECK rad etishi, CLI xato holatlari, seed idempotentligi, production rad etishi, parollar hash — usta-baza; `pnpm check`, `build`, `format:check` — Tech Lead qayta tekshirdi, o'tdi.
+- **Qarorlar:** `Role` enum'ida PARENT yo'q (virtual); onDelete — Prisma standarti (docs'da yo'q); `parent_access_logs.ip/user_agent` NOT NULL; parol siyosati S-19 taxmini (≥8, harf+raqam).
+- **Savollar:** host 5432 band; dev bazani tozalash.

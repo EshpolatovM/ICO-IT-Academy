@@ -1,0 +1,239 @@
+// ICO IT Academy LMS — Prisma sxemasi.
+// Manba: docs/11-database.md. Konvensiyalar (§0): model nomlari PascalCase, jadvallar
+// `@@map` orqali snake_case ko'plikda; PK — UUID v7 (`uuid(7)`, ilova tomonida generatsiya),
+// katta append-only jadvallar — bigint identity; vaqt — timestamptz; indekslar `idx_<table>_<cols>`,
+// unique — `uq_<table>_<cols>`.
+//
+// Prisma ifodalay olmaydigan narsalar (CHECK, sequence, pg_trgm GIN ifoda-indeksi, partial index)
+// migratsiya SQL faylida qo'lda yozilgan va izohlangan.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/infra/prisma/generated"
+  moduleFormat        = "cjs"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enum'lar
+// ---------------------------------------------------------------------------
+
+/// Akkauntli rollar (docs/11 §1 `users.role`). PARENT — virtual rol, akkaunti yo'q (docs/01 §1),
+/// shuning uchun DB enum'iga kirmaydi.
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  MENTOR
+  STUDENT
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+/// docs/11 §11 `files.purpose`.
+enum FilePurpose {
+  AVATAR
+  BLOG_IMAGE
+  CHAT_ATTACHMENT
+  MATERIAL
+  PROJECT_IMAGE
+  CERTIFICATE
+  PRODUCT_IMAGE
+  CONTENT
+  EXPORT
+}
+
+/// docs/11 §11 `files.status`: pre-signed upload tasdiqlanguncha PENDING.
+enum FileStatus {
+  PENDING
+  READY
+}
+
+// ---------------------------------------------------------------------------
+// 1. Auth va foydalanuvchilar (docs/11 §1)
+// ---------------------------------------------------------------------------
+
+/// Barcha akkauntli rollar bitta jadvalda. Soft delete: `deleted_at`.
+/// Migratsiyada: CHECK `chk_users_login_by_role`, GIN `idx_users_full_name_trgm`, `student_code_seq`.
+model User {
+  id                 String     @id @default(uuid(7)) @db.Uuid
+  role               Role
+  /// E.164. Staff uchun majburiy (CHECK).
+  phone              String?    @db.VarChar(16)
+  /// `ST-10001`. Student uchun majburiy (CHECK), raqam `student_code_seq` dan.
+  studentCode        String?    @map("student_code") @db.VarChar(16)
+  /// Argon2id.
+  passwordHash       String     @map("password_hash")
+  mustChangePassword Boolean    @default(false) @map("must_change_password")
+  tokenVersion       Int        @default(0) @map("token_version")
+  firstName          String     @map("first_name") @db.VarChar(64)
+  lastName           String     @map("last_name") @db.VarChar(64)
+  avatarFileId       String?    @map("avatar_file_id") @db.Uuid
+  bio                String?    @db.VarChar(500)
+  status             UserStatus
+  blogBannedUntil    DateTime?  @map("blog_banned_until") @db.Timestamptz
+  lastLoginAt        DateTime?  @map("last_login_at") @db.Timestamptz
+  lastSeenAt         DateTime?  @map("last_seen_at") @db.Timestamptz
+  createdById        String?    @map("created_by_id") @db.Uuid
+  createdAt          DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt          DateTime?  @map("deleted_at") @db.Timestamptz
+
+  avatarFile   File?  @relation("UserAvatar", fields: [avatarFileId], references: [id])
+  createdBy    User?  @relation("UserCreatedBy", fields: [createdById], references: [id])
+  createdUsers User[] @relation("UserCreatedBy")
+
+  refreshTokens         RefreshToken[]
+  parentTokensAsStudent ParentAccessToken[] @relation("ParentTokenStudent")
+  parentTokensCreated   ParentAccessToken[] @relation("ParentTokenCreatedBy")
+  parentTokensRevoked   ParentAccessToken[] @relation("ParentTokenRevokedBy")
+  parentAccessLogs      ParentAccessLog[]
+  auditLogs             AuditLog[]
+  ownedFiles            File[]              @relation("FileOwner")
+  updatedSystemSettings SystemSetting[]
+
+  @@unique([phone], map: "uq_users_phone")
+  @@unique([studentCode], map: "uq_users_student_code")
+  @@index([role, status], map: "idx_users_role_status")
+  @@map("users")
+}
+
+model RefreshToken {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  /// SHA-256 (hex).
+  tokenHash    String    @map("token_hash") @db.Char(64)
+  /// Rotation zanjiri (reuse detection).
+  familyId     String    @map("family_id") @db.Uuid
+  userAgent    String?   @map("user_agent") @db.VarChar(256)
+  ip           String?   @db.Inet
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz
+  revokedAt    DateTime? @map("revoked_at") @db.Timestamptz
+  replacedById String?   @map("replaced_by_id") @db.Uuid
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  user       User           @relation(fields: [userId], references: [id])
+  replacedBy RefreshToken?  @relation("RefreshTokenRotation", fields: [replacedById], references: [id])
+  replaces   RefreshToken[] @relation("RefreshTokenRotation")
+
+  @@unique([tokenHash], map: "uq_refresh_tokens_token_hash")
+  @@index([userId, revokedAt], map: "idx_refresh_tokens_user_id_revoked_at")
+  @@index([familyId], map: "idx_refresh_tokens_family_id")
+  @@map("refresh_tokens")
+}
+
+/// Har bir farzand uchun alohida token (S-15). Migratsiyada partial index
+/// `idx_parent_access_tokens_student_id_active` (`WHERE revoked_at IS NULL`).
+model ParentAccessToken {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  studentId   String    @map("student_id") @db.Uuid
+  /// HMAC-SHA256(pepper, token) (hex).
+  tokenHash   String    @map("token_hash") @db.Char(64)
+  /// UI va log uchun.
+  tokenPrefix String    @map("token_prefix") @db.VarChar(8)
+  label       String?   @db.VarChar(64)
+  createdById String    @map("created_by_id") @db.Uuid
+  expiresAt   DateTime? @map("expires_at") @db.Timestamptz
+  lastUsedAt  DateTime? @map("last_used_at") @db.Timestamptz
+  useCount    Int       @default(0) @map("use_count")
+  revokedAt   DateTime? @map("revoked_at") @db.Timestamptz
+  revokedById String?   @map("revoked_by_id") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  student   User  @relation("ParentTokenStudent", fields: [studentId], references: [id])
+  createdBy User  @relation("ParentTokenCreatedBy", fields: [createdById], references: [id])
+  revokedBy User? @relation("ParentTokenRevokedBy", fields: [revokedById], references: [id])
+
+  logs ParentAccessLog[]
+
+  @@unique([tokenHash], map: "uq_parent_access_tokens_token_hash")
+  @@map("parent_access_tokens")
+}
+
+/// Append-only: `bigint identity` PK.
+model ParentAccessLog {
+  id        BigInt   @id @default(autoincrement())
+  tokenId   String   @map("token_id") @db.Uuid
+  studentId String   @map("student_id") @db.Uuid
+  ip        String   @db.Inet
+  userAgent String   @map("user_agent") @db.VarChar(256)
+  /// `EXCHANGE`, `VIEW`.
+  action    String   @db.VarChar(32)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  token   ParentAccessToken @relation(fields: [tokenId], references: [id])
+  student User              @relation(fields: [studentId], references: [id])
+
+  @@index([tokenId, createdAt(sort: Desc)], map: "idx_parent_access_logs_token_id_created_at")
+  @@map("parent_access_logs")
+}
+
+/// Append-only: `bigint identity` PK.
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  actorId    String?  @map("actor_id") @db.Uuid
+  actorRole  Role?    @map("actor_role")
+  /// `USER_CREATED`, `PASSWORD_RESET`, `PARENT_TOKEN_REVOKED`, `WALLET_ADJUSTED`, `SETTING_CHANGED`, ...
+  action     String   @db.VarChar(64)
+  entityType String   @map("entity_type") @db.VarChar(32)
+  entityId   String   @map("entity_id") @db.VarChar(64)
+  before     Json?
+  after      Json?
+  ip         String?  @db.Inet
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([entityType, entityId], map: "idx_audit_logs_entity_type_entity_id")
+  @@index([actorId, createdAt(sort: Desc)], map: "idx_audit_logs_actor_id_created_at")
+  @@index([createdAt], map: "idx_audit_logs_created_at")
+  @@map("audit_logs")
+}
+
+// ---------------------------------------------------------------------------
+// 6. Sozlamalar (docs/11 §6 `reward_settings` tuzilmasi; `system_settings` — faqat super admin)
+// ---------------------------------------------------------------------------
+
+model SystemSetting {
+  key         String   @id @db.VarChar(96)
+  value       Json
+  group       String   @db.VarChar(32)
+  description String
+  updatedById String?  @map("updated_by_id") @db.Uuid
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  updatedBy User? @relation(fields: [updatedById], references: [id])
+
+  @@map("system_settings")
+}
+
+// ---------------------------------------------------------------------------
+// 11. Fayllar (docs/11 §11)
+// ---------------------------------------------------------------------------
+
+model File {
+  id        String      @id @default(uuid(7)) @db.Uuid
+  ownerId   String?     @map("owner_id") @db.Uuid
+  /// `public` / `private`.
+  bucket    String      @db.VarChar(32)
+  /// Object storage kaliti.
+  key       String      @db.VarChar(256)
+  mime      String      @db.VarChar(96)
+  sizeBytes Int         @map("size_bytes")
+  purpose   FilePurpose
+  status    FileStatus
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz
+
+  owner         User?  @relation("FileOwner", fields: [ownerId], references: [id])
+  avatarOfUsers User[] @relation("UserAvatar")
+
+  @@unique([key], map: "uq_files_key")
+  @@index([ownerId, purpose], map: "idx_files_owner_id_purpose")
+  @@map("files")
+}

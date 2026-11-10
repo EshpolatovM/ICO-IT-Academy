@@ -10,3 +10,4 @@ docs
 CLAUDE.md
 .claude
 apps/web/next-env.d.ts
+apps/api/src/infra/prisma/generated
