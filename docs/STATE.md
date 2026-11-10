@@ -7,7 +7,7 @@
 | Maydon | Qiymat |
 |---|---|
 | Joriy modul | 1-bosqich: Poydevor (reja tasdiqlangan 2026-11-10) |
-| Joriy bosqich | 1.8d tugadi va commit qilindi; 1.9 (`sinchkov-tester`, `docs/tasks/01-1.9-test.md`) boshlanmoqda |
+| Joriy bosqich | 1.9 (`sinchkov-tester`) bajarilmoqda; 1.10 review tugadi (`docs/reviews/01-poydevor-review.md`: 5 HIGH, 6 MEDIUM) — keyingisi 1.11a backend tuzatishlari (`docs/tasks/01-1.11a-review-tuzatish-backend.md`), so'ng 1.11b frontend |
 | Joriy git branch | `feature/01-poydevor` |
 | Ish rejimi | **2026-11-11 kechasi: avtonom** — egasi uxlayapti, savol so'ralmaydi, Tech Lead o'zi hal qiladi; 1-bosqich oxirigacha (1.8c → 1.8d → 1.9 → 1.10 + tuzatishlar), har vazifadan keyin commit; oxirida bitta hisobot `docs/HISOBOT-2026-11-11.md`. `main` ga merge, 2-bosqich, baza o'chirish — QILINMAYDI. Egasi qaytgach rejim yana "sekin". |
 

@@ -116,3 +116,6 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Nima qilindi:** NavItem disabled, TextLink, `/my-mentor`, parent logout yangi endpoint, ShellTopBar mobil.
 - **Fayllar:** `apps/web/src/app/{page.tsx,(auth)/login/**}`, `apps/web/src/features/{parent-access,shell}/**`.
 - **Testlar:** `pnpm check` (web 94), `format:check` — o'tdi.
+
+## 2026-11-11 — 1.10: 1-bosqich review (avtonom rejim)
+- **Nima qilindi:** domla-reviewer butun 1-bosqichni ko'rdi: CRITICAL yo'q, 5 HIGH (login limit poygasi, tablararo refresh, parent exchange limiti, RBAC default-deny, helmet), 6 MEDIUM, 10 LOW. Qisqa mazmun va qarorlar: `docs/reviews/01-poydevor-review.md`. Tuzatish topshirig'i: `docs/tasks/01-1.11a-review-tuzatish-backend.md`.
