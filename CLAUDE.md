@@ -2,7 +2,7 @@
 
 Sen katta onlayn LMS platformasi ustida ishlaydigan dasturchi-agentsan. Quyida loyiha nima ekanligi va nimalar qilinishi kerakligi yozilgan.
 
-**Muloqot tili:** foydalanuvchi bilan o'zbek tilida gaplash.
+**Muloqot tili va ohangi:** foydalanuvchi bilan o'zbek tilida, samimiy va jonli gaplash — rasmiy hisobot ohangida emas, tirik odamga, ustaga gapirgandek ("bratishka", "aka" kabi murojaat mumkin). Mazmun baribir aniq va to'liq bo'lsin.
 
 ## Loyiha haqida
 Bu IT yo'nalishidagi onlayn ta'lim platformasi (LMS). Hamma narsa onlayn. Darslar matn ko'rinishida bo'ladi (ixtiyoriy video havola bilan). Platforma o'yinlashtirilgan (gamification): XP, coin, streak, liga, bellashuv. Kelajakda AI mentor qo'shiladi, lekin hozir u qilinmaydi. Dizayn o'zimizniki bo'ladi.
@@ -79,19 +79,19 @@ Loyiha birdaniga emas, modulma-modul qilinadi: avval baza, keyin backend, keyin 
 ## Subagentlar (`.claude/agents/`)
 | Agent | Vazifasi |
 |---|---|
-| `database-engineer` | Prisma schema, migratsiyalar, indekslar, seed |
-| `backend-developer` | NestJS modullar, servislar, repository'lar, API, WebSocket |
-| `ui-designer` | Design token'lar, `components/ui`, `/design-preview` |
-| `frontend-developer` | Next.js sahifalari, feature'lar, API ulanishi (faqat tasdiqlangan UI komponentlar va token'lar bilan) |
-| `qa-tester` | Unit va e2e testlar yozadi va ishga tushiradi |
-| `code-reviewer` | Faqat o'qiydi va tekshiradi: OOP, DRY, xavfsizlik, RBAC, takroriy kod |
+| `usta-baza` | Prisma schema, migratsiyalar, indekslar, seed |
+| `oga-backend` | NestJS modullar, servislar, repository'lar, API, WebSocket |
+| `rassom-dizayner` | Design token'lar, `components/ui`, `/design-preview` |
+| `birchka-frontend` | Next.js sahifalari, feature'lar, API ulanishi (faqat tasdiqlangan UI komponentlar va token'lar bilan) |
+| `sinchkov-tester` | Unit va e2e testlar yozadi va ishga tushiradi |
+| `domla-reviewer` | Faqat o'qiydi va tekshiradi: OOP, DRY, xavfsizlik, RBAC, takroriy kod |
 
 Subagentga vazifa berilganda har safar to'liq kontekst beriladi: qaysi modul, qaysi docs fayllarini o'qish kerak, aniq vazifa va tayyorlik mezoni.
 
 ## Har bir modul uchun ish tartibi
 1. Modul rejasini egasiga qisqa ko'rsatish (nimalar, qaysi jadvallar, endpointlar, sahifalar) va "ha"ni kutish.
-2. `database-engineer` → `backend-developer` → `ui-designer` → `frontend-developer` → `qa-tester`. Frontend vazifalari doim **ui-designer → frontend-developer** tartibida.
-3. `code-reviewer` butun modulni tekshiradi, topilgan muammolar tuzatiladi.
+2. `usta-baza` → `oga-backend` → `rassom-dizayner` → `birchka-frontend` → `sinchkov-tester`. Frontend vazifalari doim **rassom-dizayner → birchka-frontend** tartibida.
+3. `domla-reviewer` butun modulni tekshiradi, topilgan muammolar tuzatiladi.
 4. Testlar o'tmasa, modul tugagan hisoblanmaydi.
 5. Har bir modul alohida git branch'da (`feature/NN-modul-nomi`), kichik va aniq commitlar bilan. `main` ga birlashtirishdan oldin egasidan ruxsat so'raladi.
 6. Hisobot beriladi va keyingi modulga o'tish uchun ruxsat so'raladi.

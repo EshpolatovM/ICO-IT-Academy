@@ -29,3 +29,10 @@ Yangi yozuvlar pastga qo'shiladi.
   - 1.1 topshirig'i `docs/tasks/` ga saqlandi.
   - `backend-developer` agenti hali yuklanmagan (Claude Code qayta ishga tushirilishi kerak).
 - **Fayllar:** `docs/99-ochiq-savollar.md`, `docs/STATE.md`, `docs/PROGRESS.md`, `docs/tasks/01-1.1-monorepo-skeleti.md`.
+
+## 2026-11-10 — Agentlarga ism berildi, muloqot ohangi
+- **Nima qilindi:**
+  - Agentlarga ism berildi: `usta-baza`, `oga-backend`, `rassom-dizayner`, `birchka-frontend`, `sinchkov-tester`, `domla-reviewer` (fayllar va barcha havolalar yangilandi).
+  - `CLAUDE.md` ga samimiy muloqot ohangi qo'shildi.
+  - `podman compose` ishlashi tasdiqlandi.
+- **Fayllar:** `.claude/agents/*.md`, `CLAUDE.md`, `docs/STATE.md`, `docs/tasks/01-1.1-monorepo-skeleti.md`.
