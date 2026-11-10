@@ -50,6 +50,7 @@ describe('validateEnv', () => {
       NODE_ENV: 'development',
       API_PORT: 3001,
       LOG_LEVEL: 'info',
+      TRUST_PROXY: false,
     });
   });
 
@@ -85,6 +86,7 @@ describe('validateEnv', () => {
     ['PARENT_COOKIE_KEY', Buffer.alloc(16).toString('base64')],
     ['PARENT_COOKIE_KEY', 'base64-emas!'],
     ['PARENT_MAX_ACTIVE_TOKENS', '0'],
+    ['TRUST_PROXY', 'true'],
   ])("%s noto'g'ri bo'lsa rad etadi", (key, value) => {
     expect(() => validateEnv({ ...VALID_ENV, [key]: value })).toThrow(new RegExp(key));
   });

@@ -45,6 +45,7 @@
 | POST | `/auth/parent/exchange` | PUB | |
 | POST | `/auth/refresh` | cookie | Rotation |
 | POST | `/auth/logout` | ANY | |
+| POST | `/auth/parent/logout` | PUB (cookie + `X-Requested-With`) | Ota-ona chiqishi, sessiya talab qilinmaydi; `ps` va `parent_tokens` cookie'larini o'chiradi, 204 |
 | GET | `/auth/me` | ANY + P | |
 | POST | `/auth/change-password` | SA A M S | |
 | GET | `/auth/sessions` | SA A M S | |
@@ -76,7 +77,7 @@ POST /auth/parent/exchange
 Set-Cookie: ps=...; HttpOnly; Secure; SameSite=Strict
 Set-Cookie: parent_tokens=<shifrlangan>; HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth/parent; Max-Age=15552000
 ```
-Body'siz `POST /auth/parent/exchange` → cookie'dagi saqlangan tokenlar bo'yicha session yangilanadi (S-15, 02 §5.1).
+Body'siz `POST /auth/parent/exchange` → cookie'dagi saqlangan tokenlar bo'yicha session yangilanadi (S-15, 02 §5.1). Body ham, cookie ham bo'lmasa → 401, rate limitga sanalmaydi.
 
 ---
 

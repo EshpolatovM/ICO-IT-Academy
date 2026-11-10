@@ -17,10 +17,16 @@ const LOCAL_IPS = ['::ffff:127.0.0.1', '127.0.0.1', '::1'];
 const HTTP_CREATED = 201;
 const HTTP_NO_CONTENT = 204;
 
-/** Exchange rate limit hisoblagichlarini tozalaydi (testlar bir IP'dan keladi). */
-export async function resetParentExchangeLimits(app: INestApplication<App>): Promise<void> {
+/**
+ * Exchange rate limit hisoblagichlarini tozalaydi (testlar bir IP'dan keladi; `X-Forwarded-For`
+ * bilan "mijoz" IP'lari `extraIps` da beriladi).
+ */
+export async function resetParentExchangeLimits(
+  app: INestApplication<App>,
+  extraIps: readonly string[] = [],
+): Promise<void> {
   const redis = app.get(RedisService);
-  for (const ip of LOCAL_IPS) {
+  for (const ip of [...LOCAL_IPS, ...extraIps]) {
     await redis.del(`${PARENT_EXCHANGE_ATTEMPTS_KEY_PREFIX}${ip}`);
     await redis.del(`${PARENT_EXCHANGE_FAILURES_KEY_PREFIX}${ip}`);
   }
@@ -69,10 +75,18 @@ export async function revokeParentToken(
     .expect(HTTP_NO_CONTENT);
 }
 
-export function exchange(app: INestApplication<App>, body?: object, cookie?: string) {
+export function exchange(
+  app: INestApplication<App>,
+  body?: object,
+  cookie?: string,
+  forwardedFor?: string,
+) {
   const req = http(app).post(`${API}/auth/parent/exchange`);
   if (cookie) {
     req.set('Cookie', cookie);
+  }
+  if (forwardedFor) {
+    req.set('X-Forwarded-For', forwardedFor);
   }
   return body === undefined ? req : req.send(body);
 }

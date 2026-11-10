@@ -5,6 +5,7 @@ import { configureApp } from '../../src/app.setup.js';
 import { RedisService } from '../../src/infra/redis/redis.service.js';
 
 import type { INestApplication, Type } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { App } from 'supertest/types.js';
 
 export interface TestAppOptions {
@@ -22,7 +23,9 @@ export async function createTestApp(options: TestAppOptions = {}): Promise<INest
   if (options.redisOverride) {
     builder.overrideProvider(RedisService).useValue(options.redisOverride);
   }
-  const app = (await builder.compile()).createNestApplication<INestApplication<App>>({
+  const app = (await builder.compile()).createNestApplication<
+    NestExpressApplication & INestApplication<App>
+  >({
     bufferLogs: true,
   });
   configureApp(app);

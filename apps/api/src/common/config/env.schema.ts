@@ -4,6 +4,7 @@ import { DEFAULT_API_PORT } from '../constants/app.constants.js';
 
 import { assertSecureCookieInProduction, authEnvShape } from './auth-env.schema.js';
 import { parentEnvShape } from './parent-env.schema.js';
+import { trustProxySchema } from './trust-proxy.schema.js';
 
 /**
  * Ilova env o'zgaruvchilari sxemasi — yagona joy (docs/13 §4: barcha tashqi manzillar env orqali).
@@ -31,6 +32,8 @@ export const envSchema = z
     WEB_BASE_URL: z
       .url({ protocol: HTTP_PROTOCOL })
       .transform((url) => url.replace(TRAILING_SLASHES, '')),
+    /** Express `trust proxy`: reverse proxy ortida mijozning haqiqiy IP'si uchun (trust-proxy.schema). */
+    TRUST_PROXY: trustProxySchema,
     ...authEnvShape,
     ...parentEnvShape,
   })

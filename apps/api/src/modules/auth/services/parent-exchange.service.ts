@@ -39,7 +39,9 @@ function uniqueTokens(tokens: readonly string[]): string[] {
  * - `tokens` berilsa: `merge=false` — faqat shular, `merge=true` — cookie'dagilarga qo'shiladi;
  * - body'siz: `parent_tokens` cookie'dagi tokenlar bilan sessiya yangilanadi.
  * Berilgan token yaroqsiz bo'lsa — 401 (umumiy xabar). Cookie'dagi yaroqsiz tokenlar jimgina
- * olib tashlanadi. Muvaffaqiyatda `ps` va `parent_tokens` qayta yoziladi, foydalanish qayd etiladi.
+ * olib tashlanadi. Body ham, `parent_tokens` cookie ham yo'q bo'lsa — 401, lekin rate limit/blok
+ * hisobiga qo'shilmaydi (frontend sessiyani tekshirishi; tekshiriladigan token yo'q).
+ * Muvaffaqiyatda `ps` va `parent_tokens` qayta yoziladi, foydalanish qayd etiladi.
  */
 @Injectable()
 export class ParentExchangeService {
@@ -52,8 +54,13 @@ export class ParentExchangeService {
 
   async exchange(input: ParentExchangeInput): Promise<ParentExchangeResponse> {
     const { dto, meta, response } = input;
-    await this.rateLimiter.consumeAttempt(meta.ip);
     const submitted = dto.tokens ?? [];
+    if (submitted.length === 0 && input.storedCookie === undefined) {
+      // Hech qanday token yo'q — bu taxmin qilish urinishi emas: limit va blokka qo'shilmaydi.
+      this.cookies.clearAll(response);
+      throw this.invalidToken();
+    }
+    await this.rateLimiter.consumeAttempt(meta.ip);
     const useStored = submitted.length === 0 || dto.merge;
     const stored = useStored ? this.cookies.decodeStoredTokens(input.storedCookie) : [];
     const grants = await this.grants.findByRawTokens(uniqueTokens([...stored, ...submitted]));
@@ -63,13 +70,17 @@ export class ParentExchangeService {
         this.cookies.clearAll(response);
       }
       await this.rateLimiter.registerFailure(meta.ip);
-      throw new AppException({
-        code: ErrorCode.UNAUTHORIZED,
-        message: INVALID_PARENT_TOKEN_MESSAGE,
-      });
+      throw this.invalidToken();
     }
     await this.startSession(grants, meta, response);
     return { children: toParentChildren(grants) };
+  }
+
+  private invalidToken(): AppException {
+    return new AppException({
+      code: ErrorCode.UNAUTHORIZED,
+      message: INVALID_PARENT_TOKEN_MESSAGE,
+    });
   }
 
   private async startSession(

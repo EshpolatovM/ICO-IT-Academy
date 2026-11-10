@@ -100,3 +100,9 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Testlar:** `pnpm check` (api 252, web 80), `format:check`, `next build` (alohida distDir) — Tech Lead qayta yurgizdi, o'tdi.
 - **Topilgan backend muammolari:** trust proxy yo'q, cookie'siz exchange failure sanaladi, parent logout sessiyasiz ishlamaydi → 1.8b.
 - **UI yetishmovchiliklari:** NavItem disabled, TextLink, mobil AppShell → 1.8c.
+
+## 2026-11-11 — S-69 va 1.8b: backend tuzatishlari
+- **S-69:** mentor paneli `/mentor/*`, student mentor sahifasi `/my-mentor` (docs/03, docs/99).
+- **Nima qilindi:** `TRUST_PROXY` (zod sxema, `configureApp` da), cookie'siz exchange failure sanalmaydi, `POST /auth/parent/logout` (public, CSRF header). README "Reverse proxy va mijoz IP'si", docs/12 §1.
+- **Fayllar:** `apps/api/src/{main.ts,app.setup.ts}`, `apps/api/src/common/config/{env.schema,trust-proxy.schema}*.ts`, `apps/api/src/modules/auth/{controllers/parent-auth.controller,services/parent-exchange.service}*.ts`, `apps/api/test/**`, `.env.example`, `README.md`, `docs/{03,12,99}*.md`.
+- **Testlar:** 276 unit, 31 e2e — Tech Lead qayta yurgizdi, o'tdi.

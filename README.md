@@ -26,6 +26,12 @@ podman compose up -d          # PostgreSQL, Redis, SeaweedFS S3 (compose.yaml, i
 pnpm dev                      # api: http://localhost:3001/api/v1, web: http://localhost:3000
 ```
 
+### Reverse proxy va mijoz IP'si (`TRUST_PROXY`)
+
+API rate limit, sessiyalar, audit va `parent_access_logs` uchun `req.ip` dan foydalanadi. Ilova proksi ortida bo'lsa (dev'da Next.js rewrites, production'da Nginx/LB) `TRUST_PROXY` orqali ishonchli proksi ko'rsatiladi: dev — `loopback`, production — faqat o'z proksingiz manzili/subneti (masalan `10.0.0.5` yoki `10.0.0.0/24`) yoki hop soni (`1`).
+
+> **Ogohlantirish:** `TRUST_PROXY` keragidan kengroq bo'lsa (proksi yo'q joyda hop soni, mijozlar ham kiradigan subnet), har kim `X-Forwarded-For` sarlavhasini soxtalashtirib o'z IP'sini almashtira oladi va IP bo'yicha rate limit/blokni chetlab o'tadi, audit'ga soxta IP yoziladi. Proksi yo'q bo'lsa — `false`.
+
 ### Baza (PostgreSQL + Prisma)
 
 Sxema: `apps/api/prisma/schema.prisma` (manba: `docs/11-database.md`), migratsiyalar: `apps/api/prisma/migrations/`, Prisma CLI konfiguratsiyasi: `apps/api/prisma.config.ts` (ildizdagi `.env` ni o'qiydi). Prisma Client `src/infra/prisma/generated/` ga generatsiya qilinadi (git'da yo'q; `build`/`typecheck`/`lint`/`test` dan oldin turbo avtomatik `db:generate` ni ishga tushiradi).

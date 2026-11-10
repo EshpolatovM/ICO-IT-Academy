@@ -19,7 +19,8 @@ const NAMES: Record<string, string> = { s1: 'Ali', s2: 'Vali' };
 const session = { token: 'ps-jwt', expiresAt: new Date() };
 const meta = { ip: '10.0.0.1', userAgent: 'jest' };
 
-function setup(stored: string[] = []) {
+/** `storedCookie: null` — so'rovda `parent_tokens` cookie yo'q. */
+function setup(stored: string[] = [], storedCookie: string | null = 'enc') {
   const grants = {
     findByRawTokens: jest.fn((tokens: string[]) =>
       Promise.resolve(
@@ -54,7 +55,7 @@ function setup(stored: string[] = []) {
   const run = (dto: Partial<ParentExchangeDto>) =>
     service.exchange({
       dto: { merge: false, ...dto },
-      storedCookie: 'enc',
+      storedCookie: storedCookie ?? undefined,
       meta,
       response,
     });
@@ -105,6 +106,24 @@ describe('ParentExchangeService', () => {
     expect(cookies.clearAll).toHaveBeenCalledWith(response);
     expect(rateLimiter.registerFailure).toHaveBeenCalledWith('10.0.0.1');
     expect(cookies.setSession).not.toHaveBeenCalled();
+  });
+
+  it("body'siz va cookie'siz — 401, rate limit/blok hisobiga qo'shilmaydi", async () => {
+    const { run, cookies, rateLimiter, grants, response } = setup([], null);
+
+    await expect(run({})).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED, status: 401 });
+    expect(rateLimiter.consumeAttempt).not.toHaveBeenCalled();
+    expect(rateLimiter.registerFailure).not.toHaveBeenCalled();
+    expect(grants.findByRawTokens).not.toHaveBeenCalled();
+    expect(cookies.clearAll).toHaveBeenCalledWith(response);
+  });
+
+  it("body'siz, cookie buzilgan (tokenlar o'qilmaydi) — 401 va xato sanaladi", async () => {
+    const { run, rateLimiter } = setup([], 'v1.buzilgan');
+
+    await expect(run({})).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+    expect(rateLimiter.consumeAttempt).toHaveBeenCalledWith('10.0.0.1');
+    expect(rateLimiter.registerFailure).toHaveBeenCalledWith('10.0.0.1');
   });
 
   it("berilgan token yaroqsiz (merge bilan ham) — 401, mavjud cookie'larga tegilmaydi", async () => {

@@ -16,3 +16,5 @@ if (existsSync(ROOT_ENV_FILE)) {
   }
 }
 process.env.LOG_LEVEL ??= 'silent';
+// Dev'dagi kabi (Next rewrites lokal proksi): X-Forwarded-For faqat loopback'dan ishonchli.
+process.env.TRUST_PROXY ??= 'loopback';
