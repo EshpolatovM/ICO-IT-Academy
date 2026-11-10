@@ -9,13 +9,13 @@
 | Joriy modul | 1-bosqich: Poydevor (reja tasdiqlangan 2026-11-10) |
 | Joriy bosqich | 1.1 — monorepo skeleti: topshiriq tayyor, agentlar yuklanishi uchun Claude Code qayta ishga tushirilishi kutilmoqda |
 | Joriy git branch | `feature/01-poydevor` |
+| Ish rejimi | Sekin: har bir vazifadan keyin hisobot va "Davom etaymi?" |
 
 ## Egasining qarorlari (2026-11-10, "ha")
 - 1-bosqich rejasi tasdiqlandi. Mentor uchun parent-token endpointlari 2-bosqichda qo'shiladi.
 - Dizayn: oddiy standart wireframe token'lar (ko'k `#2563EB`, oq fon + neutral kulranglar, `system-ui`, hozircha faqat yorug' tema), keyin egasi to'g'rilaydi.
 - S-67: kod = tokenning o'zi. S-68: Podman. Faqat dev muhit uchun seed (1 mentor, 1 student) qilinadi.
 - pnpm 10.34.9 `~/.local` ga o'rnatildi (global npm prefix'ga ruxsat yo'q edi).
-| Ish rejimi | Sekin: har bir vazifadan keyin hisobot va "Davom etaymi?" |
 
 ## Oxirgi bajarilgan vazifa
 0-qadam yakunlandi:
