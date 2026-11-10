@@ -10,6 +10,7 @@ export type RawQueryClient = Pick<Prisma.TransactionClient, '$queryRaw'>;
 /**
  * Student kodi (`ST-10245`) `student_code_seq` dan — poyga holatisiz (docs/02 §2, docs/11 §1).
  * Student yaratish tranzaksiyasi ichida chaqiriladi, shuning uchun klient parametr sifatida beriladi.
+ * `BaseRepository` dan meros olmaydi: model emas, PostgreSQL sequence bilan ishlaydi (CRUD ma'nosiz).
  */
 @Injectable()
 export class StudentCodeRepository {

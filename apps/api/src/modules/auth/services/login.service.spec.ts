@@ -37,9 +37,8 @@ function createService(found: UserAuthRecord | null, passwordMatches = true) {
   };
   const passwords = { verify: jest.fn().mockResolvedValue(passwordMatches) };
   const rateLimiter = {
-    assertAllowed: jest.fn().mockResolvedValue(undefined),
-    registerFailure: jest.fn().mockResolvedValue(undefined),
-    reset: jest.fn().mockResolvedValue(undefined),
+    consume: jest.fn().mockResolvedValue(undefined),
+    succeed: jest.fn().mockResolvedValue(undefined),
   };
   const sessions = {
     start: jest.fn().mockResolvedValue({ accessToken: 'jwt', expiresIn: 900, refreshToken }),
@@ -81,8 +80,8 @@ describe('LoginService', () => {
       refreshToken,
     });
     const limiterKey = { kind: 'student', ip: '10.0.0.1', login: 'ST-10001' };
-    expect(rateLimiter.assertAllowed).toHaveBeenCalledWith(limiterKey);
-    expect(rateLimiter.reset).toHaveBeenCalledWith(limiterKey);
+    expect(rateLimiter.consume).toHaveBeenCalledWith(limiterKey);
+    expect(rateLimiter.succeed).toHaveBeenCalledWith(limiterKey);
     expect(users.markLoggedIn).toHaveBeenCalledWith('u1', expect.any(Date));
     expect(sessions.start).toHaveBeenCalledWith(expect.objectContaining({ id: 'u1' }), meta);
   });
@@ -98,13 +97,17 @@ describe('LoginService', () => {
     expect(result.body.user).not.toHaveProperty('studentCode');
   });
 
-  it("parol noto'g'ri — umumiy 401, xato urinish hisoblanadi, sessiya ochilmaydi", async () => {
-    const { rateLimiter, sessions, service } = createService(user(), false);
+  it("parol noto'g'ri — umumiy 401, urinish oldindan sanalgan va tozalanmaydi, sessiya ochilmaydi", async () => {
+    const { rateLimiter, passwords, sessions, service } = createService(user(), false);
 
     await expect(
       service.loginStudent({ studentCode: 'ST-10001', password: 'P' }, meta),
     ).rejects.toMatchObject(invalidCredentials);
-    expect(rateLimiter.registerFailure).toHaveBeenCalledTimes(1);
+    expect(rateLimiter.consume).toHaveBeenCalledTimes(1);
+    expect(rateLimiter.consume.mock.invocationCallOrder[0]).toBeLessThan(
+      passwords.verify.mock.invocationCallOrder[0] ?? 0,
+    );
+    expect(rateLimiter.succeed).not.toHaveBeenCalled();
     expect(sessions.start).not.toHaveBeenCalled();
   });
 
@@ -127,7 +130,7 @@ describe('LoginService', () => {
 
   it('limit oshgan — 429, foydalanuvchi qidirilmaydi', async () => {
     const { users, rateLimiter, service } = createService(user());
-    rateLimiter.assertAllowed.mockRejectedValue(
+    rateLimiter.consume.mockRejectedValue(
       Object.assign(new Error('limit'), { code: ErrorCode.RATE_LIMITED }),
     );
 

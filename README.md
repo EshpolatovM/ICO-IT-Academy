@@ -32,6 +32,18 @@ API rate limit, sessiyalar, audit va `parent_access_logs` uchun `req.ip` dan foy
 
 > **Ogohlantirish:** `TRUST_PROXY` keragidan kengroq bo'lsa (proksi yo'q joyda hop soni, mijozlar ham kiradigan subnet), har kim `X-Forwarded-For` sarlavhasini soxtalashtirib o'z IP'sini almashtira oladi va IP bo'yicha rate limit/blokni chetlab o'tadi, audit'ga soxta IP yoziladi. Proksi yo'q bo'lsa — `false`.
 
+**Zanjir misoli (production): brauzer → Nginx → Next.js (web) → API.** Brauzer faqat web origin'ga murojaat qiladi, Next `rewrites` `/api/v1/*` ni API'ga uzatadi. Har bir proksi `X-Forwarded-For` ga o'zidan oldingi manzilni qo'shadi, shuning uchun API'ga sarlavha `<mijoz IP>, <Nginx IP>` ko'rinishida, TCP ulanish esa Next'dan keladi:
+
+```
+mijoz 203.0.113.7 ──► Nginx 10.0.0.5 ──► Next 10.0.0.6 ──► API
+X-Forwarded-For (API'da): "203.0.113.7, 10.0.0.5"     req.socket: 10.0.0.6
+```
+
+- Hop soni bilan: `TRUST_PROXY=2` (Next + Nginx) — o'ngdan 2 ta manzil proksi deb tashlanadi, `req.ip = 203.0.113.7`. Faqat API'ga tashqaridan to'g'ridan-to'g'ri kirib bo'lmasa xavfsiz (aks holda hujumchi soxta `X-Forwarded-For` bilan bitta hop'ni "sotib oladi").
+- Manzillar bilan (afzal): `TRUST_PROXY=10.0.0.5,10.0.0.6` (yoki ikkalasi bitta subnetda bo'lsa `10.0.0.0/29`) — faqat shu manzillar qo'shgan yozuvlarga ishoniladi.
+- Next va API bitta hostda bo'lsa: `TRUST_PROXY=loopback,10.0.0.5`.
+- Nginx `X-Forwarded-For` ni `$proxy_add_x_forwarded_for` bilan to'ldiradi (mijoz yuborgan qiymat ustiga qo'shadi) — shuning uchun API faqat ishonchli hop'larni o'ngdan sanaydi; `true` ataylab qabul qilinmaydi.
+
 ### Baza (PostgreSQL + Prisma)
 
 Sxema: `apps/api/prisma/schema.prisma` (manba: `docs/11-database.md`), migratsiyalar: `apps/api/prisma/migrations/`, Prisma CLI konfiguratsiyasi: `apps/api/prisma.config.ts` (ildizdagi `.env` ni o'qiydi). Prisma Client `src/infra/prisma/generated/` ga generatsiya qilinadi (git'da yo'q; `build`/`typecheck`/`lint`/`test` dan oldin turbo avtomatik `db:generate` ni ishga tushiradi).

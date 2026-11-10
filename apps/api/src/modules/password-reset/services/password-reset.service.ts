@@ -6,6 +6,7 @@ import type { AccountRole, PasswordResetResponse } from '@lms/shared';
 import { AppException } from '../../../common/exceptions/app.exception.js';
 import { PASSWORD_HASHER } from '../../../common/security/password-hasher.interface.js';
 import { generateTemporaryPassword } from '../../../common/security/temporary-password.generator.js';
+import { UnitOfWork } from '../../../common/transaction/unit-of-work.js';
 import { auditActor } from '../../audit/audit-actor.js';
 import { AuditService } from '../../audit/services/audit.service.js';
 import { TokenVersionService } from '../../auth/services/token-version.service.js';
@@ -28,6 +29,7 @@ const STAFF_RESET_TARGETS: Readonly<Partial<Record<Role, readonly AccountRole[]>
  * Parolni tiklash (docs/02 §4.3): 10 belgili kriptografik tasodifiy vaqtinchalik parol,
  * `must_change_password = true`, `token_version++` (Redis kesh yangilanadi), barcha refresh
  * tokenlar bekor, audit. Vaqtinchalik parol javobda faqat bir marta qaytadi, hech qayerda saqlanmaydi.
+ * Parol yangilash va audit — bitta tranzaksiyada (`UnitOfWork`); Argon2 hash — undan oldin.
  */
 @Injectable()
 export class PasswordResetService {
@@ -36,6 +38,7 @@ export class PasswordResetService {
     @Inject(PASSWORD_HASHER) private readonly hasher: PasswordHasher,
     private readonly tokenVersions: TokenVersionService,
     private readonly audit: AuditService,
+    private readonly unitOfWork: UnitOfWork,
   ) {}
 
   /** Scope (`@StudentScope`) controller'da; bu yerda — student mavjudligi (aks holda 404). */
@@ -66,20 +69,24 @@ export class PasswordResetService {
 
   private async reset(target: UserAuthRecord, actor: ActorContext): Promise<PasswordResetResponse> {
     const temporaryPassword = generateTemporaryPassword();
-    const { tokenVersion } = await this.users.resetPassword(target.id, {
-      passwordHash: await this.hasher.hash(temporaryPassword),
-      revokedAt: new Date(),
+    const passwordHash = await this.hasher.hash(temporaryPassword);
+    const { tokenVersion } = await this.unitOfWork.run(async () => {
+      const result = await this.users.resetPassword(target.id, {
+        passwordHash,
+        revokedAt: new Date(),
+      });
+      await this.audit.record({
+        actor: auditActor(actor.user),
+        action: AuditAction.PASSWORD_RESET,
+        entityType: AuditEntityType.USER,
+        entityId: target.id,
+        before: { role: target.role, mustChangePassword: target.mustChangePassword },
+        after: { role: target.role, mustChangePassword: true },
+        ip: actor.meta.ip,
+      });
+      return result;
     });
-    await this.tokenVersions.remember(target.id, tokenVersion);
-    await this.audit.record({
-      actor: auditActor(actor.user),
-      action: AuditAction.PASSWORD_RESET,
-      entityType: AuditEntityType.USER,
-      entityId: target.id,
-      before: { role: target.role, mustChangePassword: target.mustChangePassword },
-      after: { role: target.role, mustChangePassword: true },
-      ip: actor.meta.ip,
-    });
+    await this.tokenVersions.onVersionChanged(target.id, tokenVersion);
     return { temporaryPassword };
   }
 }

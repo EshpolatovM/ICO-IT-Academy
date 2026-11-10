@@ -18,9 +18,23 @@ export const authEnvShape = {
   REFRESH_TTL_STAFF_SECONDS: positiveSeconds,
   /** Refresh cookie `Secure` atributi. Production'da majburiy `true` (sxemada tekshiriladi). */
   COOKIE_SECURE: z.stringbool(),
-  /** Login rate limit: `ip + login` bo'yicha muvaffaqiyatsiz urinishlar (docs/02 §6). */
+  /**
+   * Login rate limit (docs/02 §6): `ip + login` bo'yicha urinishlar. Har urinish parol tekshiruvidan
+   * oldin sanaladi, muvaffaqiyatli kirishda hisoblagich tozalanadi.
+   */
   LOGIN_RATE_LIMIT_MAX_ATTEMPTS: positiveCount,
   LOGIN_RATE_LIMIT_WINDOW_SECONDS: positiveSeconds,
+  /** IP bo'yicha umumiy login limiti (password spraying, Argon2 CPU DoS): muvaffaqiyatsiz urinishlar. */
+  LOGIN_IP_RATE_LIMIT_MAX_ATTEMPTS: positiveCount,
+  LOGIN_IP_RATE_LIMIT_WINDOW_SECONDS: positiveSeconds,
+  /**
+   * Refresh reuse grace oynasi: almashtirilgan token shu muddat ichida qayta kelsa (parallel tablar),
+   * oila bekor qilinmaydi — 401 `REFRESH_SUPERSEDED`. Undan keyin — reuse detection (docs/02 §3).
+   */
+  REFRESH_REUSE_GRACE_SECONDS: positiveSeconds,
+  /** `POST /auth/change-password`: foydalanuvchi bo'yicha eski parol urinishlari limiti. */
+  CHANGE_PASSWORD_RATE_LIMIT_MAX_ATTEMPTS: positiveCount,
+  CHANGE_PASSWORD_RATE_LIMIT_WINDOW_SECONDS: positiveSeconds,
 };
 
 /** Production'da cookie faqat HTTPS orqali yuborilishi shart. */

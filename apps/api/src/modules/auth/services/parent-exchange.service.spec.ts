@@ -44,6 +44,7 @@ function setup(stored: string[] = [], storedCookie: string | null = 'enc') {
   const rateLimiter = {
     consumeAttempt: jest.fn().mockResolvedValue(undefined),
     registerFailure: jest.fn().mockResolvedValue(undefined),
+    registerFailedAttempt: jest.fn().mockResolvedValue(undefined),
   };
   const service = new ParentExchangeService(
     grants as unknown as ParentGrantsService,
@@ -90,21 +91,24 @@ describe('ParentExchangeService', () => {
     expect(result.children.map((child) => child.studentId)).toEqual(['s1', 's2']);
   });
 
-  it("body'siz: cookie'dagi tokenlar bilan yangilanadi, bekor qilinganlari cookie'dan chiqadi", async () => {
+  it("body'siz: cookie'dagi tokenlar bilan yangilanadi, bekor qilinganlari chiqadi, limitga sanalmaydi", async () => {
     const { run, cookies, rateLimiter } = setup(['A', 'REVOKED', 'B']);
 
     await run({});
 
     expect(cookies.setStoredTokens).toHaveBeenCalledWith(expect.anything(), ['A', 'B']);
+    expect(rateLimiter.consumeAttempt).not.toHaveBeenCalled();
     expect(rateLimiter.registerFailure).not.toHaveBeenCalled();
+    expect(rateLimiter.registerFailedAttempt).not.toHaveBeenCalled();
   });
 
-  it("body'siz va amaldagi token yo'q — 401, ikkala cookie o'chiriladi, xato sanaladi", async () => {
+  it("body'siz va amaldagi token yo'q — 401, ikkala cookie o'chiriladi, urinish va xato sanaladi", async () => {
     const { run, cookies, rateLimiter, response } = setup(['REVOKED']);
 
     await expect(run({})).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED, status: 401 });
     expect(cookies.clearAll).toHaveBeenCalledWith(response);
-    expect(rateLimiter.registerFailure).toHaveBeenCalledWith('10.0.0.1');
+    expect(rateLimiter.registerFailedAttempt).toHaveBeenCalledWith('10.0.0.1');
+    expect(rateLimiter.consumeAttempt).not.toHaveBeenCalled();
     expect(cookies.setSession).not.toHaveBeenCalled();
   });
 
@@ -118,10 +122,11 @@ describe('ParentExchangeService', () => {
     expect(cookies.clearAll).toHaveBeenCalledWith(response);
   });
 
-  it("body'siz, cookie buzilgan (tokenlar o'qilmaydi) — 401 va xato sanaladi", async () => {
-    const { run, rateLimiter } = setup([], 'v1.buzilgan');
+  it("body'siz, cookie buzilgan (GCM'dan o'tmaydi) — 401, urinish oldindan va xato sanaladi", async () => {
+    const { run, rateLimiter, grants } = setup([], 'v1.buzilgan');
 
     await expect(run({})).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+    expect(grants.findByRawTokens).not.toHaveBeenCalled();
     expect(rateLimiter.consumeAttempt).toHaveBeenCalledWith('10.0.0.1');
     expect(rateLimiter.registerFailure).toHaveBeenCalledWith('10.0.0.1');
   });

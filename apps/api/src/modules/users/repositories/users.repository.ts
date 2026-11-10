@@ -50,7 +50,7 @@ export class UsersRepository extends SoftDeletableBaseRepository<UserRepositoryT
   protected readonly delegate: PrismaService['db']['user'];
   protected readonly defaultOrderBy = { createdAt: 'desc' } as const;
 
-  constructor(prisma: PrismaService) {
+  constructor(private readonly prisma: PrismaService) {
     super();
     this.delegate = prisma.db.user;
   }
@@ -114,12 +114,13 @@ export class UsersRepository extends SoftDeletableBaseRepository<UserRepositoryT
     return this.replacePassword(id, data, true);
   }
 
+  /** Joriy tranzaksiyaga qo'shiladi (`PrismaService.client`) — tiklash audit bilan bitta `UnitOfWork` da. */
   private replacePassword(
     id: string,
     data: PasswordChangeData,
     mustChangePassword: boolean,
   ): Promise<PasswordChangeResult> {
-    return this.delegate.update({
+    return this.prisma.client.user.update({
       where: { id },
       data: {
         passwordHash: data.passwordHash,

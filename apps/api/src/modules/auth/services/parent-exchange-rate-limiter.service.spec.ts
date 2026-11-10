@@ -14,6 +14,7 @@ function setup() {
   const limiter = {
     assertAllowed: jest.fn().mockResolvedValue(undefined),
     hit: jest.fn().mockResolvedValue(1),
+    consume: jest.fn().mockResolvedValue(undefined),
   };
   const config = { get: (key: string) => SETTINGS[key] } as unknown as AppConfigService;
   return {
@@ -35,14 +36,25 @@ const failures = {
 };
 
 describe('ParentExchangeRateLimiter', () => {
-  it("urinish: avval blok, keyin urinishlar limiti tekshiriladi, so'ng hisoblanadi (IP bo'yicha)", async () => {
+  it("urinish: avval blok tekshiriladi, so'ng urinish atomar sanaladi (IP bo'yicha)", async () => {
     const { limiter, service } = setup();
 
     await service.consumeAttempt('10.0.0.1');
 
-    expect(limiter.assertAllowed).toHaveBeenNthCalledWith(1, failures, '10.0.0.1');
-    expect(limiter.assertAllowed).toHaveBeenNthCalledWith(2, attempts, '10.0.0.1');
-    expect(limiter.hit).toHaveBeenCalledWith(attempts, '10.0.0.1');
+    expect(limiter.assertAllowed).toHaveBeenCalledTimes(1);
+    expect(limiter.assertAllowed).toHaveBeenCalledWith(failures, '10.0.0.1');
+    expect(limiter.consume).toHaveBeenCalledWith(attempts, '10.0.0.1');
+    expect(limiter.hit).not.toHaveBeenCalled();
+  });
+
+  it('oldindan sanalmagan muvaffaqiyatsiz urinish — urinish va xato ikkalasi sanaladi', async () => {
+    const { limiter, service } = setup();
+
+    await service.registerFailedAttempt('10.0.0.1');
+
+    expect(limiter.hit).toHaveBeenNthCalledWith(1, attempts, '10.0.0.1');
+    expect(limiter.hit).toHaveBeenNthCalledWith(2, failures, '10.0.0.1');
+    expect(limiter.consume).not.toHaveBeenCalled();
   });
 
   it("muvaffaqiyatsizlik — 20 tadan keyin 1 soatlik blok policy'si bilan; IP yo'q — 'unknown'", async () => {

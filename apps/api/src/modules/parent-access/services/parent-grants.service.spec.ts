@@ -12,6 +12,13 @@ const grant = (tokenId: string, studentId: string) => ({
 });
 
 function setup(cache: Record<string, string> = {}) {
+  const cachedState = (id: string) => {
+    const studentId = cache[id];
+    if (studentId === 'REVOKED') {
+      return { state: 'revoked' };
+    }
+    return studentId ? { state: 'valid', studentId } : { state: 'unknown' };
+  };
   const tokens = {
     findGrantsByHashes: jest.fn().mockResolvedValue([
       { ...grant('t2', 's2'), tokenHash: 'h:B' },
@@ -22,7 +29,7 @@ function setup(cache: Record<string, string> = {}) {
   };
   const crypto = { hash: (token: string) => `h:${token}` };
   const validity = {
-    read: jest.fn((id: string) => Promise.resolve(cache[id] ?? null)),
+    read: jest.fn((id: string) => Promise.resolve(cachedState(id))),
     remember: jest.fn().mockResolvedValue(undefined),
   };
   const service = new ParentGrantsService(
@@ -61,6 +68,15 @@ describe('ParentGrantsService', () => {
     const { service, tokens } = setup({ t1: 's1' });
 
     await service.activeStudentsByTokenIds(['t1']);
+    expect(tokens.findGrantsByIds).not.toHaveBeenCalled();
+  });
+
+  it('tombstone (bekor qilingan) — darhol rad etiladi, bazaga qaralmaydi', async () => {
+    const { service, tokens } = setup({ t1: 's1', t2: 'REVOKED' });
+
+    const active = await service.activeStudentsByTokenIds(['t1', 't2']);
+
+    expect([...active.keys()]).toEqual(['t1']);
     expect(tokens.findGrantsByIds).not.toHaveBeenCalled();
   });
 });

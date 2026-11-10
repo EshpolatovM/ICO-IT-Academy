@@ -7,7 +7,7 @@
 | Maydon | Qiymat |
 |---|---|
 | Joriy modul | 1-bosqich: Poydevor (reja tasdiqlangan 2026-11-10) |
-| Joriy bosqich | 1.9 tugadi va commit qilindi; 1.10 review tugadi (`docs/reviews/01-poydevor-review.md`: 5 HIGH, 6 MEDIUM) — keyingisi 1.11a backend tuzatishlari (`docs/tasks/01-1.11a-review-tuzatish-backend.md`), so'ng 1.11b frontend — 1.11a boshlanmoqda |
+| Joriy bosqich | 1.11a commit qilindi (WIP: 1 ta e2e yiqilmoqda); keyingisi — shu testni tuzatish, so'ng 1.11b frontend (`docs/tasks/01-1.11b-review-tuzatish-frontend.md`), yakuniy to'liq test |
 | Joriy git branch | `feature/01-poydevor` |
 | Ish rejimi | **2026-11-11 kechasi: avtonom** — egasi uxlayapti, savol so'ralmaydi, Tech Lead o'zi hal qiladi; 1-bosqich oxirigacha (1.8c → 1.8d → 1.9 → 1.10 + tuzatishlar), har vazifadan keyin commit; oxirida bitta hisobot `docs/HISOBOT-2026-11-11.md`. `main` ga merge, 2-bosqich, baza o'chirish — QILINMAYDI. Egasi qaytgach rejim yana "sekin". |
 
@@ -29,10 +29,12 @@
 - Agentlarga ism berildi: usta-baza (DB), oga-backend, rassom-dizayner (UI), birchka-frontend, sinchkov-tester (QA), domla-reviewer (review).
 
 ## Oxirgi bajarilgan vazifa
-**1.8d — frontend ulashlari** (`birchka-frontend`, Tech Lead tekshirdi): DisabledNavItem → `NavItem disabled hint`, matnli havolalar → `TextLink`, student "Mentor" → `/my-mentor` ("Tez orada"), ota-ona chiqishi → `POST /auth/parent/logout` (aylanma yo'l olib tashlandi), ShellTopBar mobil moslash. Web 94 test.
+**1.11a — review tuzatishlari, backend** (`oga-backend`): H1–H5, M1–M5, L1–L3, L5, L7, L8, L10, UUID xato formati, turbo passThroughEnv, `next-env.d.ts` gitignore + `next typegen`. `pnpm check` yashil (api 319, web 94). Tech Lead qayta yurgizganda api e2e: 169/170 — `test/auth-login.e2e-spec.ts` "noto'g'ri parol, noma'lum telefon va INACTIVE — bir xil 401" testida 429 keldi (ehtimol yangi IP umumiy login limiti `auth:login-ip:*` ketma-ket ishga tushirishlarda to'planadi; agent 3 marta yashil ko'rgan). Limit tugagani uchun commit WIP sifatida qilindi.
 
 ## Keyingi aniq vazifa
-**1.9 — testlar** (`sinchkov-tester`, `docs/tasks/01-1.9-test.md`): qamrov auditi, RBAC matritsasi e2e, yetishmagan backend testlar, Playwright e2e (7 ssenariy, o'z portlari 3200/3201). Keyin **1.10** `domla-reviewer` (butun 1-bosqich), topilmalarni tuzatish, yakuniy to'liq test va `docs/HISOBOT-2026-11-11.md`.
+1. `oga-backend`: `auth-login.e2e-spec.ts` dagi 429 ni tuzatish (suite boshida/test oldidan `auth:login-ip:*` va `auth:login:*` kalitlarini tozalash yoki testga alohida `X-Forwarded-For` IP berish), `pnpm --filter @lms/api test:e2e` ni 2 marta ketma-ket yashil qilish.
+2. `docs/tasks/01-1.11b-review-tuzatish-frontend.md` oxiridagi "1.11a natijasi" bo'limini to'ldirib `birchka-frontend`ga berish (REFRESH_SUPERSEDED, logout CSRF, strict sxemalar, UUID VALIDATION_ERROR, next typegen — PROGRESS.md 1.11a yozuvida).
+3. Yakuniy: `pnpm check`, `pnpm format:check`, `pnpm test:e2e` (api + Playwright), `docs/HISOBOT-2026-11-11.md` ni yakunlash.
 
 ## 2-bosqich uchun eslatmalar
 - `RoleBasedStudentScopeResolver` MENTOR tarmog'i → `group_members` asosida (scope tashqarisi 404).

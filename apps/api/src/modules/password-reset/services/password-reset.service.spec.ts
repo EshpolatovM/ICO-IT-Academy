@@ -11,6 +11,7 @@ import type { AccountRole } from '@lms/shared';
 import { PasswordResetService } from './password-reset.service.js';
 
 import type { PasswordHasher } from '../../../common/security/password-hasher.interface.js';
+import type { UnitOfWork } from '../../../common/transaction/unit-of-work.js';
 import type { AuditService } from '../../audit/services/audit.service.js';
 import type { TokenVersionService } from '../../auth/services/token-version.service.js';
 import type { UsersRepository } from '../../users/repositories/users.repository.js';
@@ -36,15 +37,17 @@ function setup(target: ReturnType<typeof userRecord> | null) {
     resetPassword: jest.fn().mockResolvedValue({ tokenVersion: 5 }),
   };
   const hasher = { hash: jest.fn((plain: string) => Promise.resolve(`hash(${plain})`)) };
-  const tokenVersions = { remember: jest.fn().mockResolvedValue(undefined) };
+  const tokenVersions = { onVersionChanged: jest.fn().mockResolvedValue(undefined) };
   const audit = { record: jest.fn().mockResolvedValue(undefined) };
+  const unitOfWork = { run: jest.fn(<T>(work: () => Promise<T>) => work()) };
   const service = new PasswordResetService(
     users as unknown as UsersRepository,
     hasher as unknown as PasswordHasher,
     tokenVersions as unknown as TokenVersionService,
     audit as unknown as AuditService,
+    unitOfWork as unknown as UnitOfWork,
   );
-  return { service, users, tokenVersions, audit };
+  return { service, users, tokenVersions, audit, unitOfWork };
 }
 
 const actorOf = (role: AccountRole, id = 'actor') => ({
@@ -64,7 +67,7 @@ describe('PasswordResetService — student', () => {
       passwordHash: `hash(${temporaryPassword})`,
       revokedAt: expect.any(Date) as Date,
     });
-    expect(tokenVersions.remember).toHaveBeenCalledWith('s1', 5);
+    expect(tokenVersions.onVersionChanged).toHaveBeenCalledWith('s1', 5);
     expect(audit.record).toHaveBeenCalledWith({
       actor: { id: 'actor', role: Role.ADMIN },
       action: AuditAction.PASSWORD_RESET,
@@ -75,6 +78,18 @@ describe('PasswordResetService — student', () => {
       ip: '10.0.0.1',
     });
     expect(JSON.stringify(audit.record.mock.calls)).not.toContain(temporaryPassword);
+  });
+
+  it('parol va audit bitta tranzaksiyada; audit xatosida kesh yangilanmaydi', async () => {
+    const { service, users, tokenVersions, audit, unitOfWork } = setup(
+      userRecord('s1', Role.STUDENT),
+    );
+    audit.record.mockRejectedValue(new Error('db'));
+
+    await expect(service.resetStudent('s1', actorOf(Role.ADMIN))).rejects.toThrow('db');
+    expect(unitOfWork.run).toHaveBeenCalledTimes(1);
+    expect(users.resetPassword).toHaveBeenCalledTimes(1);
+    expect(tokenVersions.onVersionChanged).not.toHaveBeenCalled();
   });
 
   it.each([null, userRecord('m1', Role.MENTOR)])(

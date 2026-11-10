@@ -10,8 +10,10 @@ function cacheKey(userId: string): string {
 
 /**
  * `users.token_version` — har so'rovda access token'dagi `ver` bilan solishtiriladi (docs/02 §3).
- * Redis keshi (docs/13 §6); kesh ishlamasa — to'g'ridan-to'g'ri bazadan (so'rov yiqilmaydi).
- * `token_version` ni o'zgartirgan har bir joy `remember` ni chaqirishi shart.
+ * Redis keshi (docs/13 §6); kesh o'qilmasa — to'g'ridan-to'g'ri bazadan (so'rov yiqilmaydi).
+ * Keshga yozish — "faqat kattaroq versiya" (Lua compare-and-set): bazadan eski versiyani o'qigan
+ * parallel so'rov yangi versiya ustidan yoza olmaydi.
+ * `token_version` ni o'zgartirgan har bir joy `onVersionChanged` ni chaqirishi shart.
  */
 @Injectable()
 export class TokenVersionService {
@@ -30,14 +32,29 @@ export class TokenVersionService {
     }
     const version = await this.users.findTokenVersion(userId);
     if (version !== null) {
-      await this.remember(userId, version);
+      await this.cacheFromRead(userId, version);
     }
     return version;
   }
 
-  async remember(userId: string, version: number): Promise<void> {
+  /**
+   * Versiya oshgandan keyin (parol almashtirish/tiklash, deaktivatsiya). Kesh xatosi yutilmaydi:
+   * yozib bo'lmasa kalit o'chiriladi (keyingi so'rov bazadan o'qiydi); u ham bo'lmasa — xato
+   * yuqoriga uzatiladi (eski versiya keshda qolib, eski access tokenlar ishlamasin).
+   */
+  async onVersionChanged(userId: string, version: number): Promise<void> {
     try {
-      await this.redis.set(cacheKey(userId), String(version), TOKEN_VERSION_CACHE_TTL_SECONDS);
+      await this.redis.setIfGreater(cacheKey(userId), version, TOKEN_VERSION_CACHE_TTL_SECONDS);
+    } catch (error) {
+      this.logger.warn(`token_version keshiga yozib bo'lmadi, kalit o'chiriladi: ${String(error)}`);
+      await this.redis.del(cacheKey(userId));
+    }
+  }
+
+  /** O'qishda keshlash — xato so'rovni yiqitmaydi. */
+  private async cacheFromRead(userId: string, version: number): Promise<void> {
+    try {
+      await this.redis.setIfGreater(cacheKey(userId), version, TOKEN_VERSION_CACHE_TTL_SECONDS);
     } catch (error) {
       this.logger.warn(`token_version keshiga yozib bo'lmadi: ${String(error)}`);
     }

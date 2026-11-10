@@ -1,20 +1,11 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseUUIDPipe,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 
 import type { ParentTokenCreatedResponse, ParentTokensListResponse } from '@lms/shared';
 
 import { Actor } from '../../../common/decorators/actor.decorator.js';
 import { NoStore } from '../../../common/decorators/no-store.decorator.js';
 import { StaffStudentAccess } from '../../../common/decorators/staff-student-access.decorator.js';
+import { UuidParam } from '../../../common/decorators/uuid-param.decorator.js';
 import { CreateParentTokenDto } from '../dto/parent-tokens.dto.js';
 import { ParentTokensService } from '../services/parent-tokens.service.js';
 
@@ -30,7 +21,7 @@ export class ParentTokensController {
   constructor(private readonly parentTokens: ParentTokensService) {}
 
   @Get()
-  list(@Param('id', ParseUUIDPipe) studentId: string): Promise<ParentTokensListResponse> {
+  list(@UuidParam('id') studentId: string): Promise<ParentTokensListResponse> {
     return this.parentTokens.list(studentId);
   }
 
@@ -38,7 +29,7 @@ export class ParentTokensController {
   @Post()
   @NoStore()
   create(
-    @Param('id', ParseUUIDPipe) studentId: string,
+    @UuidParam('id') studentId: string,
     @Body() dto: CreateParentTokenDto,
     @Actor() actor: ActorContext,
   ): Promise<ParentTokenCreatedResponse> {
@@ -48,8 +39,8 @@ export class ParentTokensController {
   @Delete(':tokenId')
   @HttpCode(HttpStatus.NO_CONTENT)
   revoke(
-    @Param('id', ParseUUIDPipe) studentId: string,
-    @Param('tokenId', ParseUUIDPipe) tokenId: string,
+    @UuidParam('id') studentId: string,
+    @UuidParam('tokenId') tokenId: string,
     @Actor() actor: ActorContext,
   ): Promise<void> {
     return this.parentTokens.revoke(studentId, tokenId, actor);
@@ -59,8 +50,8 @@ export class ParentTokensController {
   @Post(':tokenId/regenerate')
   @NoStore()
   regenerate(
-    @Param('id', ParseUUIDPipe) studentId: string,
-    @Param('tokenId', ParseUUIDPipe) tokenId: string,
+    @UuidParam('id') studentId: string,
+    @UuidParam('tokenId') tokenId: string,
     @Actor() actor: ActorContext,
   ): Promise<ParentTokenCreatedResponse> {
     return this.parentTokens.regenerate(studentId, tokenId, actor);

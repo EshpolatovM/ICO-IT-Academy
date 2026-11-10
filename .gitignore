@@ -24,3 +24,8 @@ apps/api/src/infra/prisma/generated/
 playwright-report/
 test-results/
 .next-e2e/
+# Tekshiruv build'i (NEXT_DIST_DIR=.next-be)
+.next-be/
+# Next.js generatsiya qiladigan fayl (distDir yo'lini o'z ichiga oladi): `next typegen` bilan yaratiladi
+# (web `lint`/`typecheck` skriptlari avval shuni ishga tushiradi), shuning uchun repoda saqlanmaydi.
+apps/web/next-env.d.ts

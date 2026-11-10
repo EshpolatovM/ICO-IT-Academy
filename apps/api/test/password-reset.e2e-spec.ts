@@ -86,7 +86,13 @@ describe('Parolni tiklash va parol siyosati (e2e)', () => {
     await reset(mentorToken, 'staff', admin.id).expect(403);
     await reset(studentToken, 'students', student.id).expect(403);
     await reset(adminToken, 'students', mentor.id).expect(404);
-    await reset(adminToken, 'students', 'not-a-uuid').expect(400);
+    const badId = await reset(adminToken, 'students', 'not-a-uuid').expect(400);
+    expect(badId.body).toMatchObject({
+      error: {
+        code: 'VALIDATION_ERROR',
+        details: [{ field: 'id', message: expect.any(String) as string }],
+      },
+    });
   });
 
   it("qora ro'yxatdagi parol bilan change-password — 400", async () => {

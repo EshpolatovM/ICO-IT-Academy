@@ -85,8 +85,16 @@ describe('Scope va chekka holatlar (e2e)', () => {
     await asAdmin.post(`/staff/${missing}/reset-password`).expect(404);
     await asAdmin.get(`/students/${admin.id}/parent-tokens`).expect(404);
 
-    await asAdmin.get('/students/not-a-uuid/parent-tokens').expect(400);
-    await asAdmin.delete(`/students/${missing}/parent-tokens/not-a-uuid`).expect(400);
+    const badStudent = await asAdmin.get('/students/not-a-uuid/parent-tokens').expect(400);
+    expect(badStudent.body).toMatchObject({
+      error: { code: 'VALIDATION_ERROR', details: [{ field: 'id' }] },
+    });
+    const badToken = await asAdmin
+      .delete(`/students/${missing}/parent-tokens/not-a-uuid`)
+      .expect(400);
+    expect(badToken.body).toMatchObject({
+      error: { code: 'VALIDATION_ERROR', details: [{ field: 'tokenId' }] },
+    });
   });
 
   it("token yorlig'i: 64 belgidan uzun — 400, bo'sh body — 201 (label null)", async () => {

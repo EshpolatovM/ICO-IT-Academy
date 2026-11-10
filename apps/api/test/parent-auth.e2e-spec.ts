@@ -3,9 +3,11 @@ import { Controller, Delete, Get, HttpCode, HttpStatus, Post } from '@nestjs/com
 import { AuditAction, Role } from '@lms/shared';
 import type { ParentExchangeResponse, ParentTokensListResponse } from '@lms/shared';
 
+import { AppConfigService } from '../src/common/config/app-config.service.js';
+import { AnyAuthenticated } from '../src/common/decorators/any-authenticated.decorator.js';
 import { PrismaService } from '../src/infra/prisma/prisma.service.js';
 
-import { API, AuthFixtures, http, login } from './support/auth-fixtures.js';
+import { API, AuthFixtures, http, login, statusCounts } from './support/auth-fixtures.js';
 import { createTestApp } from './support/create-test-app.js';
 import {
   asParent,
@@ -22,7 +24,8 @@ import type { TestUser } from './support/auth-fixtures.js';
 import type { INestApplication } from '@nestjs/common';
 import type { App } from 'supertest/types.js';
 
-/** Faqat testda: `@Roles` siz (ANY) GET va mutatsiya endpointlari — ParentReadOnlyGuard tekshiruvi uchun. */
+/** Faqat testda: `@AnyAuthenticated` (ANY) GET va mutatsiya endpointlari — ParentReadOnlyGuard tekshiruvi uchun. */
+@AnyAuthenticated()
 @Controller('e2e-parent-probe')
 class ParentProbeController {
   @Get()
@@ -135,7 +138,10 @@ describe('Ota-ona kirishi va tokenlari (e2e)', () => {
     await exchange(app).expect(401);
     await exchange(app, undefined, 'parent_tokens=v1.buzilgan').expect(401);
 
-    const logout = await asParent(app, pairOf(refreshed, 'ps')).post('/auth/logout').expect(204);
+    await asParent(app, pairOf(refreshed, 'ps')).post('/auth/logout').expect(403);
+    const logout = await asParent(app, pairOf(refreshed, 'ps'))
+      .postWithCsrf('/auth/logout')
+      .expect(204);
     expect(setCookieOf(logout, 'ps')).toMatch(/^ps=;.*Expires=Thu, 01 Jan 1970/);
     expect(setCookieOf(logout, 'parent_tokens')).toMatch(/^parent_tokens=;/);
   });
@@ -190,6 +196,31 @@ describe('Ota-ona kirishi va tokenlari (e2e)', () => {
     }
     const limited = await exchange(app, wrong).expect(429);
     expect(limited.body).toMatchObject({ error: { code: 'RATE_LIMITED' } });
+  });
+
+  it("exchange rate limit parallel so'rovlarda ham: limitdan ortig'i — 429", async () => {
+    const maxAttempts = app.get(AppConfigService).get('PARENT_EXCHANGE_MAX_ATTEMPTS');
+    const wrong = { tokens: ['y'.repeat(43)] };
+
+    const responses = await Promise.all(
+      Array.from({ length: maxAttempts + 2 }, () => exchange(app, wrong)),
+    );
+
+    expect(statusCounts(responses)).toEqual({ 401: maxAttempts, 429: 2 });
+  });
+
+  it("body'siz exchange (server bergan cookie bilan) muvaffaqiyatda IP limitiga sanalmaydi", async () => {
+    const maxAttempts = app.get(AppConfigService).get('PARENT_EXCHANGE_MAX_ATTEMPTS');
+    const student = await fixtures.createUser({ role: Role.STUDENT });
+    const created = await issueParentToken(app, adminToken, student.id);
+    const initial = await exchange(app, { tokens: [created.token] }).expect(200);
+    const storedCookie = pairOf(initial, 'parent_tokens');
+
+    for (let attempt = 0; attempt <= maxAttempts; attempt += 1) {
+      await exchange(app, undefined, storedCookie).expect(200);
+    }
+    // Urinishlar hisoblagichi to'lmagan: token bilan exchange hali ham ishlaydi (429 emas).
+    await exchange(app, { tokens: [created.token] }).expect(200);
   });
 
   it('mentor: parent-token endpointlari 403 (2-bosqichgacha); begona student — 404; student — 403', async () => {

@@ -5,6 +5,7 @@ import { ParentTokensService } from './parent-tokens.service.js';
 
 import type { ParentTokenIssuer } from './parent-token-issuer.service.js';
 import type { ParentTokenValidityCache } from './parent-token-validity.service.js';
+import type { UnitOfWork } from '../../../common/transaction/unit-of-work.js';
 import type { AuditService } from '../../audit/services/audit.service.js';
 import type { UsersRepository } from '../../users/repositories/users.repository.js';
 import type { ParentTokenRecord } from '../parent-access.types.js';
@@ -41,16 +42,17 @@ function setup(overrides: Partial<Record<string, jest.Mock>> = {}) {
     maxActiveTokens: 3,
     toCreatedResponse: jest.fn((r: ParentTokenRecord, token: string) => ({ id: r.id, token })),
   };
-  const validity = { invalidate: jest.fn().mockResolvedValue(undefined) };
+  const validity = { markRevoked: jest.fn().mockResolvedValue(undefined) };
   const audit = { record: jest.fn().mockResolvedValue(undefined) };
+  const unitOfWork = { run: jest.fn(<T>(work: () => Promise<T>) => work()) };
   const service = new ParentTokensService(
     tokens as unknown as ParentAccessTokensRepository,
     users as unknown as UsersRepository,
     issuer as unknown as ParentTokenIssuer,
     validity as unknown as ParentTokenValidityCache,
-    new ParentTokenAuditor(audit as unknown as AuditService),
+    new ParentTokenAuditor(audit as unknown as AuditService, unitOfWork as unknown as UnitOfWork),
   );
-  return { service, tokens, users, validity, audit };
+  return { service, tokens, users, validity, audit, unitOfWork };
 }
 
 describe('ParentTokensService', () => {
@@ -123,14 +125,18 @@ describe('ParentTokensService', () => {
     expect(audit.record).not.toHaveBeenCalled();
   });
 
-  it("bekor qilish: kesh o'chiriladi, audit; topilmasa — 404", async () => {
-    const { service, tokens, validity, audit } = setup();
+  it("bekor qilish: amal va audit bitta tranzaksiyada, so'ng kesh tombstone; topilmasa — 404", async () => {
+    const { service, tokens, validity, audit, unitOfWork } = setup();
 
     await service.revoke('s1', 't1', actor);
+    expect(unitOfWork.run).toHaveBeenCalledTimes(1);
+    expect(audit.record.mock.invocationCallOrder[0]).toBeLessThan(
+      validity.markRevoked.mock.invocationCallOrder[0] ?? 0,
+    );
     expect(tokens.revoke).toHaveBeenCalledWith(
       expect.objectContaining({ tokenId: 't1', studentId: 's1', revokedById: 'a1' }),
     );
-    expect(validity.invalidate).toHaveBeenCalledWith('t1');
+    expect(validity.markRevoked).toHaveBeenCalledWith('t1');
     expect(audit.record).toHaveBeenCalledWith(
       expect.objectContaining({ action: AuditAction.PARENT_TOKEN_REVOKED, entityId: 't1' }),
     );
@@ -139,6 +145,15 @@ describe('ParentTokensService', () => {
     await expect(service.revoke('s1', 't1', actor)).rejects.toMatchObject({
       code: ErrorCode.NOT_FOUND,
     });
+    expect(audit.record).toHaveBeenCalledTimes(1);
+  });
+
+  it('audit yozilmasa — xato tranzaksiyadan chiqadi (bekor qilish ham qaytariladi), kesh tegilmaydi', async () => {
+    const { service, validity, audit } = setup();
+    audit.record.mockRejectedValue(new Error('db'));
+
+    await expect(service.revoke('s1', 't1', actor)).rejects.toThrow('db');
+    expect(validity.markRevoked).not.toHaveBeenCalled();
   });
 
   it("qayta yaratish: revoke+create bitta chaqiruvda, eski kesh o'chiriladi, yangi xom token", async () => {
@@ -152,7 +167,7 @@ describe('ParentTokensService', () => {
       expect.objectContaining({ tokenId: 't1', studentId: 's1', revokedById: 'a1' }),
       { studentId: 's1', tokenHash: 'HASH', tokenPrefix: 'k2Jd8x', createdById: 'a1' },
     );
-    expect(validity.invalidate).toHaveBeenCalledWith('t1');
+    expect(validity.markRevoked).toHaveBeenCalledWith('t1');
     expect(audit.record).toHaveBeenCalledWith(
       expect.objectContaining({
         action: AuditAction.PARENT_TOKEN_REGENERATED,
@@ -168,6 +183,6 @@ describe('ParentTokensService', () => {
     await expect(service.regenerate('s1', 't1', actor)).rejects.toMatchObject({
       code: ErrorCode.NOT_FOUND,
     });
-    expect(validity.invalidate).not.toHaveBeenCalled();
+    expect(validity.markRevoked).not.toHaveBeenCalled();
   });
 });

@@ -11,6 +11,7 @@ function createLimiter(stored: string | null, hits = 1) {
     incrementWithTtl: jest.fn().mockResolvedValue(hits),
     expire: jest.fn().mockResolvedValue(undefined),
     del: jest.fn().mockResolvedValue(1),
+    decrementIfPositive: jest.fn().mockResolvedValue(0),
   };
   return { redis, limiter: new FixedWindowRateLimiter(redis as unknown as RedisService) };
 }
@@ -57,5 +58,25 @@ describe('FixedWindowRateLimiter', () => {
 
     await limiter.reset(policy, 'a');
     expect(redis.del).toHaveBeenCalledWith('rl:test:a');
+  });
+
+  it('consume — avval atomar sanaydi, limitdan oshganda 429', async () => {
+    const within = createLimiter(null, 3);
+    await expect(within.limiter.consume(policy, 'a')).resolves.toBeUndefined();
+    expect(within.redis.incrementWithTtl).toHaveBeenCalledWith('rl:test:a', 60);
+    expect(within.redis.get).not.toHaveBeenCalled();
+
+    const over = createLimiter(null, 4);
+    await expect(over.limiter.consume(policy, 'a')).rejects.toMatchObject({
+      code: ErrorCode.RATE_LIMITED,
+      status: 429,
+    });
+  });
+
+  it("release — hisoblagichni musbat bo'lsagina kamaytiradi", async () => {
+    const { redis, limiter } = createLimiter(null);
+
+    await limiter.release(policy, 'a');
+    expect(redis.decrementIfPositive).toHaveBeenCalledWith('rl:test:a');
   });
 });

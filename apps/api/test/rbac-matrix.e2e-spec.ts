@@ -97,7 +97,7 @@ const CASES: EndpointCase[] = [
   },
   {
     endpoint: 'POST /auth/logout',
-    build: resolved({ method: 'post', path: '/auth/logout' }),
+    build: resolved({ method: 'post', path: '/auth/logout', csrf: true }),
     expected: row(UNAUTHORIZED, ok(204), ok(204), ok(204), ok(204), ok(204), ok(204)),
   },
   {

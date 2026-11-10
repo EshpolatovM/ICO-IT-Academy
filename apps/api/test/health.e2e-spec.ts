@@ -35,6 +35,24 @@ describe('GET /api/v1/health (e2e)', () => {
     expect(response.headers[REQUEST_ID_HEADER]).toBe('e2e-req-1');
   });
 
+  it("xavfsizlik header'lari (helmet) — oddiy va xato javoblarda; dev'da HSTS yo'q", async () => {
+    const responses = [
+      await request(app.getHttpServer()).get(HEALTH_PATH).expect(200),
+      await request(app.getHttpServer()).get('/api/v1/yoq-route').expect(404),
+    ];
+
+    for (const response of responses) {
+      expect(response.headers).toMatchObject({
+        'x-content-type-options': 'nosniff',
+        'x-frame-options': 'DENY',
+        'referrer-policy': 'no-referrer',
+        'content-security-policy': "default-src 'none';frame-ancestors 'none'",
+      });
+      expect(response.headers).not.toHaveProperty('strict-transport-security');
+      expect(response.headers).not.toHaveProperty('x-powered-by');
+    }
+  });
+
   it("mavjud bo'lmagan route — 404 docs/12 §0 formatida", async () => {
     const response = await request(app.getHttpServer()).get('/api/v1/yoq-route').expect(404);
 

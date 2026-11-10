@@ -15,3 +15,15 @@ export const PARENT_TOKEN_VALID_CACHE_SUFFIX = ':valid';
  * holatlari (student deaktivatsiyasi, `expires_at`) uchun yuqori chegara.
  */
 export const PARENT_TOKEN_VALID_CACHE_TTL_SECONDS = 300;
+
+/**
+ * "Bekor qilingan" belgisi (tombstone): `parent_token:{id}:revoked`. Bekor qilishda qo'yiladi —
+ * kesh o'qilganda u bor bo'lsa token bazaga qaramay rad etiladi va `:valid` keshi qayta yozilmaydi
+ * (bekor qilish bilan parallel o'qish eski "valid" ni keshga qaytara olmaydi).
+ * Muddati `:valid` keshinikidan kam bo'lmasligi shart: undan oldin yozilgan har qanday "valid" yozuv
+ * tombstone'dan oldin tugaydi.
+ */
+export const PARENT_TOKEN_REVOKED_CACHE_SUFFIX = ':revoked';
+export const PARENT_TOKEN_REVOKED_TOMBSTONE_TTL_SECONDS = PARENT_TOKEN_VALID_CACHE_TTL_SECONDS;
+/** Tombstone qiymati (faqat kalit mavjudligi ahamiyatli). */
+export const PARENT_TOKEN_REVOKED_MARKER = '1';

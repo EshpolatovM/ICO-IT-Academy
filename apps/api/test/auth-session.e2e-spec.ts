@@ -1,7 +1,11 @@
 import { randomUUID } from 'node:crypto';
 
-import { Role } from '@lms/shared';
+import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE, ErrorCode, Role } from '@lms/shared';
 import type { AuthSessionsResponse } from '@lms/shared';
+
+import { AppConfigService } from '../src/common/config/app-config.service.js';
+import { PrismaService } from '../src/infra/prisma/prisma.service.js';
+import { hashRefreshToken } from '../src/modules/auth/services/refresh-token.service.js';
 
 import {
   API,
@@ -11,6 +15,7 @@ import {
   login,
   refreshRequest,
   refreshSetCookie,
+  statusCounts,
   TEST_PASSWORD,
 } from './support/auth-fixtures.js';
 import { createTestApp } from './support/create-test-app.js';
@@ -20,6 +25,9 @@ import type { INestApplication } from '@nestjs/common';
 import type { App } from 'supertest/types.js';
 
 const NEW_PASSWORD = 'Yangi$Parol9';
+const MS_PER_SECOND = 1000;
+/** Limitdan ortiq yuboriladigan parallel urinishlar soni. */
+const EXTRA_ATTEMPTS = 2;
 
 describe('Auth: parol almashtirish, refresh, sessiyalar, chiqish (e2e)', () => {
   let app: INestApplication<App>;
@@ -83,7 +91,7 @@ describe('Auth: parol almashtirish, refresh, sessiyalar, chiqish (e2e)', () => {
     await send({ oldPassword: TEST_PASSWORD, newPassword: 'qisqa' }).expect(400);
   });
 
-  it('refresh: X-Requested-With siz — 403; rotation; eski token qayta kelsa — 401 va oila bekor', async () => {
+  it('refresh: X-Requested-With siz — 403; rotation; grace ichida eski token — REFRESH_SUPERSEDED, sessiya saqlanadi', async () => {
     const mentor = await fixtures.createUser({ role: Role.MENTOR });
     const session = await login(app, mentor);
 
@@ -95,8 +103,47 @@ describe('Auth: parol almashtirish, refresh, sessiyalar, chiqish (e2e)', () => {
     const nextCookie = cookiePair(refreshSetCookie(rotated));
     expect(nextCookie).not.toBe(session.cookie);
 
-    await refreshRequest(app, session.cookie).expect(401);
-    // Reuse detection: shu oiladagi yangi token ham bekor bo'ldi.
+    const superseded = await refreshRequest(app, session.cookie).expect(401);
+    expect(superseded.body).toMatchObject({ error: { code: ErrorCode.REFRESH_SUPERSEDED } });
+    expect(refreshSetCookie(superseded)).toBeUndefined();
+    // Oila bekor qilinmadi: yangi token ishlaydi.
+    await refreshRequest(app, nextCookie).expect(200);
+  });
+
+  it("refresh: parallel tablar bir vaqtda — bittasi 200, qolganlari REFRESH_SUPERSEDED, sessiya o'lmaydi", async () => {
+    const student = await fixtures.createUser({ role: Role.STUDENT });
+    const session = await login(app, student);
+
+    const responses = await Promise.all(
+      Array.from({ length: 3 }, () => refreshRequest(app, session.cookie)),
+    );
+
+    const ok = responses.filter((response) => response.status === 200);
+    const rest = responses.filter((response) => response.status !== 200);
+    expect(ok).toHaveLength(1);
+    for (const response of rest) {
+      expect(response.status).toBe(401);
+      expect(response.body).toMatchObject({ error: { code: ErrorCode.REFRESH_SUPERSEDED } });
+    }
+    const [winner] = ok;
+    expect(winner).toBeDefined();
+    const winnerCookie = cookiePair(winner ? refreshSetCookie(winner) : undefined);
+    await refreshRequest(app, winnerCookie).expect(200);
+  });
+
+  it('refresh: grace oynasidan keyin eski token qayta kelsa — 401 va oila bekor (reuse detection)', async () => {
+    const mentor = await fixtures.createUser({ role: Role.MENTOR });
+    const session = await login(app, mentor);
+    const rotated = await refreshRequest(app, session.cookie).expect(200);
+    const nextCookie = cookiePair(refreshSetCookie(rotated));
+    const graceSeconds = app.get(AppConfigService).get('REFRESH_REUSE_GRACE_SECONDS');
+    await app.get(PrismaService).db.refreshToken.update({
+      where: { tokenHash: hashRefreshToken(session.cookie.replace('rt=', '')) },
+      data: { revokedAt: new Date(Date.now() - (graceSeconds + 1) * MS_PER_SECOND) },
+    });
+
+    const reused = await refreshRequest(app, session.cookie).expect(401);
+    expect(reused.body).toMatchObject({ error: { code: ErrorCode.UNAUTHORIZED } });
     await refreshRequest(app, nextCookie).expect(401);
   });
 
@@ -128,20 +175,47 @@ describe('Auth: parol almashtirish, refresh, sessiyalar, chiqish (e2e)', () => {
     const remove = (id: string) =>
       http(app).delete(`${API}/auth/sessions/${id}`).auth(laptop.accessToken, { type: 'bearer' });
     await remove(randomUUID()).expect(404);
-    await remove('not-a-uuid').expect(400);
+    const badId = await remove('not-a-uuid').expect(400);
+    expect(badId.body).toMatchObject({
+      error: { code: 'VALIDATION_ERROR', details: [{ field: 'id' }] },
+    });
   });
 
-  it('logout: 204, cookie tozalanadi, refresh endi ishlamaydi', async () => {
+  it('logout: X-Requested-With siz — 403 (CSRF); 204, cookie tozalanadi, refresh endi ishlamaydi', async () => {
     const student = await fixtures.createUser({ role: Role.STUDENT });
     const session = await login(app, student);
 
-    const response = await http(app)
-      .post(`${API}/auth/logout`)
-      .auth(session.accessToken, { type: 'bearer' })
-      .set('Cookie', session.cookie)
-      .expect(204);
+    const logout = () =>
+      http(app)
+        .post(`${API}/auth/logout`)
+        .auth(session.accessToken, { type: 'bearer' })
+        .set('Cookie', session.cookie);
+
+    const noCsrf = await logout().expect(403);
+    expect(noCsrf.body).toMatchObject({ error: { code: ErrorCode.FORBIDDEN } });
+    const response = await logout().set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE).expect(204);
 
     expect(refreshSetCookie(response)).toMatch(/^rt=;.*Expires=Thu, 01 Jan 1970/);
     await refreshRequest(app, session.cookie).expect(401);
+  });
+
+  it("change-password: eski parol bo'yicha urinishlar limiti — keyingisi 429 (to'g'ri parol bilan ham)", async () => {
+    const mentor = await fixtures.createUser({ role: Role.MENTOR });
+    const { accessToken } = await login(app, mentor);
+    const send = (oldPassword: string) =>
+      http(app)
+        .post(`${API}/auth/change-password`)
+        .auth(accessToken, { type: 'bearer' })
+        .send({ oldPassword, newPassword: NEW_PASSWORD });
+
+    const maxAttempts = app.get(AppConfigService).get('CHANGE_PASSWORD_RATE_LIMIT_MAX_ATTEMPTS');
+
+    const wrong = await Promise.all(
+      Array.from({ length: maxAttempts + EXTRA_ATTEMPTS }, () => send('NotoGri123')),
+    );
+
+    expect(statusCounts(wrong)).toEqual({ 400: maxAttempts, 429: EXTRA_ATTEMPTS });
+    const limited = await send(TEST_PASSWORD).expect(429);
+    expect(limited.body).toMatchObject({ error: { code: ErrorCode.RATE_LIMITED } });
   });
 });

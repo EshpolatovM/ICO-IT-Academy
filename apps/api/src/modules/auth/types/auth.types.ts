@@ -50,6 +50,8 @@ export interface RefreshTokenRecord {
   ip: string | null;
   expiresAt: Date;
   revokedAt: Date | null;
+  /** Rotation'da shu tokenni almashtirgan yangi token (reuse grace oynasi uchun). */
+  replacedById: string | null;
   createdAt: Date;
 }
 

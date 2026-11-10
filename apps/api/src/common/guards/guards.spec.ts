@@ -3,6 +3,8 @@ import { Reflector } from '@nestjs/core';
 import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE, ErrorCode, Role } from '@lms/shared';
 
 import { ALLOW_PENDING_PASSWORD_CHANGE_KEY } from '../decorators/allow-pending-password-change.decorator.js';
+import { ANY_AUTHENTICATED_KEY } from '../decorators/any-authenticated.decorator.js';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator.js';
 import { ROLES_KEY } from '../decorators/roles.decorator.js';
 
 import { CsrfHeaderGuard } from './csrf-header.guard.js';
@@ -60,8 +62,24 @@ afterEach(() => {
 describe('RolesGuard', () => {
   const guard = new RolesGuard(new Reflector());
 
-  it("@Roles berilmagan bo'lsa — o'tkazadi", () => {
-    expect(guard.canActivate(contextFor({ user: student }))).toBe(true);
+  it("deny-by-default: @Public/@Roles/@AnyAuthenticated yo'q — 403 (foydalanuvchi bo'lsa ham)", () => {
+    expect(thrownBy(() => guard.canActivate(contextFor({ user: student })))).toMatchObject({
+      code: ErrorCode.FORBIDDEN,
+      status: 403,
+    });
+  });
+
+  it("@Public — foydalanuvchisiz ham o'tkazadi", () => {
+    expect(guard.canActivate(contextFor({}, { [IS_PUBLIC_KEY]: true }))).toBe(true);
+  });
+
+  it("@AnyAuthenticated — har qanday autentifikatsiyalangan o'tadi, user yo'q — 403", () => {
+    const anyAuth = { [ANY_AUTHENTICATED_KEY]: true };
+
+    expect(guard.canActivate(contextFor({ user: student }, anyAuth))).toBe(true);
+    expect(thrownBy(() => guard.canActivate(contextFor({}, anyAuth)))).toMatchObject({
+      code: ErrorCode.FORBIDDEN,
+    });
   });
 
   it("rol ro'yxatda bo'lsa — o'tkazadi", () => {

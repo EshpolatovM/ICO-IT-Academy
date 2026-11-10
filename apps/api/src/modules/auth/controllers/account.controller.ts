@@ -1,13 +1,15 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 
 import type { AccessTokenResponse, MeResponse } from '@lms/shared';
 
 import { ACCOUNT_ROLES } from '../../../common/constants/roles.constants.js';
 import { AllowPendingPasswordChange } from '../../../common/decorators/allow-pending-password-change.decorator.js';
+import { AnyAuthenticated } from '../../../common/decorators/any-authenticated.decorator.js';
 import { ClientMeta } from '../../../common/decorators/client-meta.decorator.js';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator.js';
 import { ParentWriteAllowed } from '../../../common/decorators/parent-write-allowed.decorator.js';
 import { Roles } from '../../../common/decorators/roles.decorator.js';
+import { CsrfHeaderGuard } from '../../../common/guards/csrf-header.guard.js';
 import { RefreshTokenCookie } from '../decorators/refresh-token-cookie.decorator.js';
 import { ChangePasswordDto } from '../dto/auth.dto.js';
 import { LogoutService } from '../services/logout.service.js';
@@ -25,6 +27,7 @@ import type { Response } from 'express';
  * Kirgan foydalanuvchining auth amallari (docs/12 §1): `me` (ANY + P), `logout` (ANY + P),
  * `change-password` (SA A M S). Uchalasi `must_change_password = true` bo'lsa ham ishlaydi
  * (docs/02 §3; logout — foydalanuvchi qurilmadan chiqib keta olishi uchun).
+ * `ANY` — `@AnyAuthenticated()` (RolesGuard deny-by-default).
  */
 @AllowPendingPasswordChange()
 @Controller('auth')
@@ -36,13 +39,19 @@ export class AccountController {
     private readonly refreshCookie: RefreshCookieService,
   ) {}
 
+  @AnyAuthenticated()
   @Get('me')
   me(@CurrentUser() user: RequestUser): Promise<MeResponse> {
     return this.meService.getMe(user);
   }
 
-  /** Ota-ona uchun ham (ikkala cookie o'chiriladi). */
+  /**
+   * Ota-ona uchun ham (ikkala cookie o'chiriladi). `rt`/`ps` cookie bilan ishlaydi — CSRF:
+   * `X-Requested-With` majburiy (boshqa saytdan majburan chiqarib yuborilmasligi uchun).
+   */
+  @AnyAuthenticated()
   @ParentWriteAllowed()
+  @UseGuards(CsrfHeaderGuard)
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(

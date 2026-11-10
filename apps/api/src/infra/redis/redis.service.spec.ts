@@ -1,3 +1,9 @@
+import {
+  DECREMENT_IF_POSITIVE_SCRIPT,
+  INCREMENT_WITH_TTL_SCRIPT,
+  SET_IF_GREATER_SCRIPT,
+  SET_UNLESS_BLOCKED_SCRIPT,
+} from './redis-scripts.js';
 import { RedisService } from './redis.service.js';
 
 import type { Redis } from 'ioredis';
@@ -12,7 +18,8 @@ function createFakeClient(status = 'ready') {
     get: jest.fn().mockResolvedValue('qiymat'),
     set: jest.fn().mockResolvedValue('OK'),
     del: jest.fn().mockResolvedValue(1),
-    incr: jest.fn().mockResolvedValue(3),
+    eval: jest.fn().mockResolvedValue(3),
+    mget: jest.fn().mockResolvedValue(['a', null]),
     expire: jest.fn().mockResolvedValue(1),
     disconnect: jest.fn(),
   };
@@ -72,12 +79,41 @@ describe('RedisService', () => {
     expect(client.set).toHaveBeenNthCalledWith(2, 'k', 'v', 'EX', 60);
   });
 
-  it("incrementWithTtl: kalit yo'q bo'lsa TTL bilan yaratadi (NX), so'ng INCR", async () => {
+  it('incrementWithTtl: bitta atomar Lua skript (INCR + EXPIRE NX)', async () => {
     const { client, service } = createService();
 
     expect(await service.incrementWithTtl('k', 900)).toBe(3);
-    expect(client.set).toHaveBeenCalledWith('k', '0', 'EX', 900, 'NX');
-    expect(client.incr).toHaveBeenCalledWith('k');
+    expect(client.eval).toHaveBeenCalledWith(INCREMENT_WITH_TTL_SCRIPT, 1, 'k', 900);
+    expect(INCREMENT_WITH_TTL_SCRIPT).toContain("'EXPIRE', KEYS[1], ARGV[1], 'NX'");
+    expect(client.set).not.toHaveBeenCalled();
+  });
+
+  it('decrementIfPositive / setIfGreater / setUnlessExists — Lua skriptlari', async () => {
+    const { client, service } = createService();
+
+    client.eval.mockResolvedValueOnce(2).mockResolvedValueOnce(1).mockResolvedValueOnce(0);
+    expect(await service.decrementIfPositive('k')).toBe(2);
+    expect(await service.setIfGreater('v', 7, 600)).toBe(true);
+    expect(await service.setUnlessExists('a', 'b', 'x', 300)).toBe(false);
+
+    expect(client.eval).toHaveBeenNthCalledWith(1, DECREMENT_IF_POSITIVE_SCRIPT, 1, 'k');
+    expect(client.eval).toHaveBeenNthCalledWith(2, SET_IF_GREATER_SCRIPT, 1, 'v', 7, 600);
+    expect(client.eval).toHaveBeenNthCalledWith(
+      3,
+      SET_UNLESS_BLOCKED_SCRIPT,
+      2,
+      'a',
+      'b',
+      'x',
+      300,
+    );
+  });
+
+  it('getMany: MGET kalitlar tartibida', async () => {
+    const { client, service } = createService();
+
+    expect(await service.getMany(['a', 'b'])).toEqual(['a', null]);
+    expect(client.mget).toHaveBeenCalledWith('a', 'b');
   });
 
   it('expire: kalitga yangi muddat beradi', async () => {

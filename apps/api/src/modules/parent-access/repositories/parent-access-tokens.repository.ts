@@ -66,7 +66,13 @@ function toGrant(row: GrantRow): ParentGrantWithHash {
   };
 }
 
-/** `parent_access_tokens` va `parent_access_logs` jadvallari (docs/11 §1). */
+/**
+ * `parent_access_tokens` va `parent_access_logs` jadvallari (docs/11 §1).
+ * `BaseRepository` dan meros olmaydi: ikki jadval bilan ishlaydi, umumiy CRUD (`update`, `findMany`
+ * pagination) bu yerda kerak emas va xavfli (token faqat yaratiladi/bekor qilinadi, `token_hash`
+ * tashqariga chiqmaydi). Yozuv amallari `PrismaService.transaction` orqali — tashqi `UnitOfWork`
+ * (audit bilan) tranzaksiyasiga qo'shiladi.
+ */
 @Injectable()
 export class ParentAccessTokensRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -88,7 +94,7 @@ export class ParentAccessTokensRepository {
     limit: number,
     now: Date,
   ): Promise<ParentTokenRecord | null> {
-    return this.prisma.db.$transaction(async (tx) => {
+    return this.prisma.transaction(async (tx) => {
       await tx.$queryRaw`SELECT id FROM users WHERE id = ${data.studentId}::uuid FOR UPDATE`;
       const active = await tx.parentAccessToken.count({
         where: { studentId: data.studentId, ...activeWhere(now) },
@@ -102,7 +108,7 @@ export class ParentAccessTokensRepository {
 
   /** Studentning faol tokenini bekor qiladi; topilmasa (yoki allaqachon bekor) — `null`. */
   async revoke(revoke: RevokeData): Promise<ParentTokenRecord | null> {
-    return this.prisma.db.$transaction(async (tx) => {
+    return this.prisma.transaction(async (tx) => {
       const claimed = await tx.parentAccessToken.updateMany(revokeArgs(revoke));
       return claimed.count === 0
         ? null
@@ -115,7 +121,7 @@ export class ParentAccessTokensRepository {
     revoke: RevokeData,
     next: Omit<NewParentTokenData, 'label'>,
   ): Promise<RegeneratedTokens | null> {
-    return this.prisma.db.$transaction(async (tx) => {
+    return this.prisma.transaction(async (tx) => {
       const claimed = await tx.parentAccessToken.updateMany(revokeArgs(revoke));
       if (claimed.count === 0) {
         return null;

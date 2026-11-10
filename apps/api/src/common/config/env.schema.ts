@@ -4,6 +4,7 @@ import { DEFAULT_API_PORT } from '../constants/app.constants.js';
 
 import { assertSecureCookieInProduction, authEnvShape } from './auth-env.schema.js';
 import { parentEnvShape } from './parent-env.schema.js';
+import { assertNoPlaceholderSecretsInProduction } from './production-secrets.schema.js';
 import { trustProxySchema } from './trust-proxy.schema.js';
 
 /**
@@ -37,7 +38,10 @@ export const envSchema = z
     ...authEnvShape,
     ...parentEnvShape,
   })
-  .superRefine(assertSecureCookieInProduction);
+  .superRefine((env, ctx) => {
+    assertSecureCookieInProduction(env, ctx);
+    assertNoPlaceholderSecretsInProduction(env, ctx);
+  });
 
 export type Env = z.output<typeof envSchema>;
 

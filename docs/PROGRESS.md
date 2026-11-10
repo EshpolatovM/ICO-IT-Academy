@@ -125,3 +125,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Fayllar:** `apps/api/test/{rbac-matrix,access-scope}.e2e-spec.ts`, `apps/api/test/support/{rbac-actors,test-users,web-e2e-users}.ts`, `apps/web/{playwright.config.ts,e2e/**}`, `turbo.json`, `.gitignore`, `.github/workflows/ci.yml`, `package.json`lar.
 - **Testlar:** api unit 281, api e2e 160, web Vitest 94, Playwright 7 — hammasi yashil (tester); Tech Lead `pnpm check`, `format:check` qayta yurgizdi.
 - **Kuzatuvlar:** ParseUUIDPipe xato formati, turbo strict env (CI), next build tsconfig o'zgarishi → 1.11a ga qo'shildi.
+
+## 2026-11-11 — 1.11a: review tuzatishlari, backend (WIP commit)
+- **Nima qilindi:** atomar login/exchange limitlari + IP umumiy limit; refresh grace oynasi (`REFRESH_SUPERSEDED`); cookie bilan exchange limitga sanalmaydi; RolesGuard deny-by-default + `@AnyAuthenticated` + barcha route'lar testi; helmet; Redis Lua skriptlar; token_version CAS; change-password limiti; parent token tombstone + audit bitta tranzaksiyada (`UnitOfWork`); prod'da namuna sirlar rad etiladi; logout CSRF; access JWT `aud`; strict sxemalar; UUID → VALIDATION_ERROR; CI `pnpm audit`; turbo passThroughEnv; `next-env.d.ts` gitignore. postcss override (`next>postcss` 8.5.32).
+- **Frontend uchun:** REFRESH_SUPERSEDED da logout qilmaslik; logout CSRF (api client qo'yadi); strict sxemalar; UUID xato formati; web lint/typecheck `next typegen` bilan.
+- **Testlar:** `pnpm check` yashil (api 319, web 94); api e2e 169/170 — `auth-login.e2e-spec.ts` da 429 (yuqoridagi STATE ga qarang). Limit tugagani uchun WIP commit.

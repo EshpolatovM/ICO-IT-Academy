@@ -113,3 +113,12 @@ export function refreshRequest(app: INestApplication<App>, cookie: string) {
     .set('Cookie', cookie)
     .set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
 }
+
+/** Parallel so'rovlar natijasi: HTTP holati → nechta javob (rate limit testlari uchun). */
+export function statusCounts(responses: readonly request.Response[]): Record<number, number> {
+  const counts: Record<number, number> = {};
+  for (const { status } of responses) {
+    counts[status] = (counts[status] ?? 0) + 1;
+  }
+  return counts;
+}

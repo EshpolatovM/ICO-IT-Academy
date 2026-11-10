@@ -11,20 +11,25 @@ export const STUDENT_CODE_MAX_LENGTH = 16;
  */
 const loginPasswordSchema = z.string().min(1).max(PASSWORD_MAX_LENGTH);
 
+/**
+ * Auth so'rov sxemalari `z.strictObject`: noma'lum maydon — 400 `VALIDATION_ERROR` (jimgina tashlab
+ * yuborilmaydi).
+ */
+
 /** `POST /auth/staff/login` (docs/12 §1, docs/02 §4.1). */
-export const staffLoginSchema = z.object({
+export const staffLoginSchema = z.strictObject({
   phone: phoneSchema,
   password: loginPasswordSchema,
 });
 
 /** `POST /auth/student/login` (docs/12 §1, docs/02 §4.2). Kod katta harfga keltiriladi: `st-10245` → `ST-10245`. */
-export const studentLoginSchema = z.object({
+export const studentLoginSchema = z.strictObject({
   studentCode: z.string().trim().min(1).max(STUDENT_CODE_MAX_LENGTH).toUpperCase(),
   password: loginPasswordSchema,
 });
 
 /** `POST /auth/change-password` (docs/12 §1, docs/02 §4.2). Yangi parol — parol siyosati bo'yicha (S-19). */
-export const changePasswordSchema = z.object({
+export const changePasswordSchema = z.strictObject({
   oldPassword: loginPasswordSchema,
   newPassword: passwordSchema,
 });

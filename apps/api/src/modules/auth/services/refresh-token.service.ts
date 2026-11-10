@@ -30,6 +30,9 @@ export function hashRefreshToken(token: string): string {
 /**
  * Opaque refresh tokenlar (docs/02 §3): yaratish, rotation va reuse detection.
  * Bekor qilingan token qayta kelsa — shu oila (rotation zanjiri, `family_id`) to'liq bekor qilinadi.
+ * Istisno — reuse grace oynasi (`REFRESH_REUSE_GRACE_SECONDS`): rotation'da almashtirilgan
+ * (`replaced_by_id` bor) token shu muddat ichida qayta kelsa (bir nechta tab bir vaqtda refresh qildi),
+ * oila bekor qilinmaydi — 401 `REFRESH_SUPERSEDED` (frontend cookie'ni o'chirmasdan qayta uradi).
  */
 @Injectable()
 export class RefreshTokenService {
@@ -49,7 +52,8 @@ export class RefreshTokenService {
 
   /**
    * Cookie'dagi token bo'yicha faol yozuv. Topilmasa yoki muddati o'tgan bo'lsa — 401.
-   * Bekor qilingan bo'lsa (qayta ishlatish) — butun oila bekor qilinadi va 401.
+   * Bekor qilingan bo'lsa — grace ichida almashtirilgan: 401 `REFRESH_SUPERSEDED`; aks holda
+   * (qayta ishlatish) — butun oila bekor qilinadi va 401.
    */
   async findActive(token: string): Promise<RefreshTokenRecord> {
     const record = await this.tokens.findByHash(hashRefreshToken(token));
@@ -57,7 +61,7 @@ export class RefreshTokenService {
       throw new AppException({ code: ErrorCode.UNAUTHORIZED });
     }
     if (record.revokedAt) {
-      await this.handleReuse(record);
+      await this.rejectRevoked(record);
     }
     if (record.expiresAt.getTime() <= Date.now()) {
       throw new AppException({ code: ErrorCode.UNAUTHORIZED });
@@ -65,7 +69,10 @@ export class RefreshTokenService {
     return record;
   }
 
-  /** Eski tokenni bekor qilib, shu oilada yangisini beradi. Poygada yutqazilsa — reuse sifatida. */
+  /**
+   * Eski tokenni bekor qilib, shu oilada yangisini beradi. Poygada yutqazilsa (parallel so'rov
+   * hozirgina almashtirgan) — yozuv qayta o'qiladi va bekor qilingan token kabi ko'rib chiqiladi.
+   */
   async rotate(
     current: RefreshTokenRecord,
     owner: RefreshTokenOwner,
@@ -74,7 +81,7 @@ export class RefreshTokenService {
     const { issued, data } = this.prepare(owner, meta, current.familyId);
     const rotated = await this.tokens.rotate(current.id, data, new Date());
     if (!rotated) {
-      await this.handleReuse(current);
+      await this.rejectRevoked((await this.tokens.findRecordById(current.id)) ?? current);
     }
     return issued;
   }
@@ -91,6 +98,22 @@ export class RefreshTokenService {
 
   findActiveByUser(userId: string): Promise<RefreshTokenRecord[]> {
     return this.tokens.findActiveByUser(userId, new Date());
+  }
+
+  private async rejectRevoked(record: RefreshTokenRecord): Promise<never> {
+    if (this.isSupersededWithinGrace(record)) {
+      throw new AppException({ code: ErrorCode.REFRESH_SUPERSEDED });
+    }
+    return this.handleReuse(record);
+  }
+
+  /** Rotation'da almashtirilgan va almashtirilganiga grace oynasidan ko'p vaqt o'tmagan. */
+  private isSupersededWithinGrace(record: RefreshTokenRecord): boolean {
+    if (record.replacedById === null || record.revokedAt === null) {
+      return false;
+    }
+    const graceMs = this.config.get('REFRESH_REUSE_GRACE_SECONDS') * MS_PER_SECOND;
+    return Date.now() - record.revokedAt.getTime() <= graceMs;
   }
 
   private async handleReuse(record: RefreshTokenRecord): Promise<never> {

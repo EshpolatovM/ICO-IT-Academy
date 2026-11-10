@@ -9,6 +9,12 @@ export const ErrorCode = {
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   BAD_REQUEST: 'BAD_REQUEST',
   UNAUTHORIZED: 'UNAUTHORIZED',
+  /**
+   * `POST /auth/refresh`: cookie'dagi refresh token yaqinda (grace oynasi ichida) boshqa parallel
+   * so'rov tomonidan almashtirilgan. Sessiya bekor qilinmagan — frontend cookie'ni o'chirmaydi,
+   * yangi token bilan (masalan boshqa tab yangilagan cookie) qayta urinadi.
+   */
+  REFRESH_SUPERSEDED: 'REFRESH_SUPERSEDED',
   FORBIDDEN: 'FORBIDDEN',
   NOT_FOUND: 'NOT_FOUND',
   CONFLICT: 'CONFLICT',

@@ -6,6 +6,7 @@ import { AppException } from '../../../common/exceptions/app.exception.js';
 import { UsersRepository } from '../../users/repositories/users.repository.js';
 import { WRONG_OLD_PASSWORD_MESSAGE } from '../auth.constants.js';
 
+import { ChangePasswordRateLimiter } from './change-password-rate-limiter.service.js';
 import { PasswordVerifier } from './password-verifier.service.js';
 import { SessionIssuer } from './session-issuer.service.js';
 import { TokenVersionService } from './token-version.service.js';
@@ -17,7 +18,8 @@ import type { TokenResult } from '../types/auth.types.js';
 /**
  * `POST /auth/change-password` (docs/02 §4.2): eski parol tekshiriladi, so'ng yangi hash,
  * `must_change_password = false`, `token_version++`, barcha eski refresh tokenlar bekor va
- * yangi access + refresh beriladi.
+ * yangi access + refresh beriladi. Eski parol urinishlari foydalanuvchi bo'yicha cheklangan
+ * (`ChangePasswordRateLimiter`, tekshiruvdan oldin sanaladi).
  */
 @Injectable()
 export class PasswordChangeService {
@@ -26,6 +28,7 @@ export class PasswordChangeService {
     private readonly passwords: PasswordVerifier,
     private readonly tokenVersions: TokenVersionService,
     private readonly sessions: SessionIssuer,
+    private readonly rateLimiter: ChangePasswordRateLimiter,
   ) {}
 
   async change(userId: string, dto: ChangePasswordDto, meta: ClientMeta): Promise<TokenResult> {
@@ -33,17 +36,19 @@ export class PasswordChangeService {
     if (!user) {
       throw new AppException({ code: ErrorCode.UNAUTHORIZED });
     }
+    await this.rateLimiter.consume(user.id);
     if (!(await this.passwords.verify(user.passwordHash, dto.oldPassword))) {
       throw new AppException({
         code: ErrorCode.VALIDATION_ERROR,
         details: [{ field: 'oldPassword', message: WRONG_OLD_PASSWORD_MESSAGE }],
       });
     }
+    await this.rateLimiter.succeed(user.id);
     const { tokenVersion } = await this.users.changePassword(user.id, {
       passwordHash: await this.passwords.hash(dto.newPassword),
       revokedAt: new Date(),
     });
-    await this.tokenVersions.remember(user.id, tokenVersion);
+    await this.tokenVersions.onVersionChanged(user.id, tokenVersion);
     const { refreshToken, ...body } = await this.sessions.start(
       { id: user.id, role: user.role, mustChangePassword: false, tokenVersion },
       meta,

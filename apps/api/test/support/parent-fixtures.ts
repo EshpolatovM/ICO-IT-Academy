@@ -1,3 +1,4 @@
+import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE } from '@lms/shared';
 import type { ParentTokenCreatedResponse } from '@lms/shared';
 
 import { RedisService } from '../../src/infra/redis/redis.service.js';
@@ -7,13 +8,12 @@ import {
 } from '../../src/modules/auth/auth.constants.js';
 
 import { API, http } from './auth-fixtures.js';
+import { LOCAL_IPS } from './create-test-app.js';
 
 import type { INestApplication } from '@nestjs/common';
 import type request from 'supertest';
 import type { App } from 'supertest/types.js';
 
-/** Supertest so'rovlari keladigan lokal manzil ko'rinishlari (rate limit kalitlari uchun). */
-const LOCAL_IPS = ['::ffff:127.0.0.1', '127.0.0.1', '::1'];
 const HTTP_CREATED = 201;
 const HTTP_NO_CONTENT = 204;
 
@@ -96,6 +96,12 @@ export function asParent(app: INestApplication<App>, psCookie: string) {
   return {
     get: (path: string) => http(app).get(`${API}${path}`).set('Cookie', psCookie),
     post: (path: string) => http(app).post(`${API}${path}`).set('Cookie', psCookie),
+    /** Cookie bilan ishlaydigan mutatsiya (logout) — CSRF sarlavhasi bilan. */
+    postWithCsrf: (path: string) =>
+      http(app)
+        .post(`${API}${path}`)
+        .set('Cookie', psCookie)
+        .set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE),
     delete: (path: string) => http(app).delete(`${API}${path}`).set('Cookie', psCookie),
   };
 }

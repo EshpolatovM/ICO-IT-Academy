@@ -36,11 +36,15 @@ function uniqueTokens(tokens: readonly string[]): string[] {
 
 /**
  * `POST /auth/parent/exchange` (docs/02 §4.5, §5.1, docs/12 §1):
- * - `tokens` berilsa: `merge=false` — faqat shular, `merge=true` — cookie'dagilarga qo'shiladi;
- * - body'siz: `parent_tokens` cookie'dagi tokenlar bilan sessiya yangilanadi.
- * Berilgan token yaroqsiz bo'lsa — 401 (umumiy xabar). Cookie'dagi yaroqsiz tokenlar jimgina
- * olib tashlanadi. Body ham, `parent_tokens` cookie ham yo'q bo'lsa — 401, lekin rate limit/blok
- * hisobiga qo'shilmaydi (frontend sessiyani tekshirishi; tekshiriladigan token yo'q).
+ * - `tokens` berilsa: `merge=false` — faqat shular, `merge=true` — cookie'dagilarga qo'shiladi.
+ *   Urinish token tekshiruvidan OLDIN sanaladi; berilgan token yaroqsiz bo'lsa — 401 (umumiy xabar)
+ *   va muvaffaqiyatsizlik sanaladi;
+ * - body'siz: `parent_tokens` cookie'dagi tokenlar bilan sessiya yangilanadi. Cookie server kaliti
+ *   bilan AES-GCM'da autentifikatsiyalangan — muvaffaqiyatli yangilash rate limitga sanalmaydi.
+ *   Cookie buzilgan bo'lsa — oddiy urinish kabi (oldindan) sanaladi; tokenlarning birortasi ham
+ *   amalda bo'lmasa — urinish va muvaffaqiyatsizlik sanaladi. Ikkala holda cookie'lar o'chiriladi.
+ *   Cookie'dagi yaroqsiz tokenlar jimgina olib tashlanadi;
+ * - body ham, `parent_tokens` cookie ham yo'q — 401, rate limit/blok hisobiga qo'shilmaydi.
  * Muvaffaqiyatda `ps` va `parent_tokens` qayta yoziladi, foydalanish qayd etiladi.
  */
 @Injectable()
@@ -55,25 +59,43 @@ export class ParentExchangeService {
   async exchange(input: ParentExchangeInput): Promise<ParentExchangeResponse> {
     const { dto, meta, response } = input;
     const submitted = dto.tokens ?? [];
-    if (submitted.length === 0 && input.storedCookie === undefined) {
+    if (submitted.length === 0) {
+      return this.refreshFromCookie(input);
+    }
+    await this.rateLimiter.consumeAttempt(meta.ip);
+    const stored = dto.merge ? this.cookies.decodeStoredTokens(input.storedCookie) : [];
+    const grants = await this.grants.findByRawTokens(uniqueTokens([...stored, ...submitted]));
+    const validTokens = new Set(grants.map((grant) => grant.token));
+    if (submitted.some((token) => !validTokens.has(token))) {
+      await this.rateLimiter.registerFailure(meta.ip);
+      throw this.invalidToken();
+    }
+    return this.startSession(grants, meta, response);
+  }
+
+  /** Body'siz exchange: sessiyani cookie'dagi saqlangan tokenlar bilan yangilash. */
+  private async refreshFromCookie(input: ParentExchangeInput): Promise<ParentExchangeResponse> {
+    const { meta, response } = input;
+    if (input.storedCookie === undefined) {
       // Hech qanday token yo'q — bu taxmin qilish urinishi emas: limit va blokka qo'shilmaydi.
       this.cookies.clearAll(response);
       throw this.invalidToken();
     }
-    await this.rateLimiter.consumeAttempt(meta.ip);
-    const useStored = submitted.length === 0 || dto.merge;
-    const stored = useStored ? this.cookies.decodeStoredTokens(input.storedCookie) : [];
-    const grants = await this.grants.findByRawTokens(uniqueTokens([...stored, ...submitted]));
-    const validTokens = new Set(grants.map((grant) => grant.token));
-    if (grants.length === 0 || submitted.some((token) => !validTokens.has(token))) {
-      if (submitted.length === 0) {
-        this.cookies.clearAll(response);
-      }
+    const stored = this.cookies.decodeStoredTokens(input.storedCookie);
+    if (stored.length === 0) {
+      // GCM tekshiruvidan o'tmagan (buzilgan/soxta) cookie — oddiy urinish kabi sanaladi.
+      this.cookies.clearAll(response);
+      await this.rateLimiter.consumeAttempt(meta.ip);
       await this.rateLimiter.registerFailure(meta.ip);
       throw this.invalidToken();
     }
-    await this.startSession(grants, meta, response);
-    return { children: toParentChildren(grants) };
+    const grants = await this.grants.findByRawTokens(uniqueTokens(stored));
+    if (grants.length === 0) {
+      this.cookies.clearAll(response);
+      await this.rateLimiter.registerFailedAttempt(meta.ip);
+      throw this.invalidToken();
+    }
+    return this.startSession(grants, meta, response);
   }
 
   private invalidToken(): AppException {
@@ -87,7 +109,7 @@ export class ParentExchangeService {
     grants: readonly RawTokenGrant[],
     meta: ClientMeta,
     response: Response,
-  ): Promise<void> {
+  ): Promise<ParentExchangeResponse> {
     await this.grants.recordExchange(grants, {
       ip: meta.ip ?? UNSPECIFIED_IP,
       userAgent: meta.userAgent ?? UNSPECIFIED_USER_AGENT,
@@ -97,5 +119,6 @@ export class ParentExchangeService {
       response,
       grants.map((grant) => grant.token),
     );
+    return { children: toParentChildren(grants) };
   }
 }

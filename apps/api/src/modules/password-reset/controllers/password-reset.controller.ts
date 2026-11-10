@@ -1,4 +1,4 @@
-import { Controller, HttpCode, HttpStatus, Param, ParseUUIDPipe, Post } from '@nestjs/common';
+import { Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 
 import { Role } from '@lms/shared';
 import type { PasswordResetResponse } from '@lms/shared';
@@ -7,6 +7,7 @@ import { Actor } from '../../../common/decorators/actor.decorator.js';
 import { NoStore } from '../../../common/decorators/no-store.decorator.js';
 import { Roles } from '../../../common/decorators/roles.decorator.js';
 import { StaffStudentAccess } from '../../../common/decorators/staff-student-access.decorator.js';
+import { UuidParam } from '../../../common/decorators/uuid-param.decorator.js';
 import { PasswordResetService } from '../services/password-reset.service.js';
 
 import type { ActorContext } from '../../../common/auth/request-user.types.js';
@@ -25,7 +26,7 @@ export class PasswordResetController {
   @HttpCode(HttpStatus.OK)
   @NoStore()
   resetStudent(
-    @Param('id', ParseUUIDPipe) studentId: string,
+    @UuidParam('id') studentId: string,
     @Actor() actor: ActorContext,
   ): Promise<PasswordResetResponse> {
     return this.passwordReset.resetStudent(studentId, actor);
@@ -36,7 +37,7 @@ export class PasswordResetController {
   @HttpCode(HttpStatus.OK)
   @NoStore()
   resetStaff(
-    @Param('id', ParseUUIDPipe) staffId: string,
+    @UuidParam('id') staffId: string,
     @Actor() actor: ActorContext,
   ): Promise<PasswordResetResponse> {
     return this.passwordReset.resetStaff(staffId, actor);

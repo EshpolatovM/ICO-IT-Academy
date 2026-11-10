@@ -24,6 +24,7 @@ const RECORD_SELECT = {
   ip: true,
   expiresAt: true,
   revokedAt: true,
+  replacedById: true,
   createdAt: true,
 } as const satisfies Prisma.RefreshTokenSelect;
 
@@ -51,6 +52,10 @@ export class RefreshTokensRepository extends BaseRepository<RefreshTokenReposito
 
   findByHash(tokenHash: string): Promise<RefreshTokenRecord | null> {
     return this.delegate.findUnique({ where: { tokenHash }, select: RECORD_SELECT });
+  }
+
+  findRecordById(id: string): Promise<RefreshTokenRecord | null> {
+    return this.delegate.findUnique({ where: { id }, select: RECORD_SELECT });
   }
 
   async insert(data: NewRefreshTokenData): Promise<void> {

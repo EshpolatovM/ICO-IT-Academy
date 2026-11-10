@@ -15,6 +15,7 @@ import { SessionsController } from './controllers/sessions.controller.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { RefreshTokensRepository } from './repositories/refresh-tokens.repository.js';
 import { AccessTokenService } from './services/access-token.service.js';
+import { ChangePasswordRateLimiter } from './services/change-password-rate-limiter.service.js';
 import { LoginRateLimiter } from './services/login-rate-limiter.service.js';
 import { LoginService } from './services/login.service.js';
 import { LogoutService } from './services/logout.service.js';
@@ -62,6 +63,7 @@ import { TokenVersionService } from './services/token-version.service.js';
     RefreshTokenService,
     TokenVersionService,
     LoginRateLimiter,
+    ChangePasswordRateLimiter,
     PasswordVerifier,
     SessionIssuer,
     LoginService,

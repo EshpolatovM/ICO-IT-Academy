@@ -11,6 +11,8 @@ import type { RefreshTokenRecord } from '../types/auth.types.js';
 const STUDENT_TTL = 2_592_000;
 const STAFF_TTL = 604_800;
 const DAY_MS = 86_400_000;
+const GRACE_SECONDS = 30;
+const GRACE_MS = GRACE_SECONDS * 1000;
 const meta = { ip: '127.0.0.1', userAgent: 'jest' };
 
 function record(overrides: Partial<RefreshTokenRecord> = {}): RefreshTokenRecord {
@@ -22,6 +24,7 @@ function record(overrides: Partial<RefreshTokenRecord> = {}): RefreshTokenRecord
     ip: null,
     expiresAt: new Date(Date.now() + DAY_MS),
     revokedAt: null,
+    replacedById: null,
     createdAt: new Date(),
     ...overrides,
   };
@@ -34,10 +37,12 @@ function createService(found: RefreshTokenRecord | null = record()) {
     rotate: jest.fn().mockResolvedValue(true),
     revokeFamily: jest.fn().mockResolvedValue(2),
     findActiveByUser: jest.fn().mockResolvedValue([]),
+    findRecordById: jest.fn().mockResolvedValue(null),
   };
   const settings: Record<string, number> = {
     REFRESH_TTL_STUDENT_SECONDS: STUDENT_TTL,
     REFRESH_TTL_STAFF_SECONDS: STAFF_TTL,
+    REFRESH_REUSE_GRACE_SECONDS: GRACE_SECONDS,
   };
   const config = { get: (key: string) => settings[key] } as unknown as AppConfigService;
   const service = new RefreshTokenService(repo as unknown as RefreshTokensRepository, config);
@@ -91,13 +96,35 @@ describe('RefreshTokenService', () => {
     expect(expired.repo.revokeFamily).not.toHaveBeenCalled();
   });
 
-  it('reuse detection: bekor qilingan token qayta kelsa — butun oila bekor va 401', async () => {
-    const { repo, service } = createService(record({ revokedAt: new Date() }));
+  it.each<[string, { replacedById: string | null; ageMs: number }]>([
+    [
+      "almashtirilmagan (logout/sessiya o'chirilgan) — grace ichida ham",
+      { replacedById: null, ageMs: 0 },
+    ],
+    ['grace oynasidan keyin almashtirilgan', { replacedById: 'rt-2', ageMs: GRACE_MS + 1000 }],
+  ])(
+    'reuse detection: %s token qayta kelsa — butun oila bekor va 401',
+    async (_case, { replacedById, ageMs }) => {
+      const revokedAt = new Date(Date.now() - ageMs);
+      const { repo, service } = createService(record({ revokedAt, replacedById }));
+
+      await expect(service.findActive('raw')).rejects.toMatchObject({
+        code: ErrorCode.UNAUTHORIZED,
+      });
+      expect(repo.revokeFamily).toHaveBeenCalledWith('fam-1', expect.any(Date), undefined);
+    },
+  );
+
+  it('grace: almashtirilgan token grace ichida qayta kelsa — 401 REFRESH_SUPERSEDED, oila bekor qilinmaydi', async () => {
+    const { repo, service } = createService(
+      record({ revokedAt: new Date(Date.now() - GRACE_MS / 2), replacedById: 'rt-2' }),
+    );
 
     await expect(service.findActive('raw')).rejects.toMatchObject({
-      code: ErrorCode.UNAUTHORIZED,
+      code: ErrorCode.REFRESH_SUPERSEDED,
+      status: 401,
     });
-    expect(repo.revokeFamily).toHaveBeenCalledWith('fam-1', expect.any(Date), undefined);
+    expect(repo.revokeFamily).not.toHaveBeenCalled();
   });
 
   it('rotate: shu oilada yangi token, eskisi repository tranzaksiyasida bekor qilinadi', async () => {
@@ -112,13 +139,29 @@ describe('RefreshTokenService', () => {
     );
   });
 
-  it("rotate: parallel so'rovda yutqazsa (eski token allaqachon bekor) — oila bekor va 401", async () => {
+  /** Rotation poygasida yutqazish: repository `false`, qayta o'qilgan yozuv — `latest`. */
+  function rotateLosingRace(latest: RefreshTokenRecord) {
     const { repo, service } = createService();
     repo.rotate.mockResolvedValue(false);
+    repo.findRecordById.mockResolvedValue(latest);
+    const outcome = service.rotate(record(), { userId: 'u1', role: Role.STUDENT }, meta);
+    return { repo, outcome };
+  }
 
-    await expect(
-      service.rotate(record(), { userId: 'u1', role: Role.STUDENT }, meta),
-    ).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+  it("rotate: parallel so'rov hozirgina almashtirgan — 401 REFRESH_SUPERSEDED, oila saqlanadi", async () => {
+    const { repo, outcome } = rotateLosingRace(
+      record({ revokedAt: new Date(), replacedById: 'rt-2' }),
+    );
+
+    await expect(outcome).rejects.toMatchObject({ code: ErrorCode.REFRESH_SUPERSEDED });
+    expect(repo.findRecordById).toHaveBeenCalledWith('rt-1');
+    expect(repo.revokeFamily).not.toHaveBeenCalled();
+  });
+
+  it('rotate: yutqazdi, lekin token almashtirilmagan (bekor qilingan) — oila bekor va 401', async () => {
+    const { repo, outcome } = rotateLosingRace(record({ revokedAt: new Date() }));
+
+    await expect(outcome).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
     expect(repo.revokeFamily).toHaveBeenCalledWith('fam-1', expect.any(Date), undefined);
   });
 

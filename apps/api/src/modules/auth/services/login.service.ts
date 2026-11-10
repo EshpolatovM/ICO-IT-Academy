@@ -60,16 +60,16 @@ export class LoginService {
 
   private async login(attempt: LoginAttempt): Promise<LoginResult> {
     const limiterKey = { kind: attempt.kind, ip: attempt.meta.ip, login: attempt.login };
-    await this.rateLimiter.assertAllowed(limiterKey);
+    // Urinish parol tekshiruvidan OLDIN sanaladi (parallel so'rovlar ham limitga tushadi).
+    await this.rateLimiter.consume(limiterKey);
     const user = await this.authenticate(attempt);
     if (!user) {
-      await this.rateLimiter.registerFailure(limiterKey);
       throw new AppException({
         code: ErrorCode.UNAUTHORIZED,
         message: INVALID_CREDENTIALS_MESSAGE,
       });
     }
-    await this.rateLimiter.reset(limiterKey);
+    await this.rateLimiter.succeed(limiterKey);
     await this.users.markLoggedIn(user.id, new Date());
     const { refreshToken, ...access } = await this.sessions.start(user, attempt.meta);
     return { body: { ...access, user: toAuthUser(user) }, refreshToken };

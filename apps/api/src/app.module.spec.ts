@@ -1,32 +1,26 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { parseEnv } from 'node:util';
+
+import { METHOD_METADATA } from '@nestjs/common/constants.js';
+import { DiscoveryModule, DiscoveryService, MetadataScanner, Reflector } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 
 import { Role } from '@lms/shared';
 
 import { AppModule } from './app.module.js';
 import { STAFF_ROLES } from './common/constants/roles.constants.js';
+import { ANY_AUTHENTICATED_KEY } from './common/decorators/any-authenticated.decorator.js';
+import { IS_PUBLIC_KEY } from './common/decorators/public.decorator.js';
+import { ROLES_KEY } from './common/decorators/roles.decorator.js';
 
-/** Kompilyatsiya uchun soxta, lekin to'g'ri formatdagi env (ulanish `init` da bo'ladi, bu yerda emas). */
-const TEST_ENV = {
-  DATABASE_URL: 'postgresql://user:pass@localhost:5433/db',
-  REDIS_URL: 'redis://localhost:6379/0',
-  JWT_ACCESS_SECRET: 'test-secret-'.padEnd(32, 'x'),
-  JWT_ACCESS_TTL_SECONDS: '900',
-  REFRESH_TTL_STUDENT_SECONDS: '2592000',
-  REFRESH_TTL_STAFF_SECONDS: '604800',
-  COOKIE_SECURE: 'false',
-  LOGIN_RATE_LIMIT_MAX_ATTEMPTS: '5',
-  LOGIN_RATE_LIMIT_WINDOW_SECONDS: '900',
-  WEB_BASE_URL: 'http://localhost:3000',
-  PARENT_TOKEN_PEPPER: 'test-pepper-'.padEnd(32, 'x'),
-  PARENT_COOKIE_KEY: Buffer.alloc(32, 1).toString('base64'),
-  PARENT_SESSION_TTL_SECONDS: '43200',
-  PARENT_TOKENS_COOKIE_MAX_AGE_SECONDS: '15552000',
-  PARENT_MAX_ACTIVE_TOKENS: '3',
-  PARENT_EXCHANGE_MAX_ATTEMPTS: '10',
-  PARENT_EXCHANGE_WINDOW_SECONDS: '900',
-  PARENT_EXCHANGE_MAX_FAILURES: '20',
-  PARENT_EXCHANGE_BLOCK_SECONDS: '3600',
-};
+/**
+ * Kompilyatsiya uchun `.env.example` qiymatlari (to'g'ri formatdagi namuna; ulanish `init` da bo'ladi,
+ * bu yerda emas). Yangi env o'zgaruvchisi `.env.example` ga qo'shilsa — shu yerga avtomatik tushadi.
+ */
+const TEST_ENV = parseEnv(
+  readFileSync(path.resolve(__dirname, '..', '..', '..', '.env.example'), 'utf8'),
+);
 
 describe('AppModule (smoke)', () => {
   const originalEnv = process.env;
@@ -58,5 +52,88 @@ describe('AppModule (smoke)', () => {
     expect(STAFF_ROLES).toEqual([Role.SUPER_ADMIN, Role.ADMIN, Role.MENTOR]);
     expect(STAFF_ROLES).not.toContain(Role.STUDENT);
     expect(STAFF_ROLES).not.toContain(Role.PARENT);
+  });
+});
+
+/** RBAC metadata kalitlari: har bir route'da kamida bittasi bo'lishi shart (deny-by-default). */
+const ACCESS_KEYS = [IS_PUBLIC_KEY, ROLES_KEY, ANY_AUTHENTICATED_KEY] as const;
+
+/** docs/12 da `PUB` deb belgilangan endpointlar — yangi public endpoint shu ro'yxatga ongli qo'shiladi. */
+const EXPECTED_PUBLIC_ROUTES = [
+  'AuthController.refresh',
+  'AuthController.staffLogin',
+  'AuthController.studentLogin',
+  'HealthController.check',
+  'ParentAuthController.exchange',
+  'ParentAuthController.logout',
+];
+
+interface RouteAccess {
+  route: string;
+  access: string[];
+}
+
+/** Ilovadagi BARCHA HTTP route'lar (controller metodlari) va ulardagi RBAC metadata'si. */
+async function collectRouteAccess(): Promise<RouteAccess[]> {
+  const moduleRef = await Test.createTestingModule({
+    imports: [AppModule, DiscoveryModule],
+  }).compile();
+  const reflector = moduleRef.get(Reflector);
+  const scanner = moduleRef.get(MetadataScanner);
+  const routes = moduleRef
+    .get(DiscoveryService)
+    .getControllers()
+    .flatMap(({ instance, metatype }) => {
+      if (!instance || !metatype) {
+        return [];
+      }
+      const prototype = Object.getPrototypeOf(instance) as Record<string, unknown>;
+      return scanner.getAllMethodNames(prototype).flatMap((name) => {
+        const handler = prototype[name] as object;
+        if (Reflect.getMetadata(METHOD_METADATA, handler) === undefined) {
+          return [];
+        }
+        const targets = [handler as () => void, metatype];
+        const access = ACCESS_KEYS.filter(
+          (key) => reflector.getAllAndOverride<unknown>(key, targets) !== undefined,
+        );
+        return [{ route: `${metatype.name}.${name}`, access }];
+      });
+    });
+  await moduleRef.close();
+  return routes;
+}
+
+describe('RBAC deny-by-default — barcha route metadata (docs/13 §8)', () => {
+  const originalEnv = process.env;
+  let routes: RouteAccess[];
+
+  beforeAll(async () => {
+    process.env = { ...originalEnv, ...TEST_ENV };
+    routes = await collectRouteAccess();
+  });
+
+  afterAll(() => {
+    process.env = originalEnv;
+  });
+
+  it("route'lar topiladi (HTTP metod metadata'si bo'yicha)", () => {
+    expect(routes.length).toBeGreaterThan(EXPECTED_PUBLIC_ROUTES.length);
+    expect(routes.map((route) => route.route)).toContain('AccountController.me');
+  });
+
+  it("har bir route'da @Public, @Roles yoki @AnyAuthenticated bor (aks holda RolesGuard 403 beradi)", () => {
+    expect(routes.filter((route) => route.access.length === 0).map((route) => route.route)).toEqual(
+      [],
+    );
+  });
+
+  it('@Public faqat docs/12 dagi PUB endpointlarda', () => {
+    const publicRoutes = routes
+      .filter((route) => route.access.includes(IS_PUBLIC_KEY))
+      .map((route) => route.route)
+      .sort();
+
+    expect(publicRoutes).toEqual(EXPECTED_PUBLIC_ROUTES);
   });
 });

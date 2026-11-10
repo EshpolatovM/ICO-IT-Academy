@@ -38,17 +38,20 @@ export class ParentGrantsService {
     });
   }
 
-  /** Token id → student id, faqat hali amaldagilar uchun. Avval kesh, keyin baza (natija keshlanadi). */
+  /**
+   * Token id → student id, faqat hali amaldagilar uchun. Avval kesh (tombstone — darhol rad,
+   * bazaga qaralmaydi), keyin baza (natija keshlanadi).
+   */
   async activeStudentsByTokenIds(tokenIds: readonly string[]): Promise<Map<string, string>> {
     const unique = [...new Set(tokenIds)];
     const cached = await Promise.all(unique.map((tokenId) => this.validity.read(tokenId)));
     const active = new Map<string, string>();
     const misses: string[] = [];
     unique.forEach((tokenId, index) => {
-      const studentId = cached[index];
-      if (studentId) {
-        active.set(tokenId, studentId);
-      } else {
+      const entry = cached[index];
+      if (entry?.state === 'valid') {
+        active.set(tokenId, entry.studentId);
+      } else if (entry?.state !== 'revoked') {
         misses.push(tokenId);
       }
     });

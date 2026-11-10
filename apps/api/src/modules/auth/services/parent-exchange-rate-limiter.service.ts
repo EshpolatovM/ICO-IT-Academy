@@ -15,6 +15,9 @@ import type { RateLimitPolicy } from '../../../common/rate-limit/rate-limit.type
  * - barcha urinishlar: `PARENT_EXCHANGE_MAX_ATTEMPTS` / `PARENT_EXCHANGE_WINDOW_SECONDS` (10 / 15 daqiqa);
  * - muvaffaqiyatsizlar: `PARENT_EXCHANGE_MAX_FAILURES` (20) ga yetsa IP `PARENT_EXCHANGE_BLOCK_SECONDS`
  *   (1 soat) ga bloklanadi; ular ham shu muddatli oynada sanaladi.
+ * Server o'zi bergan (AES-GCM bilan autentifikatsiyalangan) `parent_tokens` cookie bilan muvaffaqiyatli
+ * body'siz exchange sanalmaydi (docs/02 §5.1: sessiya yangilash; CGNAT ortidagi ota-onalar bir-birini
+ * bloklamasin) — `ParentExchangeService` ga qarang.
  */
 @Injectable()
 export class ParentExchangeRateLimiter {
@@ -39,15 +42,27 @@ export class ParentExchangeRateLimiter {
     };
   }
 
-  /** Blok yoki urinishlar limiti — 429; aks holda urinish hisobga olinadi. */
+  /**
+   * Token tekshiruvidan OLDIN: IP bloklangan bo'lsa — 429; so'ng urinish atomar sanaladi va limitdan
+   * oshgan bo'lsa — 429 (parallel so'rovlar limitni chetlab o'ta olmaydi).
+   */
   async consumeAttempt(ip: string | null): Promise<void> {
     const subject = ip ?? UNKNOWN_IP;
     await this.limiter.assertAllowed(this.failures, subject);
-    await this.limiter.assertAllowed(this.attempts, subject);
-    await this.limiter.hit(this.attempts, subject);
+    await this.limiter.consume(this.attempts, subject);
   }
 
   async registerFailure(ip: string | null): Promise<void> {
     await this.limiter.hit(this.failures, ip ?? UNKNOWN_IP);
+  }
+
+  /**
+   * Oldindan sanalmagan (server bergan cookie bilan) urinish muvaffaqiyatsiz bo'lsa: urinish ham,
+   * muvaffaqiyatsizlik ham hisobga olinadi (429 tashlanmaydi — javob baribir 401).
+   */
+  async registerFailedAttempt(ip: string | null): Promise<void> {
+    const subject = ip ?? UNKNOWN_IP;
+    await this.limiter.hit(this.attempts, subject);
+    await this.limiter.hit(this.failures, subject);
   }
 }

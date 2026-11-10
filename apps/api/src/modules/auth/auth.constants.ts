@@ -15,8 +15,12 @@ export const TOKEN_VERSION_CACHE_PREFIX = 'user:ver:';
 /** Kesh muddati — barcha yozuvchilar keshni yangilaydi, TTL faqat xotirani tozalash uchun. */
 export const TOKEN_VERSION_CACHE_TTL_SECONDS = 600;
 
-/** Login rate limit hisoblagichi: `auth:login-fail:{kind}:{ip}:{login}` (docs/02 §6). */
-export const LOGIN_FAILURE_KEY_PREFIX = 'auth:login-fail:';
+/** Login rate limit hisoblagichi: `auth:login:{kind}:{ip}:{login}` (docs/02 §6). */
+export const LOGIN_ATTEMPTS_KEY_PREFIX = 'auth:login:';
+/** IP bo'yicha umumiy login hisoblagichi: `auth:login-ip:{ip}`. */
+export const LOGIN_IP_ATTEMPTS_KEY_PREFIX = 'auth:login-ip:';
+/** Parol almashtirish urinishlari: `auth:change-password:{userId}`. */
+export const CHANGE_PASSWORD_ATTEMPTS_KEY_PREFIX = 'auth:change-password:';
 
 /** Login xatosi — har doim bir xil (enumeration'dan himoya, docs/02 §6). */
 export const INVALID_CREDENTIALS_MESSAGE = "Login yoki parol noto'g'ri";
@@ -35,6 +39,9 @@ export const PARENT_SESSION_COOKIE_NAME = 'ps';
 export const PARENT_SESSION_COOKIE_PATH = `/${API_GLOBAL_PREFIX}`;
 export const PARENT_TOKENS_COOKIE_NAME = 'parent_tokens';
 export const PARENT_TOKENS_COOKIE_PATH = `/${API_GLOBAL_PREFIX}/auth/parent`;
+
+/** Access JWT auditoriyasi (`aud`) — parent session JWT bilan aralashmasligi uchun (bir xil kalit). */
+export const ACCESS_TOKEN_AUDIENCE = 'access';
 
 /** Parent session JWT auditoriyasi — access token bilan almashtirib bo'lmasligi uchun. */
 export const PARENT_SESSION_AUDIENCE = 'parent-session';

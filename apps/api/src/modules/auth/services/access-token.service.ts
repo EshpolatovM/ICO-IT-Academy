@@ -7,6 +7,7 @@ import type { AccessTokenResponse } from '@lms/shared';
 
 import { AppConfigService } from '../../../common/config/app-config.service.js';
 import { AppException } from '../../../common/exceptions/app.exception.js';
+import { ACCESS_TOKEN_AUDIENCE } from '../auth.constants.js';
 
 import type { AccessTokenPayload, AccessTokenSubject } from '../types/auth.types.js';
 
@@ -20,7 +21,8 @@ const accessTokenPayloadSchema = z.object({
 
 /**
  * Access JWT (docs/02 §3): imzolash va tekshirish. Sir, algoritm va muddat — `AuthModule` dagi
- * `JwtModule` sozlamasida (env'dan).
+ * `JwtModule` sozlamasida (env'dan). `aud=access` — parent session JWT (`aud=parent-session`, bir xil
+ * kalit) access token o'rnida o'tmaydi va aksincha.
  */
 @Injectable()
 export class AccessTokenService {
@@ -36,7 +38,7 @@ export class AccessTokenService {
       mcp: subject.mustChangePassword,
       ver: subject.tokenVersion,
     };
-    const accessToken = await this.jwt.signAsync(payload);
+    const accessToken = await this.jwt.signAsync(payload, { audience: ACCESS_TOKEN_AUDIENCE });
     return { accessToken, expiresIn: this.config.get('JWT_ACCESS_TTL_SECONDS') };
   }
 
@@ -44,7 +46,7 @@ export class AccessTokenService {
   async verify(token: string): Promise<AccessTokenPayload> {
     let decoded: unknown;
     try {
-      decoded = await this.jwt.verifyAsync<object>(token);
+      decoded = await this.jwt.verifyAsync<object>(token, { audience: ACCESS_TOKEN_AUDIENCE });
     } catch (error) {
       throw new AppException({ code: ErrorCode.UNAUTHORIZED, cause: error });
     }

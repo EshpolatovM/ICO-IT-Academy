@@ -31,6 +31,8 @@
 | Parent session | `HttpOnly` cookie | 12 soat (sliding) | `sub=parentTokenId`, `role=PARENT`, `studentIds` |
 
 - **Refresh rotation:** har bir `/auth/refresh` chaqiruvida yangi refresh token beriladi, eskisi `revoked` bo'ladi. Eski token qayta ishlatilsa (reuse detection), shu "oila"dagi barcha sessiyalar bekor qilinadi.
+  - **Grace oynasi (1.11a):** rotation'da almashtirilgan (`replaced_by_id` bor) token `REFRESH_REUSE_GRACE_SECONDS` (env, dev/CI: 30) ichida qayta kelsa (bir nechta tab bir vaqtda refresh qildi) — oila bekor qilinmaydi, javob 401 `REFRESH_SUPERSEDED`, cookie tozalanmaydi (frontend yangi cookie bilan qayta uradi). Grace'dan keyin yoki almashtirilmagan (logout/sessiya o'chirilgan) token — reuse detection, oila bekor.
+- **Access JWT `aud=access`**, parent session JWT `aud=parent-session` (bir xil kalit, biri ikkinchisi o'rnida o'tmaydi).
 - **`token_version`:** `users.token_version` maydoni. Parol tiklanganda yoki foydalanuvchi deaktivatsiya qilinganda u oshiriladi va barcha eski access tokenlar yaroqsiz bo'ladi (`ver` mos kelmaydi). Uni har so'rovda tekshirish uchun Redis keshi ishlatiladi.
 - `must_change_password = true` bo'lsa, access token faqat `POST /auth/change-password` va `GET /auth/me` uchun ishlaydi (`PasswordChangeRequiredGuard`).
 - Socket.IO ulanishi ham access token bilan autentifikatsiya qilinadi (`auth.token` handshake).
@@ -162,10 +164,10 @@ sequenceDiagram
 |---|---|
 | Uzun va tasodifiy | `crypto.randomBytes(32)` → base64url (43 belgi, 256 bit entropiya) |
 | Bazada hash | `HMAC-SHA256(server_pepper, token)`. Entropiya yuqori bo'lgani uchun sekin hash shart emas, HMAC tezkor qidiruv uchun indekslanadi. Pepper env/secret manager'da saqlanadi. |
-| Bekor qilish | `revoked_at`, `revoked_by`. Redis'dagi `parent_token:{id}:valid` keshi o'chiriladi va keyingi so'rovda sessiya tugaydi. |
+| Bekor qilish | `revoked_at`, `revoked_by`. Redis'dagi `parent_token:{id}:valid` keshi o'chiriladi va keyingi so'rovda sessiya tugaydi. Poygaga qarshi `parent_token:{id}:revoked` tombstone (TTL = valid kesh TTL) qo'yiladi: u bor bo'lsa token bazaga qaramay rad etiladi va `:valid` qayta yozilmaydi. Bekor qilish va audit — bitta tranzaksiyada; Redis xatosi bekor qilishni 500 ga aylantirmaydi (log). |
 | Qayta yaratish | Yangi token yaratiladi va eskisi bekor qilinadi ("regenerate" = revoke + create, bitta tranzaksiyada). |
 | Read-only | JWT `role=PARENT`. `ParentReadOnlyGuard` faqat `GET` (va `/auth/parent/*`) ga ruxsat beradi. Parent controller'lari alohida modulda turadi va mutatsiya qiluvchi endpointlar u yerga umuman qo'shilmaydi. |
-| Rate limit | `/auth/parent/exchange`: IP bo'yicha 10 urinish/15 daqiqa. 20 ta muvaffaqiyatsiz urinishdan keyin IP 1 soatga bloklanadi. |
+| Rate limit | `/auth/parent/exchange`: IP bo'yicha 10 urinish/15 daqiqa. 20 ta muvaffaqiyatsiz urinishdan keyin IP 1 soatga bloklanadi. Urinish token tekshiruvidan oldin atomar sanaladi. Body'siz exchange server bergan (AES-GCM bilan autentifikatsiyalangan) `parent_tokens` cookie bilan muvaffaqiyatli bo'lsa — sanalmaydi; muvaffaqiyatsiz bo'lsa (tokenlar bekor/muddati o'tgan) — urinish va muvaffaqiyatsizlik sanaladi; cookie buzilgan bo'lsa — oddiy urinish kabi. |
 | Token oshkor bo'lishi | Token URL'dan darhol tozalanadi, `Referrer-Policy: no-referrer`, token log'larga yozilmaydi (log'larda faqat `prefix`). |
 | Kuzatuv | `last_used_at`, `use_count`. Mentor token ro'yxatida "oxirgi foydalanilgan vaqt"ni ko'radi. |
 
@@ -190,8 +192,10 @@ Afzalligi: turli guruh/mentorlardagi farzandlarni hech kim "bog'lashi" shart ema
 ## 6. Boshqa xavfsizlik choralari
 
 - **Login rate limit:** `ip+login` bo'yicha 5 urinish/15 daqiqa, keyin progressiv kechikish. Student ID'lar ketma-ket bo'lgani uchun enumeration xavfi bor, shu sabab javob doim bir xil: "Login yoki parol noto'g'ri".
+  - **Amalga oshirish (1.11a):** urinish parol tekshiruvidan OLDIN atomar sanaladi (parallel so'rovlar ham), muvaffaqiyatli kirishda `ip+login` hisoblagichi tozalanadi (`LOGIN_RATE_LIMIT_*`). Qo'shimcha IP bo'yicha umumiy limit (`LOGIN_IP_RATE_LIMIT_*`, dev/CI: 50/15 daqiqa) — password spraying va Argon2 CPU yukiga qarshi; muvaffaqiyatli kirish undan ayiriladi (amalda faqat muvaffaqiyatsizlar sanaladi). Progressiv kechikish hozircha yo'q (fixed window).
+- **Parol almashtirish limiti:** `POST /auth/change-password` — foydalanuvchi bo'yicha eski parol urinishlari `CHANGE_PASSWORD_RATE_LIMIT_*` (dev/CI: 5/15 daqiqa), keyin 429.
 - **Parol siyosati (Taxmin → S-19):** kamida 8 belgi, harf va raqam bo'lishi shart, eng keng tarqalgan parollar qora ro'yxati. Studentlar (yosh foydalanuvchilar ham bo'lishi mumkin) uchun ham shu talab.
-- **CSRF:** refresh/parent cookie `SameSite=Strict`. `/auth/refresh` qo'shimcha `X-Requested-With` header talab qiladi.
+- **CSRF:** refresh/parent cookie `SameSite=Strict`. `/auth/refresh`, `/auth/logout` va `/auth/parent/logout` qo'shimcha `X-Requested-With: XMLHttpRequest` header talab qiladi (yo'q bo'lsa — 403).
 - **Sessiyalar ro'yxati:** foydalanuvchi profilida faol qurilmalar ko'rinadi va ularni bekor qilish mumkin (`refresh_tokens` asosida).
 - **Deaktivatsiya:** `status=INACTIVE` bo'lganda `token_version++`, barcha sessiyalar uziladi.
 
