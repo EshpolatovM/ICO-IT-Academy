@@ -87,3 +87,9 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Fayllar:** `apps/api/src/modules/{parent-access,password-reset,audit,auth}/**`, `apps/api/src/common/{scope,rate-limit,security,guards,decorators,config}/**`, `apps/api/test/**`, `packages/shared/src/{auth,parent,audit,enums}/**`, `.env.example`, `.github/workflows/ci.yml`.
 - **Testlar:** 252 unit, 26 e2e — Tech Lead qayta yurgizdi, o'tdi. Dev baza holati o'zgarmagan (4 user, 0 token, 0 audit).
 - **Qarorlar:** qora ro'yxat 10k'dan filtrlangan (top-1000 dan faqat 12 tasi mos edi); mentor hozircha 403 (2-bosqichda scope → 404); token prefix 6 belgi (docs/02 §4.4); parent `me` = `{role, children}`; parent JWT `aud` bilan ajratilgan; exchange'da max 10 token (taxmin).
+
+## 2026-11-11 — 1.7: design token'lar va UI komponentlar
+- **Nima qilindi:** Tailwind v4, yagona `tokens.css` (egasi tasdiqlagan wireframe qiymatlari, standart Tailwind klasslari bloklangan), 17 ta `components/ui` komponenti, `cn` util, `/design-preview` (production'da yopiq), sahifalarda xom stil uchun ESLint taqiqlari, Vitest + Testing Library (26 test).
+- **Fayllar:** `apps/web/{postcss.config.mjs,vitest.config.mts,vitest.setup.ts,eslint.config.mjs,package.json,tsconfig.json}`, `apps/web/src/{styles,components/ui,lib,app}/**`, `pnpm-lock.yaml`.
+- **Testlar:** `pnpm check` (api 252, web 26), `format:check` — Tech Lead qayta yurgizdi, o'tdi; `/design-preview` dev'da 200, prod build'da 404 (agent tekshirdi).
+- **Savollar:** primary `#2563EB` vs v4 blue-600; danger hover/fg token'lari.

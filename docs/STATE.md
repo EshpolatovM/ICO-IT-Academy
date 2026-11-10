@@ -7,7 +7,7 @@
 | Maydon | Qiymat |
 |---|---|
 | Joriy modul | 1-bosqich: Poydevor (reja tasdiqlangan 2026-11-10) |
-| Joriy bosqich | 1.6 tugadi va commit qilindi — 1-bosqich backend qismi yakunlandi; keyingisi 1.7 (rassom-dizayner: token'lar + components/ui), egasining ruxsati kutilmoqda |
+| Joriy bosqich | 1.7 tugadi va commit qilindi; egasi `/design-preview` ni ko'rib chiqishi va 1.8 (birchka-frontend) ga ruxsat kutilmoqda |
 | Joriy git branch | `feature/01-poydevor` |
 | Ish rejimi | Sekin: har bir vazifadan keyin hisobot va "Davom etaymi?" |
 
@@ -27,10 +27,10 @@
 - Agentlarga ism berildi: usta-baza (DB), oga-backend, rassom-dizayner (UI), birchka-frontend, sinchkov-tester (QA), domla-reviewer (review).
 
 ## Oxirgi bajarilgan vazifa
-**1.6 — parent auth, parol tiklash, audit, RBAC** (`oga-backend`, Tech Lead tekshirdi): `modules/parent-access` (token CRUD + regenerate, HMAC pepper, limit config'da, `FOR UPDATE`), `POST /auth/parent/exchange` (`ps` JWT `aud=parent-session`, AES-256-GCM `parent_tokens` cookie, merge/body'siz, `FixedWindowRateLimiter` umumlashtirildi), JwtAuthGuard Bearer yoki `ps`, parent `me`/logout, global `ParentReadOnlyGuard` + `@ParentWriteAllowed`, `StudentScopeResolver` + `@StudentScope` (mentor hozircha 403, 2-bosqichda group_members), `modules/password-reset` (student/staff), `modules/audit`, parollar qora ro'yxati (SecLists 10k, MIT, siyosatga mos 340 ta). 252 unit + 26 e2e.
+**1.7 — design token'lar va UI** (`rassom-dizayner`, Tech Lead tekshirdi): Tailwind 4.3.3 (`@tailwindcss/postcss`), `src/styles/tokens.css` (`@theme static`, Tailwind standart klasslari `initial` bilan bloklangan), semantik klasslar (`bg-primary`, `text-text-muted`, `border-border`, `bg-danger-bg` ...), `components/ui` (Button, Input, PasswordInput, Label, FormField, Card*, Alert, Spinner, Heading, Text, Container, Stack, AppShell, TopBar, Sidebar, NavItem, EmptyState, `classes.ts`), `src/lib/cn.ts`, `/design-preview` (production'da 404, `ENABLE_DESIGN_PREVIEW`), ESLint: palitra klasslari, hex/rgb/oklch, `style`, arbitrary qiymatlar taqiqi. Vitest + Testing Library: 26 test.
 
 ## Keyingi aniq vazifa
-**1.7 — dizayn token'lar va UI komponentlar** (`rassom-dizayner`): egasi tasdiqlagan wireframe token'lar (ko'k `#2563EB`, oq fon + neutral kulranglar, `system-ui`, faqat yorug' tema) — Tailwind o'rnatish, token'lar CSS o'zgaruvchilari, `components/ui` (Button, Input, Label, FormField, Card, Alert, Spinner, Layout karkas elementlari), `/design-preview` sahifasi. Keyin 1.8 `birchka-frontend` (api client + TanStack Query, auth store, login sahifalari staff/student/parent, parol almashtirish, rol bo'yicha route guard'lar, bo'sh layout'lar). So'ng `sinchkov-tester`, `domla-reviewer`. Topshiriq `docs/tasks/01-1.7-ui-tokenlar.md` ga yoziladi.
+**1.8 — frontend: auth sahifalari va panellar** (`birchka-frontend`): api client (access token xotirada, refresh bitta so'rovga yig'iladi, `X-Requested-With`), TanStack Query, `stores/auth.store.ts` (Zustand), login sahifalari (staff, student, parent `/parent?t=` + kod kiritish), majburiy parol almashtirish, rol bo'yicha route guard'lar, bo'sh layout'lar (student/mentor/admin/super admin/parent) `AppShell` bilan. Faqat `components/ui` va token'lar. Topshiriq `docs/tasks/01-1.8-frontend-auth.md` ga yoziladi.
 
 ## 2-bosqich uchun eslatmalar
 - `RoleBasedStudentScopeResolver` MENTOR tarmog'i → `group_members` asosida (scope tashqarisi 404).
@@ -39,6 +39,9 @@
 - Frontend: refresh so'rovlarini bitta so'rovga yig'ish (parallel refresh → reuse detection).
 
 ## Egasidan kutilayotgan javoblar
+- Asosiy rang: `#2563EB` (egasi bergan, Tailwind v3 blue-600) qolsinmi yoki v4 blue-600 (`oklch(54.6% 0.245 262.881)` ≈ `#155DFC`)?
+- Danger tugma uchun alohida `--color-danger-hover` / `--color-danger-fg` token'lari kerakmi (hozir `hover:opacity-90`)?
+- `/design-preview` ni ko'rib, wireframe ko'rinishini tasdiqlash.
 - **S-01 / S-02** Yo'llar soni, guruh yo'lga qanday biriktiriladi, student bir vaqtda nechta guruhda bo'ladi. 1-bosqichga ta'sir qilmaydi, 2-bosqichdan oldin kerak.
 - **S-65** Jamoa hajmi, muddat, MVP tarkibi.
 - **GitHub repo:** CI (GitHub Actions) uchun remote repo bormi?
