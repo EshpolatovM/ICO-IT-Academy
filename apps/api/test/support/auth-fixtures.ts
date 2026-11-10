@@ -1,5 +1,3 @@
-import { randomBytes, randomInt } from 'node:crypto';
-
 import request from 'supertest';
 
 import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE, Role, UserStatus } from '@lms/shared';
@@ -8,17 +6,20 @@ import type { AccountRole, LoginResponse } from '@lms/shared';
 import { PASSWORD_HASHER } from '../../src/common/security/password-hasher.interface.js';
 import { PrismaService } from '../../src/infra/prisma/prisma.service.js';
 
+import {
+  deleteTestUsers,
+  randomTestPhone,
+  randomTestStudentCode,
+  TEST_PASSWORD,
+} from './test-users.js';
+
 import type { PasswordHasher } from '../../src/common/security/password-hasher.interface.js';
 import type { INestApplication } from '@nestjs/common';
 import type { App } from 'supertest/types.js';
 
 export const API = '/api/v1';
-export const TEST_PASSWORD = 'E2eParol123';
-const PHONE_SUFFIX_MAX = 10_000_000;
-const PHONE_SUFFIX_DIGITS = String(PHONE_SUFFIX_MAX - 1).length;
+export { TEST_PASSWORD };
 const HTTP_OK = 200;
-const PHONE_PREFIX = '+99877';
-const CODE_BYTES = 4;
 
 export interface TestUser {
   id: string;
@@ -48,12 +49,8 @@ export class AuthFixtures {
     const user = await this.prisma().dbIncludingDeleted.user.create({
       data: {
         role: options.role,
-        phone: isStudent
-          ? null
-          : `${PHONE_PREFIX}${String(randomInt(PHONE_SUFFIX_MAX)).padStart(PHONE_SUFFIX_DIGITS, '0')}`,
-        studentCode: isStudent
-          ? `E2E-${randomBytes(CODE_BYTES).toString('hex').toUpperCase()}`
-          : null,
+        phone: isStudent ? null : randomTestPhone(),
+        studentCode: isStudent ? randomTestStudentCode() : null,
         passwordHash: await hasher.hash(TEST_PASSWORD),
         mustChangePassword: options.mustChangePassword ?? false,
         firstName: 'E2E',
@@ -68,19 +65,7 @@ export class AuthFixtures {
 
   /** Faqat shu fixture yaratgan foydalanuvchilar va ularga bog'langan yozuvlar o'chiriladi. */
   async cleanup(): Promise<void> {
-    const db = this.prisma().dbIncludingDeleted;
-    const ids = { in: this.createdIds };
-    await db.auditLog.deleteMany({ where: { OR: [{ actorId: ids }, { entityId: ids }] } });
-    await db.parentAccessLog.deleteMany({ where: { studentId: ids } });
-    await db.parentAccessToken.deleteMany({
-      where: { OR: [{ studentId: ids }, { createdById: ids }, { revokedById: ids }] },
-    });
-    await db.refreshToken.updateMany({
-      where: { userId: { in: this.createdIds } },
-      data: { replacedById: null },
-    });
-    await db.refreshToken.deleteMany({ where: { userId: { in: this.createdIds } } });
-    await db.user.deleteMany({ where: { id: { in: this.createdIds } } });
+    await deleteTestUsers(this.prisma().dbIncludingDeleted, this.createdIds);
   }
 
   private prisma(): PrismaService {

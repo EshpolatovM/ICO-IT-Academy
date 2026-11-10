@@ -55,8 +55,8 @@ const rawStyleRestrictions = [
 export default defineConfig(
   createBaseConfig({ tsconfigRootDir: import.meta.dirname }),
   {
-    // Next.js tomonidan avtomatik yaratiladigan fayl.
-    ignores: ['next-env.d.ts'],
+    // Next.js tomonidan avtomatik yaratiladigan fayl; Playwright e2e build va natijalari.
+    ignores: ['next-env.d.ts', '.next-e2e/**', 'playwright-report/**', 'test-results/**'],
   },
   {
     plugins: { '@next/next': nextPlugin },

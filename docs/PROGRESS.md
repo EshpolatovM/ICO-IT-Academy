@@ -119,3 +119,9 @@ Yangi yozuvlar pastga qo'shiladi.
 
 ## 2026-11-11 — 1.10: 1-bosqich review (avtonom rejim)
 - **Nima qilindi:** domla-reviewer butun 1-bosqichni ko'rdi: CRITICAL yo'q, 5 HIGH (login limit poygasi, tablararo refresh, parent exchange limiti, RBAC default-deny, helmet), 6 MEDIUM, 10 LOW. Qisqa mazmun va qarorlar: `docs/reviews/01-poydevor-review.md`. Tuzatish topshirig'i: `docs/tasks/01-1.11a-review-tuzatish-backend.md`.
+
+## 2026-11-11 — 1.9: 1-bosqich testlari (avtonom rejim)
+- **Nima qilindi:** qamrov auditi; RBAC matritsasi e2e (17 endpoint × 7 aktyor = 119 test); scope/IDOR va chekka holatlar (10); 2 ta unit spec; Playwright e2e (7 ssenariy: staff, admin/SA menyu, student majburiy parol, xato parol, ota-ona havolasi, sessiyasiz yo'naltirish, mobil menyu); turbo `@lms/web#test:e2e`, CI Playwright qadami.
+- **Fayllar:** `apps/api/test/{rbac-matrix,access-scope}.e2e-spec.ts`, `apps/api/test/support/{rbac-actors,test-users,web-e2e-users}.ts`, `apps/web/{playwright.config.ts,e2e/**}`, `turbo.json`, `.gitignore`, `.github/workflows/ci.yml`, `package.json`lar.
+- **Testlar:** api unit 281, api e2e 160, web Vitest 94, Playwright 7 — hammasi yashil (tester); Tech Lead `pnpm check`, `format:check` qayta yurgizdi.
+- **Kuzatuvlar:** ParseUUIDPipe xato formati, turbo strict env (CI), next build tsconfig o'zgarishi → 1.11a ga qo'shildi.

@@ -15,7 +15,8 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "create-super-admin": "tsx --env-file-if-exists=../../.env prisma/seed/create-super-admin.ts"
+    "create-super-admin": "tsx --env-file-if-exists=../../.env prisma/seed/create-super-admin.ts",
+    "e2e:web-users": "tsx --env-file-if-exists=../../.env test/support/web-e2e-users.ts"
   },
   "dependencies": {
     "@lms/shared": "workspace:*",

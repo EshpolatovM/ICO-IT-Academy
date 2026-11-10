@@ -19,3 +19,8 @@ coverage/
 
 # Prisma Client (prisma generate natijasi)
 apps/api/src/infra/prisma/generated/
+
+# Playwright (apps/web e2e) natijalari va e2e build papkasi
+playwright-report/
+test-results/
+.next-e2e/
