@@ -66,8 +66,15 @@ export class AuthFixtures {
     return user;
   }
 
+  /** Faqat shu fixture yaratgan foydalanuvchilar va ularga bog'langan yozuvlar o'chiriladi. */
   async cleanup(): Promise<void> {
     const db = this.prisma().dbIncludingDeleted;
+    const ids = { in: this.createdIds };
+    await db.auditLog.deleteMany({ where: { OR: [{ actorId: ids }, { entityId: ids }] } });
+    await db.parentAccessLog.deleteMany({ where: { studentId: ids } });
+    await db.parentAccessToken.deleteMany({
+      where: { OR: [{ studentId: ids }, { createdById: ids }, { revokedById: ids }] },
+    });
     await db.refreshToken.updateMany({
       where: { userId: { in: this.createdIds } },
       data: { replacedById: null },

@@ -81,3 +81,9 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Testlar:** 152 unit, 16 e2e — Tech Lead qayta yurgizdi, hammasi o'tdi.
 - **Qarorlar:** `@nestjs/jwt` 11.0.2 (12.x ESM-only); throttler o'rniga o'z limiter (muvaffaqiyatsiz urinishlar sanaladi); refresh sliding; eski parol xato → 400; S-12 qiymatlari env'da docs taxmini bo'yicha.
 - **Savollar:** S-12 tasdig'i, parollar qora ro'yxati, progressiv kechikish, proxy ortida IP (hosting bilan).
+
+## 2026-11-10 — 1.6: parent auth, parol tiklash, audit, RBAC
+- **Nima qilindi:** parent token CRUD/regenerate, parent exchange (shifrlangan cookie, sliding session), parent autentifikatsiyasi va revoke, ParentReadOnlyGuard, StudentScope karkasi, student/staff reset-password, AuditService, umumiy FixedWindowRateLimiter, parollar qora ro'yxati (SecLists 10k → siyosatga mos 340 ta).
+- **Fayllar:** `apps/api/src/modules/{parent-access,password-reset,audit,auth}/**`, `apps/api/src/common/{scope,rate-limit,security,guards,decorators,config}/**`, `apps/api/test/**`, `packages/shared/src/{auth,parent,audit,enums}/**`, `.env.example`, `.github/workflows/ci.yml`.
+- **Testlar:** 252 unit, 26 e2e — Tech Lead qayta yurgizdi, o'tdi. Dev baza holati o'zgarmagan (4 user, 0 token, 0 audit).
+- **Qarorlar:** qora ro'yxat 10k'dan filtrlangan (top-1000 dan faqat 12 tasi mos edi); mentor hozircha 403 (2-bosqichda scope → 404); token prefix 6 belgi (docs/02 §4.4); parent `me` = `{role, children}`; parent JWT `aud` bilan ajratilgan; exchange'da max 10 token (taxmin).

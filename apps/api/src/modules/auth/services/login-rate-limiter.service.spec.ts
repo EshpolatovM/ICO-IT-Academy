@@ -1,5 +1,7 @@
 import { ErrorCode } from '@lms/shared';
 
+import { FixedWindowRateLimiter } from '../../../common/rate-limit/fixed-window-rate-limiter.service.js';
+
 import { LoginRateLimiter } from './login-rate-limiter.service.js';
 
 import type { AppConfigService } from '../../../common/config/app-config.service.js';
@@ -19,7 +21,11 @@ function createLimiter(failures: string | null) {
     LOGIN_RATE_LIMIT_WINDOW_SECONDS: WINDOW_SECONDS,
   };
   const config = { get: (key: string) => settings[key] } as unknown as AppConfigService;
-  return { redis, limiter: new LoginRateLimiter(redis as unknown as RedisService, config) };
+  const limiter = new LoginRateLimiter(
+    new FixedWindowRateLimiter(redis as unknown as RedisService),
+    config,
+  );
+  return { redis, limiter };
 }
 
 const attempt = { kind: 'student', ip: '10.0.0.1', login: 'ST-10001' } as const;

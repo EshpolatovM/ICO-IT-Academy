@@ -1,9 +1,10 @@
 import { z } from 'zod';
 
+import { isCommonPassword } from './common-passwords.js';
+
 /**
- * Parol siyosati — docs/02-auth.md §6 (S-19 ✅): kamida 8 belgi, harf va raqam bo'lishi shart.
- * Qora ro'yxat (eng keng tarqalgan parollar) — docs/02 §6 da bor, lekin S-19 javobida yo'q va
- * ro'yxatning o'zi berilmagan: egasi qaroriga qadar qo'llanmaydi.
+ * Parol siyosati — docs/02-auth.md §6 (S-19 ✅): kamida 8 belgi, harf va raqam bo'lishi shart,
+ * eng keng tarqalgan parollar qora ro'yxatida bo'lmasligi kerak (egasi qarori, 1.6).
  */
 export const PASSWORD_MIN_LENGTH = 8;
 /** Kiritish chegarasi (DoS'dan himoya: Argon2'ga juda uzun satr yuborilmasin). Siyosat emas. */
@@ -14,12 +15,16 @@ const HAS_DIGIT = /\d/;
 
 export const PASSWORD_POLICY_MESSAGE = `Parol kamida ${PASSWORD_MIN_LENGTH} belgidan iborat bo'lishi va harf hamda raqamni o'z ichiga olishi kerak.`;
 
+export const COMMON_PASSWORD_MESSAGE =
+  'Bu parol juda keng tarqalgan va oson topiladi. Boshqa parol tanlang.';
+
 export const passwordSchema = z
   .string()
   .min(PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE)
   .max(PASSWORD_MAX_LENGTH)
   .regex(HAS_LETTER, PASSWORD_POLICY_MESSAGE)
-  .regex(HAS_DIGIT, PASSWORD_POLICY_MESSAGE);
+  .regex(HAS_DIGIT, PASSWORD_POLICY_MESSAGE)
+  .refine((password) => !isCommonPassword(password), COMMON_PASSWORD_MESSAGE);
 
 /** E.164: `+` va 8–15 raqam (docs/02 §1: `+998XXXXXXXXX`). */
 const E164_PHONE = /^\+[1-9]\d{7,14}$/;

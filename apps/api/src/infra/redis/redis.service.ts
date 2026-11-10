@@ -55,6 +55,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return this.client.del(key);
   }
 
+  /** Mavjud kalitga yangi muddat beradi (masalan rate limit blokini uzaytirish). */
+  async expire(key: string, ttlSeconds: number): Promise<void> {
+    await this.client.expire(key, ttlSeconds);
+  }
+
   /**
    * Hisoblagichni oshiradi. Kalit yangi bo'lsa — `ttlSeconds` muddat bilan yaratiladi (oyna boshidan
    * hisoblanadi, keyingi oshirishlar muddatni uzaytirmaydi). `INCR` mavjud TTL'ni saqlaydi.

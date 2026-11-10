@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { DEFAULT_API_PORT } from '../constants/app.constants.js';
 
 import { assertSecureCookieInProduction, authEnvShape } from './auth-env.schema.js';
+import { parentEnvShape } from './parent-env.schema.js';
 
 /**
  * Ilova env o'zgaruvchilari sxemasi — yagona joy (docs/13 §4: barcha tashqi manzillar env orqali).
@@ -16,6 +17,8 @@ export const LOG_LEVELS = ['fatal', 'error', 'warn', 'info', 'debug', 'trace', '
 
 const POSTGRES_PROTOCOL = /^postgres(ql)?$/;
 const REDIS_PROTOCOL = /^rediss?$/;
+const HTTP_PROTOCOL = /^https?$/;
+const TRAILING_SLASHES = /\/+$/;
 
 export const envSchema = z
   .object({
@@ -24,7 +27,12 @@ export const envSchema = z
     DATABASE_URL: z.url({ protocol: POSTGRES_PROTOCOL }),
     REDIS_URL: z.url({ protocol: REDIS_PROTOCOL }),
     LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
+    /** Frontend bazaviy manzili (ota-ona havolasi uchun: `${WEB_BASE_URL}/parent?t=...`). */
+    WEB_BASE_URL: z
+      .url({ protocol: HTTP_PROTOCOL })
+      .transform((url) => url.replace(TRAILING_SLASHES, '')),
     ...authEnvShape,
+    ...parentEnvShape,
   })
   .superRefine(assertSecureCookieInProduction);
 

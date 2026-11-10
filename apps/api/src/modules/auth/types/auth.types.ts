@@ -60,3 +60,27 @@ export interface NewRefreshTokenData {
   expiresAt: Date;
   meta: ClientMeta;
 }
+
+/** Sessiyadagi token va unga bog'langan farzand (`tokenIds[i]` ↔ `studentIds[i]`, docs/10 §3). */
+export interface ParentSessionGrant {
+  tokenId: string;
+  studentId: string;
+}
+
+/**
+ * Parent session JWT tarkibi (docs/02 §3, docs/10 §3): `sub` — birinchi token id'si,
+ * `role=PARENT`, `tokenIds[]` va `studentIds[]` (bir xil tartibda), `exp` — tugash vaqti (soniya).
+ */
+export interface ParentSessionPayload {
+  sub: string;
+  role: 'PARENT';
+  tokenIds: string[];
+  studentIds: string[];
+  exp: number;
+}
+
+/** Yangi parent session (`ps` cookie qiymati va tugash vaqti). */
+export interface IssuedParentSession {
+  token: string;
+  expiresAt: Date;
+}

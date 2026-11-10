@@ -8,7 +8,7 @@ import { PrismaService } from '../../../infra/prisma/prisma.service.js';
 
 import type { RepositoryTypes } from '../../../common/repository/repository.types.js';
 import type { Prisma, User } from '../../../infra/prisma/generated/client.js';
-import type { PasswordChangeResult, UserAuthRecord } from '../users.types.js';
+import type { PasswordChangeResult, StudentProfileRecord, UserAuthRecord } from '../users.types.js';
 
 interface UserRepositoryTypes extends RepositoryTypes {
   model: User;
@@ -37,6 +37,12 @@ export interface PasswordChangeData {
   /** Shu vaqt bilan foydalanuvchining barcha faol refresh tokenlari bekor qilinadi. */
   revokedAt: Date;
 }
+
+const STUDENT_PROFILE_SELECT = {
+  id: true,
+  firstName: true,
+  lastName: true,
+} as const satisfies Prisma.UserSelect;
 
 /** `users` jadvali. O'chirilgan (soft delete) foydalanuvchilar avtomatik yashiriladi. */
 @Injectable()
@@ -79,16 +85,45 @@ export class UsersRepository extends SoftDeletableBaseRepository<UserRepositoryT
     await this.delegate.update({ where: { id }, data: { lastLoginAt: at }, select: { id: true } });
   }
 
+  /** Student (o'chirilmagan, istalgan holatda) — topilmasa yoki student bo'lmasa `null`. */
+  findStudent(id: string): Promise<StudentProfileRecord | null> {
+    return this.delegate.findFirst({
+      where: { id, role: Role.STUDENT },
+      select: STUDENT_PROFILE_SELECT,
+    });
+  }
+
+  findStudentsByIds(ids: readonly string[]): Promise<StudentProfileRecord[]> {
+    return this.delegate.findMany({
+      where: { id: { in: [...ids] }, role: Role.STUDENT },
+      orderBy: this.defaultOrderBy,
+      select: STUDENT_PROFILE_SELECT,
+    });
+  }
+
   /**
    * Parolni almashtirish — bitta atomar yozuvda (docs/02 §4.2): yangi hash,
    * `must_change_password = false`, `token_version++` va barcha faol refresh tokenlar bekor.
    */
-  async changePassword(id: string, data: PasswordChangeData): Promise<PasswordChangeResult> {
+  changePassword(id: string, data: PasswordChangeData): Promise<PasswordChangeResult> {
+    return this.replacePassword(id, data, false);
+  }
+
+  /** Parolni tiklash (docs/02 §4.3): xuddi shunday, lekin `must_change_password = true`. */
+  resetPassword(id: string, data: PasswordChangeData): Promise<PasswordChangeResult> {
+    return this.replacePassword(id, data, true);
+  }
+
+  private replacePassword(
+    id: string,
+    data: PasswordChangeData,
+    mustChangePassword: boolean,
+  ): Promise<PasswordChangeResult> {
     return this.delegate.update({
       where: { id },
       data: {
         passwordHash: data.passwordHash,
-        mustChangePassword: false,
+        mustChangePassword,
         tokenVersion: { increment: 1 },
         refreshTokens: {
           updateMany: { where: { revokedAt: null }, data: { revokedAt: data.revokedAt } },

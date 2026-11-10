@@ -17,14 +17,19 @@ const mentor = {
   status: UserStatus.ACTIVE,
 };
 
-function createService(found: object | null) {
-  const users = { findAuthById: jest.fn().mockResolvedValue(found) };
+const account = { id: 'u1', role: Role.MENTOR, mustChangePassword: false } as const;
+
+function createService(found: object | null, students: object[] = []) {
+  const users = {
+    findAuthById: jest.fn().mockResolvedValue(found),
+    findStudentsByIds: jest.fn().mockResolvedValue(students),
+  };
   return new MeService(users as unknown as UsersRepository);
 }
 
 describe('MeService', () => {
   it('AuthUser qaytaradi: hash va versiya chiqmaydi', async () => {
-    await expect(createService(mentor).getMe('u1')).resolves.toEqual({
+    await expect(createService(mentor).getMe(account)).resolves.toEqual({
       id: 'u1',
       role: Role.MENTOR,
       firstName: 'Dev',
@@ -35,8 +40,30 @@ describe('MeService', () => {
   });
 
   it("foydalanuvchi o'chirilgan — 401", async () => {
-    await expect(createService(null).getMe('u1')).rejects.toMatchObject({
+    await expect(createService(null).getMe(account)).rejects.toMatchObject({
       code: ErrorCode.UNAUTHORIZED,
+    });
+  });
+
+  it('ota-ona — sessiyadagi farzandlar (sessiya tartibida, guruh hozircha null)', async () => {
+    const service = createService(null, [
+      { id: 's2', firstName: 'Vali', lastName: 'B' },
+      { id: 's1', firstName: 'Ali', lastName: 'A' },
+    ]);
+    const parent = {
+      id: 't1',
+      role: Role.PARENT,
+      mustChangePassword: false,
+      tokenIds: ['t1', 't2', 't3'],
+      studentIds: ['s1', 's2', 'yoq'],
+    } as const;
+
+    await expect(service.getMe(parent)).resolves.toEqual({
+      role: Role.PARENT,
+      children: [
+        { studentId: 's1', firstName: 'Ali', lastName: 'A', groupName: null },
+        { studentId: 's2', firstName: 'Vali', lastName: 'B', groupName: null },
+      ],
     });
   });
 });

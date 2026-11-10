@@ -18,3 +18,10 @@ export interface UserAuthRecord {
 export interface PasswordChangeResult {
   tokenVersion: number;
 }
+
+/** Student haqida qisqa ma'lumot (ota-ona paneli, token boshqaruvi). */
+export interface StudentProfileRecord {
+  id: string;
+  firstName: string;
+  lastName: string;
+}

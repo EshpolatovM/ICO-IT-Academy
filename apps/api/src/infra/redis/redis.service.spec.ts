@@ -13,6 +13,7 @@ function createFakeClient(status = 'ready') {
     set: jest.fn().mockResolvedValue('OK'),
     del: jest.fn().mockResolvedValue(1),
     incr: jest.fn().mockResolvedValue(3),
+    expire: jest.fn().mockResolvedValue(1),
     disconnect: jest.fn(),
   };
 }
@@ -77,5 +78,12 @@ describe('RedisService', () => {
     expect(await service.incrementWithTtl('k', 900)).toBe(3);
     expect(client.set).toHaveBeenCalledWith('k', '0', 'EX', 900, 'NX');
     expect(client.incr).toHaveBeenCalledWith('k');
+  });
+
+  it('expire: kalitga yangi muddat beradi', async () => {
+    const { client, service } = createService();
+
+    await service.expire('k', 3600);
+    expect(client.expire).toHaveBeenCalledWith('k', 3600);
   });
 });

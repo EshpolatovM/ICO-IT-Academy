@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { ErrorCode } from '@lms/shared';
-
 import { AppConfigService } from '../../../common/config/app-config.service.js';
-import { AppException } from '../../../common/exceptions/app.exception.js';
-import { RedisService } from '../../../infra/redis/redis.service.js';
-import { LOGIN_FAILURE_KEY_PREFIX, UNKNOWN_IP } from '../auth.constants.js';
+import { FixedWindowRateLimiter } from '../../../common/rate-limit/fixed-window-rate-limiter.service.js';
+import { UNKNOWN_IP } from '../../../common/rate-limit/rate-limit.types.js';
+import { LOGIN_FAILURE_KEY_PREFIX } from '../auth.constants.js';
+
+import type { RateLimitPolicy } from '../../../common/rate-limit/rate-limit.types.js';
 
 export type LoginKind = 'staff' | 'student';
 
@@ -18,34 +18,37 @@ export interface LoginAttemptKey {
 /**
  * Login rate limit (docs/02 §6): `ip + login` bo'yicha muvaffaqiyatsiz urinishlar soni Redis'da,
  * oyna — birinchi xatodan boshlab. Limitga yetgach keyingi urinish — 429 (to'g'ri parol bilan ham).
- * Muvaffaqiyatli kirishda hisoblagich tozalanadi. Raqamlar — env'dan.
+ * Muvaffaqiyatli kirishda hisoblagich tozalanadi. Raqamlar — env'dan. Hisoblash —
+ * umumiy `FixedWindowRateLimiter` orqali.
  */
 @Injectable()
 export class LoginRateLimiter {
-  constructor(
-    private readonly redis: RedisService,
-    private readonly config: AppConfigService,
-  ) {}
+  private readonly policy: RateLimitPolicy;
 
-  async assertAllowed(attempt: LoginAttemptKey): Promise<void> {
-    const failures = Number(await this.redis.get(this.key(attempt)));
-    if (failures >= this.config.get('LOGIN_RATE_LIMIT_MAX_ATTEMPTS')) {
-      throw new AppException({ code: ErrorCode.RATE_LIMITED });
-    }
+  constructor(
+    private readonly limiter: FixedWindowRateLimiter,
+    config: AppConfigService,
+  ) {
+    this.policy = {
+      keyPrefix: LOGIN_FAILURE_KEY_PREFIX,
+      maxHits: config.get('LOGIN_RATE_LIMIT_MAX_ATTEMPTS'),
+      windowSeconds: config.get('LOGIN_RATE_LIMIT_WINDOW_SECONDS'),
+    };
+  }
+
+  assertAllowed(attempt: LoginAttemptKey): Promise<void> {
+    return this.limiter.assertAllowed(this.policy, this.subject(attempt));
   }
 
   async registerFailure(attempt: LoginAttemptKey): Promise<void> {
-    await this.redis.incrementWithTtl(
-      this.key(attempt),
-      this.config.get('LOGIN_RATE_LIMIT_WINDOW_SECONDS'),
-    );
+    await this.limiter.hit(this.policy, this.subject(attempt));
   }
 
-  async reset(attempt: LoginAttemptKey): Promise<void> {
-    await this.redis.del(this.key(attempt));
+  reset(attempt: LoginAttemptKey): Promise<void> {
+    return this.limiter.reset(this.policy, this.subject(attempt));
   }
 
-  private key({ kind, ip, login }: LoginAttemptKey): string {
-    return `${LOGIN_FAILURE_KEY_PREFIX}${kind}:${ip ?? UNKNOWN_IP}:${login.toLowerCase()}`;
+  private subject({ kind, ip, login }: LoginAttemptKey): string {
+    return `${kind}:${ip ?? UNKNOWN_IP}:${login.toLowerCase()}`;
   }
 }

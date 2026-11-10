@@ -1,4 +1,5 @@
 import type { Role } from '../enums/role.js';
+import type { ParentMeResponse } from '../parent/parent.types.js';
 
 /**
  * Akkauntli rollar (docs/01 §1). PARENT — virtual rol, akkaunti yo'q: u alohida parent session
@@ -46,3 +47,6 @@ export interface AuthSession {
 export interface AuthSessionsResponse {
   items: AuthSession[];
 }
+
+/** `GET /auth/me` (docs/12 §1: "ANY + P") — akkauntli foydalanuvchi yoki ota-ona sessiyasi (`role` bo'yicha ajratiladi). */
+export type MeResponse = AuthUser | ParentMeResponse;

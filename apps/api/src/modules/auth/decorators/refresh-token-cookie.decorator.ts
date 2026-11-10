@@ -1,13 +1,13 @@
 import { createParamDecorator } from '@nestjs/common';
 
+import { readCookie } from '../../../common/utils/read-cookie.js';
 import { REFRESH_COOKIE_NAME } from '../auth.constants.js';
 
 import type { ExecutionContext } from '@nestjs/common';
 import type { Request } from 'express';
 
 export function refreshTokenFromRequest(request: Request): string | undefined {
-  const value: unknown = request.cookies[REFRESH_COOKIE_NAME];
-  return typeof value === 'string' && value.length > 0 ? value : undefined;
+  return readCookie(request, REFRESH_COOKIE_NAME);
 }
 
 /** `rt` cookie'dagi xom refresh token (`cookie-parser` orqali); bo'lmasa — `undefined`. */

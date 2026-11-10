@@ -17,6 +17,8 @@ export const REDACT_PATHS: readonly string[] = [
   'req.headers.authorization',
   'req.headers.cookie',
   'res.headers["set-cookie"]',
-  ...['password', 'passwordHash', 'oldPassword', 'newPassword'].flatMap((key) => [key, `*.${key}`]),
+  ...['password', 'passwordHash', 'oldPassword', 'newPassword', 'temporaryPassword'].flatMap(
+    (key) => [key, `*.${key}`],
+  ),
   ...['token', 'tokens', 'accessToken', 'refreshToken'].flatMap((key) => [key, `*.${key}`]),
 ];
