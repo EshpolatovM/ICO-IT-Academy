@@ -36,3 +36,10 @@ Yangi yozuvlar pastga qo'shiladi.
   - `CLAUDE.md` ga samimiy muloqot ohangi qo'shildi.
   - `podman compose` ishlashi tasdiqlandi.
 - **Fayllar:** `.claude/agents/*.md`, `CLAUDE.md`, `docs/STATE.md`, `docs/tasks/01-1.1-monorepo-skeleti.md`.
+
+## 2026-11-10 — 1.1: monorepo skeleti
+- **Nima qilindi:** pnpm workspaces + Turborepo 2.11.10; `packages/config` (tsconfig strict, ESLint flat bazasi), `packages/shared` (Role enum, zod 4.6.7), `apps/api` (NestJS 11.2.9, prefiks `api/v1`, smoke test 2/2), `apps/web` (Next 15.5.29, React 19.3.1, alias'lar), `compose.yaml` (Postgres 16, Redis 7, MinIO; faqat 127.0.0.1), `.env.example`, README. Barcha versiyalar aniq pin.
+- **Fayllar:** ildiz konfiglari, `apps/api/**`, `apps/web/**`, `packages/{config,shared}/**`, `.gitignore`.
+- **Testlar:** install, build, lint, typecheck, test — Tech Lead qayta tekshirdi, hammasi o'tdi. `podman compose config` o'tdi.
+- **Qarorlar:** TS 5.9.3 va ESLint 9 (typescript-eslint/Next mosligi uchun); compose ildizda; Redis paroli bilan; `.prettierignore` da docs.
+- **Muammolar:** MinIO image'i registry'dan pull qilinmayapti — egasi qarori kerak.

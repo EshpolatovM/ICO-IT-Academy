@@ -1,0 +1,15 @@
+{
+  "extends": "@lms/config/tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node", "jest"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "sourceMap": true,
+    "isolatedModules": true
+  },
+  "include": ["src"]
+}
