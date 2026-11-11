@@ -10,10 +10,9 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  Heading,
+  PageHeader,
   Stack,
   Text,
-  TextLink,
 } from '@/components/ui';
 
 import { studentsApi } from '../api/students.api';
@@ -68,10 +67,10 @@ export function StudentImportPage() {
 
   return (
     <Stack gap="6">
-      <TextLink href={AdminUsersPath.STUDENTS} variant="muted">
-        ← Studentlar
-      </TextLink>
-      <Heading as="h1">Studentlarni CSV orqali import qilish</Heading>
+      <PageHeader
+        title="Studentlarni CSV orqali import qilish"
+        back={{ href: AdminUsersPath.STUDENTS, label: 'Studentlar' }}
+      />
       <Card>
         <CardHeader>
           <CardTitle>{result === null ? 'Fayl yuklash' : 'Natija'}</CardTitle>

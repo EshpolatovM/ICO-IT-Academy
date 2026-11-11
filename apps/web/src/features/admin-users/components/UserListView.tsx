@@ -2,7 +2,7 @@
 
 import type { ManagedUserBase } from '@lms/shared';
 
-import { Heading, Pagination, Stack } from '@/components/ui';
+import { PageHeader, Pagination, Stack } from '@/components/ui';
 
 import { useListUrlState } from '../hooks/useListUrlState';
 import { useUserList } from '../hooks/useUserList';
@@ -27,19 +27,6 @@ export interface UserListViewProps<T extends ManagedUserBase> {
   extraFilters?: ReactNode;
 }
 
-function ListHeader({ title, actions }: { title: string; actions: ReactNode }) {
-  return (
-    <Stack direction="horizontal" justify="between" align="center" gap="3" wrap>
-      <Heading as="h1">{title}</Heading>
-      {actions !== undefined ? (
-        <Stack direction="horizontal" gap="2" wrap>
-          {actions}
-        </Stack>
-      ) : null}
-    </Stack>
-  );
-}
-
 /**
  * Foydalanuvchilar ro'yxati sahifasi (studentlar, mentorlar, adminlar uchun umumiy): qidiruv,
  * holat filtri, saralash, pagination — hammasi URL query'da; yuklanish, bo'sh va xato holatlari.
@@ -60,7 +47,7 @@ export function UserListView<T extends ManagedUserBase>({
 
   return (
     <Stack gap="6">
-      <ListHeader title={title} actions={actions} />
+      <PageHeader title={title} actions={actions} />
       {nav}
       <UserListToolbar
         q={state.q}

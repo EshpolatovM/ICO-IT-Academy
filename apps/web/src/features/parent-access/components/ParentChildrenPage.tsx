@@ -1,6 +1,14 @@
 'use client';
 
-import { Alert, Card, CardContent, CardHeader, CardTitle, Heading, Stack } from '@/components/ui';
+import {
+  Alert,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  PageHeader,
+  Stack,
+} from '@/components/ui';
 import { useParentSessionStore } from '@/stores/parent-session.store';
 
 import { ParentChildrenList } from './ParentChildrenList';
@@ -11,7 +19,7 @@ export function ParentChildrenPage() {
   const linkError = useParentSessionStore((state) => state.linkError);
   return (
     <Stack gap="6">
-      <Heading as="h1">Farzandlarim</Heading>
+      <PageHeader title="Farzandlarim" />
       {linkError !== null ? <Alert variant="danger">{linkError}</Alert> : null}
       <ParentChildrenList />
       <Card>

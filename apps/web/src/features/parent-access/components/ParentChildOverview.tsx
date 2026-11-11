@@ -1,6 +1,6 @@
 'use client';
 
-import { EmptyState, Heading, Spinner, Stack } from '@/components/ui';
+import { EmptyState, PageHeader, Spinner, Stack } from '@/components/ui';
 
 import { useParentChildren } from '../hooks/useParentChildren';
 
@@ -18,9 +18,7 @@ export function ParentChildOverview({ studentId }: { studentId: string }) {
   }
   return (
     <Stack gap="6">
-      <Heading as="h1">
-        {child.firstName} {child.lastName}
-      </Heading>
+      <PageHeader title={`${child.firstName} ${child.lastName}`} />
       <EmptyState title="Tez orada" description="Farzand paneli 14-bosqichda qo'shiladi." />
     </Stack>
   );

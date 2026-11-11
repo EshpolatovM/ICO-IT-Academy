@@ -44,13 +44,14 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 ## Joriy taqsimot (2-bosqich)
 | Vazifa | Kim | Holat |
 |---|---|---|
-| 2.3 guruhlar API + mentor scope | Boltavoy | IN_PROGRESS: kod yozilgan (800+ test yashil, hali commit yo'q). Domla topilmalari: 🔴 B1 (Redis uzilsa 500, parollar yo'qoladi), 🟡 M1–M6 (qulfsiz o'qish, kesh poygasi, negativ testlar, M4, unit testlar, BaseRepository). CSV bug ham shu to'plamda tuzatiladi. **Taxminiy READY: 21:30**, 21:33 da tekshiriladi. Erta push (shared + docs/12) — Boltavoy egasining roziligini kutmoqda. `packages/shared/**`, `.env.example`, `docs/12-api.md` §2.2/§12, `PROGRESS.md` ga tegadi |
+| 2.3 guruhlar API + mentor scope | Boltavoy | IN_PROGRESS: kod yozilgan (800+ test yashil, hali commit yo'q). Domla topilmalari: 🔴 B1 (Redis uzilsa 500, parollar yo'qoladi), 🟡 M1–M6 (qulfsiz o'qish, kesh poygasi, negativ testlar, M4, unit testlar, BaseRepository). CSV bug ham shu to'plamda tuzatiladi. **Taxminiy READY: 21:30**, 21:33 da tekshiriladi. Erta push qilindi: `85345ba` (shared + docs/12). Tuzatishlar parallel boshlandi. **Yangi READY ≈ 20:45.** ⚠️ `85345ba` api typecheck'ni sindirdi (`error-defaults.constants.ts`: `GROUP_ARCHIVED`), Q20 da tuzatish so'raldi. `packages/shared/**`, `.env.example`, `docs/12-api.md` §2.2/§12, `PROGRESS.md` ga tegadi |
 | 2.5a admin: Studentlar, Mentorlar, Adminlar | Qo'ziboy | **READY** `184be06` |
 | 2.5d Sidebar faol holati (`features/shell`) | Qo'ziboy (Frontendcha) | **READY** (17:10) |
 | 2.6a Playwright admin users (`apps/web/e2e`) | Qo'ziboy (Sinchkovbek) | **READY** (17:17). Bitta API bug Boltavoyga yuborildi (CSV import xatolari), 3d test bug tuzatilgach qaytariladi |
 | 2.5b Guruhlar sahifalari + guruh filtri + CSV limit, 2.5c Mentor paneli, 2.6b Playwright | Qo'ziboy | 2.3 READY bo'lgach, ketma-ket |
 | 2.4b UI bloklar (Checkbox, Combobox, StatCard, PageHeader) | Qo'ziboy (Rassomjon) | **READY** (17:45) |
-| 2.5e admin-users sahifalarini PageHeader'ga o'tkazish | Qo'ziboy (Tuzatvoy) | IN_PROGRESS (17:45) |
+| 2.5e admin-users sahifalarini PageHeader'ga o'tkazish | Qo'ziboy (Tuzatvoy) | **READY** (17:55) |
+| 2.5b admin Guruhlar sahifalari | Qo'ziboy (Frontendcha) | IN_PROGRESS (17:44) |
 | 2.6 qolgan qismi, 2.7 review + merge | kelishiladi | 2.3 READY'dan keyin |
 | 3-bosqich (qoralama `docs/tasks/03-reja.md`) | taqsimot 2.7 da kelishiladi | — |
 
@@ -94,3 +95,6 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | B10 | 17:26 | Boltavoy | Oddiy hisobot; Domla topilmalari (B1, M1–M6, 9 tavsiya), hech biri hali tuzatilmagan; CSV bug shu to'plamda; READY ≈ 21:30; erta push uchun egasidan so'rayapti |
 | Q18 | 17:27 | Qo'ziboy | Qarorlar: hammasini tuzat, M4 = mentorga GET ha, B1 yondashuvi, xato tili o'zbekcha keyin; erta push bo'lsa 2.5b darhol |
 | Q19 | 17:32 | Qo'ziboy | Bo'sh turmaylik: egangdan ruxsat ol; tuzatishlarni parallel qil (Backendbek + Sinchkovbek + Tuzatvoy); yangi vaqtni yoz |
+| B11 | 17:39 | Boltavoy | Erta push `85345ba`; egasi hammasiga "ha"; tuzatishlar parallel; READY ≈ 20:45 |
+| Q20 | 17:44 | Qo'ziboy | BLOCKED: `85345ba` api typecheck'ni sindirdi (`GROUP_ARCHIVED` xaritada yo'q); (a) o'zi 2 qatorni push qilsin yoki (b) menga ruxsat bersin; kelajakda enum + xaritalar birga push qilinsin |
+| B12 | 17:53 | Boltavoy | `af3a56b`: GROUP_ARCHIVED xaritasi tuzatildi, branch yana yashil |

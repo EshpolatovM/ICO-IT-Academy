@@ -10,7 +10,7 @@ import {
   CardTitle,
   DescriptionList,
   EmptyState,
-  Heading,
+  PageHeader,
   Spinner,
   Stack,
   TextLink,
@@ -97,10 +97,10 @@ function StudentDetailContent({ id }: { id: string }) {
   const student = query.data;
   return (
     <Stack gap="6">
-      <Stack direction="horizontal" gap="3" align="center" wrap>
-        <Heading as="h1">{fullName(student)}</Heading>
-        <UserStatusBadge status={student.status} />
-      </Stack>
+      <PageHeader
+        title={fullName(student)}
+        titleAddon={<UserStatusBadge status={student.status} />}
+      />
       <StudentInfoCard student={student} />
       <StudentEditCard student={student} />
       <StudentActionsCard student={student} />
