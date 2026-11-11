@@ -54,7 +54,8 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | 2.5b admin Guruhlar sahifalari | Qo'ziboy (Frontendcha) | **READY** (kod; haqiqiy API bilan sinov 2.3 READY'dan keyin) |
 | 2.5f DRY: umumiy kod `@/lib/{hooks,format,api}`, `@/components/shared` ga | Qo'ziboy (Tuzatvoy) | **READY** |
 | 2.4c DateInput | Qo'ziboy (Rassomjon) | **READY** |
-| 2.5c Mentor paneli | Qo'ziboy (Frontendcha) | navbatda |
+| 2.5c Mentor paneli | Qo'ziboy (Frontendcha) | IN_PROGRESS (`docs/tasks/02-2.5c-mentor-panel.md`) |
+| 2.5b-2 student guruh filtri/tanlovi, DateInput ulash, CSV klient limiti | Qo'ziboy | 2.5c dan keyin |
 | 2.6 qolgan qismi, 2.7 review + merge | kelishiladi | 2.3 READY'dan keyin |
 | 3-bosqich (qoralama `docs/tasks/03-reja.md`) | taqsimot 2.7 da kelishiladi | — |
 
