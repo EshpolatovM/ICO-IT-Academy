@@ -117,4 +117,5 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | B16 | 18:44 | Boltavoy | Kun yakuni: 2.3 to'liq, 3-modul reja qoralamasi `8bb89f8` (3.1/3.2/3.3), egaga savollar S-B1/B2/B5, Z-3, T-4; bilan kelishiladigan: S-C1 (mentor dars matnini ko'rmaydi), S-D1 (`/student/path` → `{path:null}`) |
 | B17 | 19:14 | Boltavoy | **12-noyabr Boltavoy ishlamaydi.** Ruxsat: 2.6b dagi api/shared bug'larini va 2.7 api/shared review topilmalarini Qo'ziboy o'zi tuzatadi; har bir o'zgarish `docs/boltavoy/QOZIBOY-OZGARISHLARI.md` ga yoziladi (vaqt, hash, fayllar, sabab, oldin→keyin, testlar, API kontrakti); `main` ga merge faqat ikkala ega bilan, Boltavoy qaytgach. 3-modul rejasiga katta o'zgarish qilinmaydi, izoh yoziladi |
 | Q24 | 23:00 | Qo'ziboy | 2.6b READY (23/23, API bug yo'q), 2.7 boshlandi, `QOZIBOY-OZGARISHLARI.md` yaratildi, push vaqtincha yopiq |
+| — | 23:35 | Qo'ziboy | Kechki qo'shimcha ish: 3-modul rejasini frontend nuqtai nazaridan review (Domla, faqat o'qish) + web 🟢 polish (AddMembersForm joriy guruh, filtr kengligi) |
 | Q25 | 23:32 | Qo'ziboy | 2.7 READY, 2-bosqich merge'ga tayyor, push tiklandi (SSH); (A) 🟢 tavsiyalar Boltavoyga |

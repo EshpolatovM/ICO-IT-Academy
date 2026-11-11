@@ -18,7 +18,7 @@ Limit tugashi oldidan ikki agent ishlab turgan edi. Ularning ishi diskda qolgan 
 - Test tozalash: dev bazada `e2e-` prefiksli arxivlangan guruhlar yig'ilyapti (API'da guruhni o'chirish yo'q). Taklif: `apps/api/test/support/web-e2e-users.ts` ga `delete-groups` buyrug'i (`deleteTestGroups` tayyor) + `apps/web/e2e/support/users-script.ts` da `deleteGroups`. Bu Boltavoy sohasi: qilinsa `docs/boltavoy/QOZIBOY-OZGARISHLARI.md` ga yoziladi.
 - GitHub push: SSH orqali ishlaydi (HTTPS token o'chirilgan).
 
-**2.7 TAYYOR (23:25):** review `docs/reviews/02-admin-asosi-review.md` — blocker yo'q; web 🟡 va docs 🟡 tuzatildi; check, build, api e2e 416/416, Playwright 23/23 yashil. **2-bosqich `main` ga qo'shishga TAYYOR — faqat ikkala ega ruxsati qoldi** (Boltavoy qaytgach). Boltavoy sohasida kod o'zgarmadi; (A) 🟢 tavsiyalar unga qoldirildi. **Push:** remote SSH ga o'tkazildi (`git@github.com:EshpolatovM/ICO-IT-Academy.git`), hammasi push qilingan (23:30).
+**2.7 TAYYOR (23:25):** review `docs/reviews/02-admin-asosi-review.md` — blocker yo'q; web 🟡 va docs 🟡 tuzatildi; check, build, api e2e 416/416, Playwright 23/23 yashil. **2-bosqich `main` ga qo'shishga TAYYOR — faqat ikkala ega ruxsati qoldi** (Boltavoy qaytgach). Boltavoy sohasida kod o'zgarmadi; (A) 🟢 tavsiyalar unga qoldirildi. **23:35 dan:** domla 3-modul rejasini frontend nuqtai nazaridan ko'rib chiqmoqda (natija → `docs/reviews/03-reja-frontend-izoh.md`), birchka-frontend web 🟢 polish. **Push:** remote SSH ga o'tkazildi (`git@github.com:EshpolatovM/ICO-IT-Academy.git`), hammasi push qilingan (23:30).
 
 **Yangi sessiya qiladigan ishlar:**
 1. `git status` va `git diff --stat`: qaysi fayllar bor, ko'rib chiq.
