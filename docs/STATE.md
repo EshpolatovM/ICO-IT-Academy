@@ -41,6 +41,14 @@ Limit tugashi oldidan ikki agent ishlab turgan edi. Ularning ishi diskda qolgan 
 - Taqsimot (egasi "ha", 2026-11-11 17:35): **Boltavoy → 2.3** (guruhlar API + mentor scope, `apps/api/**`); **Qo'ziboy → 2.5a** (admin: Studentlar, Mentorlar, Adminlar sahifalari, `apps/web/**`, vazifa `docs/tasks/02-2.5a-admin-users-ui.md`).
 - Koordinatsiya: har qadamdan oldin/keyin Drive papkasi + `git fetch` tekshiriladi; IN_PROGRESS/READY xatlar; umumiy fayllar (shared, STATE, PROGRESS, root config, lockfile) oldidan ogohlantirish. Boltavoy o'z holatini `docs/boltavoy/HOLAT.md` da yuritadi.
 
+## Egasining kelajakdagi rejasi (2026-11-11, HOZIR EMAS — egasi oxirida o'zi aytadi)
+- Frontend route'lari va sahifa tarkibi keyin o'zgarishi mumkin. Masalan, **"Bugungi missiya" (`/today`) "Ilm yo'li" (`/path`) sahifasiga qo'shilishi** mumkin.
+- **Shunga tayyor turish qoidasi (hozirdan):**
+  - har bir bo'lim alohida feature komponent bo'lsin (masalan `features/daily-mission` → `<DailyMissionPanel/>`), u sahifaga bog'lanmasin va istalgan sahifaga qo'yila olsin;
+  - `app/**/page.tsx` faqat yupqa o'ram bo'lsin: faqat feature komponentni chaqiradi, mantiq yo'q (hozir shunday);
+  - yo'llar faqat konstantalarda (`*-paths.ts`) va menyu faqat `features/shell/config/nav.config.ts` da turadi, sahifalarda qattiq yozilgan URL bo'lmasin.
+- O'zgartirish vaqti kelganda yangilanadiganlar: `nav.config.ts`, yo'l konstantalari, eski URL'dan redirect, Playwright testlari, `docs/03-sahifalar.md`.
+
 ## Tech Lead qarorlari (2026-11-11, egasi "o'zing tanla")
 - Sidebar'dagi "Foydalanuvchilar" bandi `/admin/students`, `/admin/mentors`, `/admin/admins` da faol ko'rinadi (`NavEntry` ga active prefix). 2.5b bilan birga qilinadi.
 - `/admin/mentors/[id]` alohida sahifa hozircha QILINMAYDI: tahrirlash Dialog orqali. Mentorning guruhlari va studentlari kerak bo'lsa, 2.5b da qayta ko'riladi.
