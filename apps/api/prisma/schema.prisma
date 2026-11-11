@@ -49,6 +49,19 @@ enum FilePurpose {
   EXPORT
 }
 
+/// docs/11 §3: kontent holati (yo'llar, bo'limlar, mavzular, darslar, savollar).
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+/// docs/11 §2 `groups.status`.
+enum GroupStatus {
+  ACTIVE
+  ARCHIVED
+}
+
 /// docs/11 §11 `files.status`: pre-signed upload tasdiqlanguncha PENDING.
 enum FileStatus {
   PENDING
@@ -97,6 +110,8 @@ model User {
   auditLogs             AuditLog[]
   ownedFiles            File[]              @relation("FileOwner")
   updatedSystemSettings SystemSetting[]
+  mentoredGroups        Group[]             @relation("GroupMentor")
+  groupMemberships      GroupMember[]       @relation("GroupMemberStudent")
 
   @@unique([phone], map: "uq_users_phone")
   @@unique([studentCode], map: "uq_users_student_code")
@@ -197,6 +212,72 @@ model AuditLog {
 }
 
 // ---------------------------------------------------------------------------
+// 2. Guruhlar (docs/11 §2). S-01 B: guruh bitta yo'lni o'qiydi; S-02 A: bitta faol guruh;
+// S-03 A: bitta mentor.
+// ---------------------------------------------------------------------------
+
+/// Soft delete: `deleted_at`.
+model Group {
+  id        String      @id @default(uuid(7)) @db.Uuid
+  name      String      @db.VarChar(64)
+  /// Guruh o'qiydigan yo'l (S-01).
+  pathId    String      @map("path_id") @db.Uuid
+  /// Bitta mentor (S-03).
+  mentorId  String?     @map("mentor_id") @db.Uuid
+  status    GroupStatus
+  startsAt  DateTime?   @map("starts_at") @db.Date
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime    @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime?   @map("deleted_at") @db.Timestamptz
+
+  path   LearningPath @relation(fields: [pathId], references: [id])
+  mentor User?        @relation("GroupMentor", fields: [mentorId], references: [id])
+
+  members GroupMember[]
+
+  @@index([mentorId, status], map: "idx_groups_mentor_id_status")
+  @@map("groups")
+}
+
+/// A'zolik tarixi: guruhdan chiqqanda `left_at` to'ldiriladi (yozuv o'chirilmaydi).
+/// Migratsiyada: partial unique `uq_group_members_active_student` (`student_id` WHERE
+/// `left_at IS NULL`, S-02) va partial index `idx_group_members_group_id_active`.
+model GroupMember {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  groupId   String    @map("group_id") @db.Uuid
+  studentId String    @map("student_id") @db.Uuid
+  joinedAt  DateTime  @default(now()) @map("joined_at") @db.Timestamptz
+  leftAt    DateTime? @map("left_at") @db.Timestamptz
+
+  group   Group @relation(fields: [groupId], references: [id])
+  student User  @relation("GroupMemberStudent", fields: [studentId], references: [id])
+
+  @@map("group_members")
+}
+
+// ---------------------------------------------------------------------------
+// 3. Ilm yo'li (docs/11 §3) — 2-bosqichda faqat `learning_paths` (guruh FK uchun).
+// ---------------------------------------------------------------------------
+
+model LearningPath {
+  id          String        @id @default(uuid(7)) @db.Uuid
+  title       String        @db.VarChar(128)
+  slug        String        @db.VarChar(128)
+  description String?
+  coverFileId String?       @map("cover_file_id") @db.Uuid
+  status      ContentStatus
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  coverFile File? @relation("LearningPathCover", fields: [coverFileId], references: [id])
+
+  groups Group[]
+
+  @@unique([slug], map: "uq_learning_paths_slug")
+  @@map("learning_paths")
+}
+
+// ---------------------------------------------------------------------------
 // 6. Sozlamalar (docs/11 §6 `reward_settings` tuzilmasi; `system_settings` — faqat super admin)
 // ---------------------------------------------------------------------------
 
@@ -230,8 +311,9 @@ model File {
   status    FileStatus
   createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz
 
-  owner         User?  @relation("FileOwner", fields: [ownerId], references: [id])
-  avatarOfUsers User[] @relation("UserAvatar")
+  owner              User?          @relation("FileOwner", fields: [ownerId], references: [id])
+  avatarOfUsers      User[]         @relation("UserAvatar")
+  learningPathCovers LearningPath[] @relation("LearningPathCover")
 
   @@unique([key], map: "uq_files_key")
   @@index([ownerId, purpose], map: "idx_files_owner_id_purpose")

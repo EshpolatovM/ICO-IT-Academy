@@ -6,6 +6,7 @@ import { Prisma } from './generated/client.js';
  */
 export const SOFT_DELETE_MODELS: ReadonlySet<string> = new Set<Prisma.ModelName>([
   Prisma.ModelName.User,
+  Prisma.ModelName.Group,
 ]);
 
 /** O'qish operatsiyalari — ularda `deletedAt: null` filtri avtomatik qo'shiladi. */

@@ -145,3 +145,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Qarorlar (Tech Lead, egasi to'liq vakolat bergan):** S-01 B (bir nechta yo'l, guruh orqali), S-02 A (bitta faol guruh), S-03 A (bitta mentor), S-70 (ota-ona havolasi `#t=`).
 - **Nima qilindi:** S-70 backend + shared helper + frontend; `feature/01-poydevor` → `main` (`--no-ff`); `feature/02-admin-asosi` ochildi; 2-bosqich rejasi `docs/tasks/02-reja.md`.
 - **Testlar:** `pnpm check` (web 117), api e2e 170, Playwright 9 — yashil.
+
+## 2026-11-11 — 2.1: yo'llar va guruhlar bazasi
+- **Nima qilindi:** `learning_paths`, `groups`, `group_members` + enum'lar, migratsiya `groups_and_paths` (partial index'lar qo'lda), idempotent dev seed, soft delete config'ga `Group`.
+- **Fayllar:** `apps/api/prisma/{schema.prisma,migrations/20261111090000_groups_and_paths,seed/**}`, `apps/api/src/infra/prisma/soft-delete.config.ts`, `.env.example`, `README.md`.
+- **Testlar:** toza bazada migrate + drift yo'q, partial unique psql bilan, seed 2× idempotent, api unit 325, api e2e 170.

@@ -51,12 +51,13 @@ Sxema: `apps/api/prisma/schema.prisma` (manba: `docs/11-database.md`), migratsiy
 ```bash
 podman compose up -d postgres                       # faqat PostgreSQL
 pnpm --filter @lms/api db:migrate:deploy            # migratsiyalarni qo'llash
-pnpm --filter @lms/api db:seed                      # dev seed: 1 mentor + 1 student (SEED_* env, production'da ishlamaydi)
+pnpm --filter @lms/api db:seed                      # dev seed: mentor, student, yo'l, guruh (SEED_* env, production'da ishlamaydi)
 pnpm --filter @lms/api create-super-admin -- --phone +998901234567 --first-name Ali --last-name Valiyev
 ```
 
 - `create-super-admin`: parol `SUPER_ADMIN_PASSWORD` env'dan olinadi, bo'lmasa terminalda ko'rinmas holda ikki marta so'raladi. Telefon band bo'lsa xato beradi.
-- Dev seed idempotent: qayta ishga tushirilganda mavjud mentor/student qayta yaratilmaydi. Student kodi `student_code_seq` dan (`ST-10001`, ...), birinchi kirishda parolni almashtirish majburiy.
+- Jadvallar (migratsiyalar): `init_foundation` — `users`, `refresh_tokens`, `parent_access_tokens`, `parent_access_logs`, `audit_logs`, `system_settings`, `files`; `groups_and_paths` — `learning_paths` (`ContentStatus`), `groups` (`GroupStatus`, soft delete, bitta yo'l va bitta mentor — S-01, S-03), `group_members` (a'zolik tarixi; student bir vaqtda faqat bitta faol guruhda — partial unique `uq_group_members_active_student`, S-02).
+- Dev seed idempotent: qayta ishga tushirilganda mavjud yozuvlar qayta yaratilmaydi va o'zgartirilmaydi. Yaratiladi: mentor (`SEED_MENTOR_*`), student (`SEED_STUDENT_*`; kodi `student_code_seq` dan — `ST-10001`, ..., birinchi kirishda parolni almashtirish majburiy), `PUBLISHED` yo'l (`SEED_PATH_SLUG`, `SEED_PATH_TITLE`), guruh (`SEED_GROUP_NAME`, seed mentor biriktirilgan) va seed studentning shu guruhdagi faol a'zoligi (student allaqachon biror faol guruhda bo'lsa o'tkazib yuboriladi).
 - Boshqa buyruqlar: `db:migrate` (yangi migratsiya, `prisma migrate dev --name <nom>`), `db:generate`, `db:studio`.
 - Mavjud migratsiya fayllari tahrirlanmaydi, faqat yangisi qo'shiladi.
 
