@@ -44,12 +44,17 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 ## Joriy taqsimot (2-bosqich)
 | Vazifa | Kim | Holat |
 |---|---|---|
-| 2.3 guruhlar API + mentor scope | Boltavoy | IN_PROGRESS: Backendbek tugatdi (unit 421, e2e 388, hali commit yo'q), endi Domla review → tuzatishlar. **Taxminiy READY: 20:00 (+05)**, 20:03 da tekshiriladi. `packages/shared/**`, `.env.example`, `docs/12-api.md` §2.2/§12, `PROGRESS.md` ga tegadi |
+| 2.3 guruhlar API + mentor scope | Boltavoy | IN_PROGRESS: kod yozilgan (800+ test yashil, hali commit yo'q). Domla topilmalari: 🔴 B1 (Redis uzilsa 500, parollar yo'qoladi), 🟡 M1–M6 (qulfsiz o'qish, kesh poygasi, negativ testlar, M4, unit testlar, BaseRepository). CSV bug ham shu to'plamda tuzatiladi. **Taxminiy READY: 21:30**, 21:33 da tekshiriladi. Erta push (shared + docs/12) — Boltavoy egasining roziligini kutmoqda. `packages/shared/**`, `.env.example`, `docs/12-api.md` §2.2/§12, `PROGRESS.md` ga tegadi |
 | 2.5a admin: Studentlar, Mentorlar, Adminlar | Qo'ziboy | **READY** `184be06` |
 | 2.5d Sidebar faol holati (`features/shell`) | Qo'ziboy (Frontendcha) | **READY** (17:10) |
 | 2.6a Playwright admin users (`apps/web/e2e`) | Qo'ziboy (Sinchkovbek) | **READY** (17:17). Bitta API bug Boltavoyga yuborildi (CSV import xatolari), 3d test bug tuzatilgach qaytariladi |
 | 2.5b Guruhlar sahifalari + guruh filtri + CSV limit, 2.5c Mentor paneli, 2.6b Playwright | Qo'ziboy | 2.3 READY bo'lgach, ketma-ket |
 | 2.6 qolgan qismi, 2.7 review + merge | kelishiladi | 2.3 READY'dan keyin |
+
+## Qo'ziboy qarorlari (Q18)
+- M4: `GET /admin/paths` — mentorga HA, faqat o'qish (docs/01 §2.2 "K", docs/12 221-qator). 2.3 vazifa faylidagi "(SA, A)" eskirgan.
+- B1: baza yozuvi muvaffaqiyatli bo'lsa, javob ham muvaffaqiyatli; kesh xatosi log + qisqa cheklangan qayta urinish + TTL.
+- Xato matnlari o'zbekcha bo'ladi — 2.3 dan keyin alohida vazifa.
 
 ## Ochiq takliflar va savollar Boltavoyga
 - Import limitlari: **qabul qilindi (B6).** 2.3 doirasida `@lms/shared` ga `STUDENT_IMPORT_DEFAULT_MAX_FILE_BYTES` va `STUDENT_IMPORT_DEFAULT_MAX_ROWS` qo'shiladi (server env default sifatida). 2.5b da klient tekshiruviga ulanadi.
@@ -83,3 +88,5 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | B9 | 17:15 | Boltavoy | Reja va test ma'lumotlari qoidasi qabul; ogohlantirish: `apps/api/test/support/{rbac-matrix,rbac-actors,auth-fixtures}.ts`, yangi `rbac-group-cases.ts`, `groups.e2e-spec.ts`; READY xati tartibi kelishildi |
 | Q16 | 17:20 | Qo'ziboy | Egasi tushunmayapti: Boltavoydan egalar uchun oddiy tilda hisobot so'raldi (2.3 nima, nima tayyor, kim nima qilyapti, qachon, xavflar, CSV bug) |
 | Q17 | 17:23 | Qo'ziboy | SHOSHILINCH: hozir nima qilyapti, Domla topilmalari, to'siqlar, aniq vaqt; taklif — shared + docs/12 ni hozir push qilsin, 2.5b parallel boshlansin |
+| B10 | 17:26 | Boltavoy | Oddiy hisobot; Domla topilmalari (B1, M1–M6, 9 tavsiya), hech biri hali tuzatilmagan; CSV bug shu to'plamda; READY ≈ 21:30; erta push uchun egasidan so'rayapti |
+| Q18 | 17:27 | Qo'ziboy | Qarorlar: hammasini tuzat, M4 = mentorga GET ha, B1 yondashuvi, xato tili o'zbekcha keyin; erta push bo'lsa 2.5b darhol |
