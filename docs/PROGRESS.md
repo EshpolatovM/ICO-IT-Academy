@@ -209,3 +209,9 @@ Yangi yozuvlar pastga qo'shiladi.
 - Umumiy: `apps/web/src/lib/{hooks,format}/**`, `lib/api/{request-path,error-message}.ts`, `components/shared/**`; admin-users va admin-groups eski nusxalari o'chirildi.
 - `components/ui/DateInput.tsx` (+6 test), design-preview.
 - `pnpm check` yashil (web 50 fayl, api 380), web jscpd klonlari 0, Playwright admin 8/8.
+
+## 2026-11-11 — 2.3: backend guruhlar, mentor scope, mentor endpointlari
+- **Nima qilindi:** `/admin/paths` (SA A), `/admin/groups` CRUD + `PUT .../mentor` + `POST/DELETE .../members` (SA A), `/mentor/groups[/:id[/students]]`, `/mentor/students/:id` (M); haqiqiy mentor scope (`MentorStudentScope` → `group_members`, Redis set `mentor:{id}:studentIds` 60 s, invalidatsiya: a'zolik, mentor almashtirish, arxivlash, student yaratish/import guruh bilan, mentor deaktivatsiyasi); mentor uchun `/students/:id/reset-password` va `parent-tokens*` ochildi (scope'dan tashqari — 404); ota-ona `children[].groupName`; audit `GROUP_*`; `GROUP_ARCHIVED` xato kodi; `STUDENT_IMPORT_DEFAULT_MAX_FILE_BYTES/ROWS` shared'ga (env default).
+- **Fayllar:** `apps/api/src/modules/groups/**`, `apps/api/src/common/scope/**`, `apps/api/src/infra/redis/**`, `apps/api/src/modules/{admin-users,auth,parent-access,users,password-reset}/**` (kichik), `apps/api/src/common/{config,exceptions,decorators}/**`, `apps/api/test/**`, `packages/shared/src/{groups,enums,validation,users,errors,audit,parent}/**`, `.env.example`, `docs/12-api.md`.
+- **Testlar:** api unit 421, api e2e 388, web 144, `pnpm check`, `format:check` — yashil (agent yurgizdi).
+- **Qarorlar:** Redis kalit `mentor:{id}:studentIds` (docs/01, docs/11); arxivlashda a'zoliklar saqlanadi; student deaktivatsiyasi a'zolikka tegmaydi; mentor faqat ACTIVE guruhlarini ko'radi; `/admin/paths` faqat SA A (M — 3-bosqich).
