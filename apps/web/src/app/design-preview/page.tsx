@@ -8,6 +8,7 @@ import { DataSection } from './_components/DataSection';
 import { FieldsExtraSection } from './_components/FieldsExtraSection';
 import { FormsSection } from './_components/FormsSection';
 import { LayoutSection } from './_components/LayoutSection';
+import { LearningPathSection } from './_components/LearningPathSection';
 import { OverlaySection } from './_components/OverlaySection';
 import { PageSection } from './_components/PageSection';
 import { ScalesSection } from './_components/ScalesSection';
@@ -53,6 +54,7 @@ export default function DesignPreviewPage() {
           <DataSection />
           <OverlaySection />
           <PageSection />
+          <LearningPathSection />
           <LayoutSection />
         </Stack>
       </Container>

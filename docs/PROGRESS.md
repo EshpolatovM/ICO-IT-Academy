@@ -250,3 +250,6 @@ Yangi yozuvlar pastga qo'shiladi.
 ## 2026-11-11 (kech) — 2.7 review va yakuniy tekshiruv
 - domla-reviewer: blocker yo'q, shartli HA (`docs/reviews/02-admin-asosi-review.md`). Combobox fix (`5928ebb`), web 🟡 tuzatildi (`1d38dc7`), docs 🟡 (`7f34cdf`).
 - Yakuniy: `pnpm check`, `pnpm build`, api e2e 416/416, Playwright 23/23 — hammasi yashil. 2-bosqich merge'ga tayyor (ikkala ega ruxsati kutilmoqda).
+
+## 2026-11-11 (kech) — 3.4a UI: ilm yo'li komponentlari (rassom-dizayner), branch `feature/03-ilm-yoli`
+- `components/ui/{ProgressBar,NodeStatusBadge,nodeStatus,PathNode,PathSection,TreeList,TreeListRow,TreeList.types}`, design-preview bo'limi; 15 yangi test, web 301 yashil.

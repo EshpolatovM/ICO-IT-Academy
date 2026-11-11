@@ -82,3 +82,20 @@ export type { TextLinkProps, TextLinkVariant } from './TextLink';
 export type { TextElement, TextProps, TextVariant } from './Text';
 export { TopBar } from './TopBar';
 export type { TopBarProps } from './TopBar';
+export { NodeStatusBadge } from './NodeStatusBadge';
+export type { NodeStatusBadgeProps } from './NodeStatusBadge';
+export type { ChestNodeStatus, PathNodeKind, TopicNodeStatus } from './nodeStatus';
+export { PathNode } from './PathNode';
+export type { ChestPathNodeProps, PathNodeProps, TopicPathNodeProps } from './PathNode';
+export { PathSection } from './PathSection';
+export type { PathSectionNode, PathSectionProps } from './PathSection';
+export { ProgressBar } from './ProgressBar';
+export type { ProgressBarProps } from './ProgressBar';
+export { TreeList } from './TreeList';
+export type {
+  TreeListItem,
+  TreeListMoveContext,
+  TreeListMoveHandler,
+  TreeListProps,
+  TreeListStatus,
+} from './TreeList.types';
