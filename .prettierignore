@@ -11,3 +11,5 @@ CLAUDE.md
 .claude
 apps/web/next-env.d.ts
 apps/api/src/infra/prisma/generated
+AGENT_BUS.md
+PROJECT_STATE.md
