@@ -77,14 +77,24 @@ Loyiha birdaniga emas, modulma-modul qilinadi: avval baza, keyin backend, keyin 
 - `docs/` — yagona haqiqat manbai. Har bir modulda unga tegishli docs fayllariga tayaniladi. Hujjatda yo'q narsa to'qilmaydi.
 
 ## Subagentlar (`.claude/agents/`)
-| Agent | Vazifasi |
-|---|---|
-| `usta-baza` | Prisma schema, migratsiyalar, indekslar, seed |
-| `oga-backend` | NestJS modullar, servislar, repository'lar, API, WebSocket |
-| `rassom-dizayner` | Design token'lar, `components/ui`, `/design-preview` |
-| `birchka-frontend` | Next.js sahifalari, feature'lar, API ulanishi (faqat tasdiqlangan UI komponentlar va token'lar bilan) |
-| `sinchkov-tester` | Unit va e2e testlar yozadi va ishga tushiradi |
-| `domla-reviewer` | Faqat o'qiydi va tekshiradi: OOP, DRY, xavfsizlik, RBAC, takroriy kod |
+| Agent | Laqabi | Vazifasi |
+|---|---|---|
+| `usta-baza` | Bazarboy | Prisma schema, migratsiyalar, indekslar, seed |
+| `oga-backend` | Backendbek | NestJS modullar, servislar, repository'lar, API, WebSocket |
+| `rassom-dizayner` | Rassomjon | Design token'lar, `components/ui`, `/design-preview` |
+| `birchka-frontend` | Frontendcha | Next.js sahifalari, feature'lar, API ulanishi (faqat tasdiqlangan UI komponentlar va token'lar bilan) |
+| `sinchkov-tester` | Sinchkovbek | Unit va e2e testlar yozadi va ishga tushiradi |
+| `domla-reviewer` | Domla | Faqat o'qiydi va tekshiradi: OOP, DRY, xavfsizlik, RBAC, takroriy kod |
+| `pushbek-git` | Pushbek | Tech Lead aytgan fayllarni commit, `pull --rebase`, push; konflikt hisoboti (force push va main'ga merge yo'q) |
+| `hisobotchi-xatboy` | Xatboy | STATE.md / PROGRESS.md, hamkor sessiyaga Drive XAT, egaga hisobot matni |
+| `qorovul-kuzatuvchi` | Qorovulboy | Drive'dagi yangi xatlar va GitHub'dagi yangi commitlarni kuzatadi, to'qnashuv xavfini aytadi (faqat o'qiydi) |
+| `chaqqon-tuzatkich` | Tuzatvoy | Lint/typecheck/test va review'dagi mayda topilmalarni tuzatadi (yangi feature yozmaydi) |
+
+### Parallel ishlash (egasi, 2026-11-11)
+- Kerak bo'lsa bir vaqtda **2–3 ta** subagent ishlatiladi. Shart: ular **turli fayllarga** tegadi va bir-birining natijasini kutmaydi. Masalan: backend + frontend skeleti; frontend + qorovul; tester + hisobotchi.
+- Bitta faylga yoki bir-biriga bog'liq ishlarga (baza → backend → frontend zanjiri) parallel agent qo'yilmaydi.
+- Kerak bo'lmasa agent chaqirilmaydi. Mayda ishni (bitta qator, bitta xat) Tech Lead o'zi qiladi.
+- Hamkor sessiya (Boltavoy) ham xuddi shu agentlar to'plami va qoidalar bilan ishlaydi.
 
 Subagentga vazifa berilganda har safar to'liq kontekst beriladi: qaysi modul, qaysi docs fayllarini o'qish kerak, aniq vazifa va tayyorlik mezoni.
 
