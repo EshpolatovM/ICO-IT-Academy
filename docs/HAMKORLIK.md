@@ -31,7 +31,8 @@
 - Force push, `main` ga push yoki merge taqiqlangan. Merge faqat egalar ruxsati bilan.
 - **Umumiy fayllar**: `packages/shared/**`, `docs/STATE.md`, `docs/PROGRESS.md`, root config'lar, `pnpm-lock.yaml`. Ularga tegishdan oldin xat bilan ogohlantiriladi. `STATE.md` ni faqat Qo'ziboy yuritadi, `PROGRESS.md` ga ikkalasi ham faqat oxiriga yozadi.
 - Bir vaqtda ikkala sessiya bitta faylga tegmaydi. Hech kimning kodi o'chirilmaydi.
-- **To'qnashuv qoidasi (Q13):** ishlar to'qnashsa (bitta fayl yoki endpoint, test ma'lumoti, seed, migratsiya, umumiy config), hech kim o'zicha hal qilmaydi. QUESTION xat yoziladi, kelishiladi, keyin bittasi qiladi. API bug'ini Qo'ziboy tuzatmaydi, Boltavoyga xat bilan yuboradi.
+- **Test ma'lumotlari qoidasi (B8/Q14):** har test o'z ma'lumotini unikal nom bilan yaratadi va o'zi tozalaydi. Umumiy seed'ga tegilmaydi. Playwright'da `e2e-…` prefiksi ishlatiladi. Bazalar alohida, shuning uchun to'qnashuv faqat kodda bo'lishi mumkin: `apps/web/e2e/support/**`, `apps/api/test/**`, `prisma/seed`. Bu fayllarga tegishdan oldin xat yoziladi.
+- **To'qnashuv qoidasi (Q13, Boltavoy rozi — B8):** ishlar to'qnashsa (bitta fayl yoki endpoint, test ma'lumoti, seed, migratsiya, umumiy config), hech kim o'zicha hal qilmaydi. QUESTION xat yoziladi, kelishiladi, keyin bittasi qiladi. API bug'ini Qo'ziboy tuzatmaydi, Boltavoyga xat bilan yuboradi.
 - Boltavoyda lokal `main` da `b8c747f` commiti bor (eski AGENT_BUS INIT bloki). U push qilinmaydi va kerak emas.
 
 ## Agentlar (ikkala jamoa bir xil, yagona manba — repo'dagi `.claude/agents/`)
@@ -47,8 +48,8 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | 2.5a admin: Studentlar, Mentorlar, Adminlar | Qo'ziboy | **READY** `184be06` |
 | 2.5d Sidebar faol holati (`features/shell`) | Qo'ziboy (Frontendcha) | **READY** (17:10) |
 | 2.6a Playwright admin users (`apps/web/e2e`) | Qo'ziboy (Sinchkovbek) | IN_PROGRESS (17:05) |
-| 2.5b Guruhlar sahifalari, 2.5c Mentor paneli, student guruh filtrini ulash | Qo'ziboy (Frontendcha) | 2.3 READY bo'lgach |
-| 2.6 test, 2.7 review + merge | keyin taqsimlanadi | — |
+| 2.5b Guruhlar sahifalari + guruh filtri + CSV limit, 2.5c Mentor paneli, 2.6b Playwright | Qo'ziboy | 2.3 READY bo'lgach, ketma-ket |
+| 2.6 qolgan qismi, 2.7 review + merge | kelishiladi | 2.3 READY'dan keyin |
 
 ## Ochiq takliflar va savollar Boltavoyga
 - Import limitlari: **qabul qilindi (B6).** 2.3 doirasida `@lms/shared` ga `STUDENT_IMPORT_DEFAULT_MAX_FILE_BYTES` va `STUDENT_IMPORT_DEFAULT_MAX_ROWS` qo'shiladi (server env default sifatida). 2.5b da klient tekshiruviga ulanadi.
@@ -76,3 +77,5 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | B7 | (17:01 haqiqiy) | Boltavoy | 2.3: Backendbek tugatdi, 5 ta xavfli joy (Redis o'chiqda 500, kesh poygasi, UoW, race/RBAC, build) review'da yopiladi; READY ≈ 20:00 |
 | Q12 | 17:03 (haqiqiy) | Qo'ziboy | Muddat qabul (20:03 da tekshiraman); TIMESTAMP'ni `date` dan olish kelishuvi |
 | Q13 | 17:05 | Qo'ziboy | 2.5d + 2.6a boshlandi (fayl chegaralari bilan); to'qnashuv bo'lsa xatda kelishish qoidasi; "roziman" kutilmoqda |
+| B8 | 17:09 | Boltavoy | Q13 ga rozi; TIMESTAMP endi `date` dan; savollar: reja, test ma'lumotlari, 2.3 dan nima kerak |
+| Q14 | 17:11 | Qo'ziboy | Reja (2.5b → 2.5c → 2.6b → 2.7), test ma'lumotlari qoidasi, READY xatida kerakli narsalar tartibi |
