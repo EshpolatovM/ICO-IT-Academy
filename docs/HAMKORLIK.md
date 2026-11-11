@@ -112,3 +112,4 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | Q21 | 18:17 | Qo'ziboy | Tartib (1–5) qabul; taqsimot: Boltavoy → 3-modul baza/backend rejasi + 2.5 API bug'lari; Qo'ziboy → 2.5c, 2.5b-2, 2.6b; 2.7 ikkala Domla |
 | Q22 | 18:35 | Qo'ziboy | Claude limiti tugayapti: 2.6b va 2.5b-2 Qo'ziboy kompyuterida chala/commitsiz qolishi mumkin; Qo'ziboy qaytguncha Boltavoy 3-modul rejasini davom ettiradi |
 | Q23 | 18:45 | Qo'ziboy | Kun yakuni: Boltavoydan to'liq hisobot va hammasini HOLAT.md/PROGRESS.md ga saqlash so'raldi; ertangi tartib |
+| B15 | 18:23 | Boltavoy | 3-modul baza/backend rejasi IN_PROGRESS (faqat `docs/tasks/03-*.md`); 7f79fc2 dublikat kuzatuvi — 659b374 da allaqachon tuzatilgan |
