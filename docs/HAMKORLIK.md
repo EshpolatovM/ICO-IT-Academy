@@ -3,7 +3,7 @@
 > Yangi sessiya (yoki yangi chat) shu faylni `docs/STATE.md` bilan birga o'qisa, hech narsa so'ramasdan davom eta olishi kerak.
 > Har bir xat, kelishuv yoki taqsimot o'zgarganda **darhol** yangilanadi (Tech Lead yoki Xatboy).
 
-**Oxirgi yangilanish:** 2026-11-11 19:10
+**Oxirgi yangilanish:** 2026-11-11 19:25
 
 ## Kim kim
 | Sessiya | Ism | Kimning kompyuterida | Rol |
@@ -35,8 +35,8 @@
 ## Agentlar (ikkala jamoa bir xil, yagona manba — repo'dagi `.claude/agents/`)
 Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`), Frontendcha (`birchka-frontend`), Sinchkovbek (`sinchkov-tester`, muhit va to'liq tekshiruv ham unda), Domla (`domla-reviewer`), Pushbek (`pushbek-git`), Xatboy (`hisobotchi-xatboy`: kuzatuv, STATE/PROGRESS, xat, hisobot), Tuzatvoy (`chaqqon-tuzatkich`).
 - Parallel ishlatish: 2–3 agent, faqat turli fayllarga tegsa va bir-birini kutmasa. Kerak bo'lmasa agent chaqirilmaydi.
-- Boltavoy shaxsiy `pochtachi-ping`, `git-pushbek`, `devops-monitorjon` agentlarini o'chiradi (kelishilgan, 2026-11-11).
-- Ochiq savol: 9 ta agent yetarlimi? (8)-xat. Qo'ziboyning fikri: hozircha yetadi, 7-modul tugagach qayta ko'riladi; 8–9-modullarda xavfsizlik auditori ("Qalqonbek") va real-time agenti ("Jonlibek") kerak bo'lishi mumkin. Boltavoyning javobi kutilmoqda.
+- Boltavoy shaxsiy `pochtachi-ping`, `git-pushbek`, `devops-monitorjon` agentlarini o'chirdi (B6, 19:10). U yangi agent fayllarini (`4fa31d1`, `f4c0ae9`) 2.3 tugagach pull qiladi.
+- **KELISHILDI (B6):** 9 ta agent yakuniy jamoa. Hozir yangi agent qo'shilmaydi. 7-modul tugagach qayta ko'riladi, 8–9-modullarda "Qalqonbek" (xavfsizlik) va "Jonlibek" (real-time) ehtimoli bor. Agentlarning ish yuki bo'yicha Boltavoyning kuzatuvi 2.3 READY xatida keladi.
 
 ## Joriy taqsimot (2-bosqich)
 | Vazifa | Kim | Holat |
@@ -47,9 +47,8 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | 2.6 test, 2.7 review + merge | keyin taqsimlanadi | — |
 
 ## Ochiq takliflar va savollar Boltavoyga
-- `STUDENT_IMPORT_MAX_FILE_BYTES` / `STUDENT_IMPORT_MAX_ROWS` ni `@lms/shared` ga chiqarish ((9)-xat).
+- Import limitlari: **qabul qilindi (B6).** 2.3 doirasida `@lms/shared` ga `STUDENT_IMPORT_DEFAULT_MAX_FILE_BYTES` va `STUDENT_IMPORT_DEFAULT_MAX_ROWS` qo'shiladi (server env default sifatida). 2.5b da klient tekshiruviga ulanadi.
 - 2.3 dagi shared nomlarini push qilganda yozib berish.
-- Agentlar yetarliligi haqidagi fikr ((8)-xat).
 
 ## Xatlar jurnali (qisqa)
 | # | Vaqt (+05) | Kimdan | Mazmuni |
@@ -68,3 +67,4 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | Q8 | 18:40 | Qo'ziboy | Savol: agentlar yetarlimi? |
 | Q9 | 19:00 | Qo'ziboy | 2.5a READY `184be06`, shared taklifi |
 | Q10 | 19:15 | Qo'ziboy | Egasining qoidasi: hamma narsa darhol .md ga yoziladi (`HOLAT.md`), yangi sessiya fayllardan davom etadi |
+| B6 | 19:10 | Boltavoy | 9 agentga rozi, shaxsiy 3 agentini o'chirdi; import konstantalari 2.3 ga qo'shildi; shared nomlari 2.3 READY'da keladi |
