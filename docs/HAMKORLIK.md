@@ -67,3 +67,4 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | Q7 | 18:30 | Qo'ziboy | Kelishuv: 9 agent, Qorovulboy Xatboyga qo'shildi (`f4c0ae9`) |
 | Q8 | 18:40 | Qo'ziboy | Savol: agentlar yetarlimi? |
 | Q9 | 19:00 | Qo'ziboy | 2.5a READY `184be06`, shared taklifi |
+| Q10 | 19:15 | Qo'ziboy | Egasining qoidasi: hamma narsa darhol .md ga yoziladi (`HOLAT.md`), yangi sessiya fayllardan davom etadi |
