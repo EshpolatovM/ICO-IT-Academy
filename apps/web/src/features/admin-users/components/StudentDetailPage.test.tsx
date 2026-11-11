@@ -2,6 +2,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { confirmAction } from '@/lib/testing/dialogs';
 import {
   errorResponse,
   jsonResponse,
@@ -61,10 +62,7 @@ describe('StudentDetailPage', () => {
     });
     renderWithQuery(<StudentDetailPage id="s1" />);
 
-    await user.click(await screen.findByRole('button', { name: 'Parolni tiklash' }));
-    await user.click(
-      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Tiklash' }),
-    );
+    await confirmAction(user, 'Parolni tiklash', 'Tiklash');
     const result = await screen.findByRole('dialog', { name: 'Parol tiklandi' });
     expect(within(result).getByText('R4tkm8Hs2w')).toBeInTheDocument();
   });

@@ -215,3 +215,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Fayllar:** `apps/api/src/modules/groups/**`, `apps/api/src/common/scope/**`, `apps/api/src/infra/redis/**`, `apps/api/src/modules/{admin-users,auth,parent-access,users,password-reset}/**` (kichik), `apps/api/src/common/{config,exceptions,decorators}/**`, `apps/api/test/**`, `packages/shared/src/{groups,enums,validation,users,errors,audit,parent}/**`, `.env.example`, `docs/12-api.md`.
 - **Testlar:** api unit 421, api e2e 388, web 144, `pnpm check`, `format:check` — yashil (agent yurgizdi).
 - **Qarorlar:** Redis kalit `mentor:{id}:studentIds` (docs/01, docs/11); arxivlashda a'zoliklar saqlanadi; student deaktivatsiyasi a'zolikka tegmaydi; mentor faqat ACTIVE guruhlarini ko'radi; `/admin/paths` faqat SA A (M — 3-bosqich).
+
+## 2026-11-11 — 2.5c Mentor paneli (birchka-frontend)
+- `/mentor/groups`, `/mentor/groups/[id]`, `/mentor/students/[id]` (parol tiklash, ota-ona tokenlari: yaratish, bekor qilish, qayta yaratish).
+- Umumiy: `components/shared/{ConfirmSecretAction,QueryView,QueryLoadError,HeadedTable,SecretResultDialog,ResetPasswordAction,student-identity-items}`, `lib/hooks/useSecretMutation`, `lib/testing/dialogs.ts`. admin-users eski nusxalari o'chirildi.
+- `pnpm check` va web build yashil; web 55 fayl / 269 test, api 464; web jscpd klonlari 0; Playwright admin 8/8 (agent).

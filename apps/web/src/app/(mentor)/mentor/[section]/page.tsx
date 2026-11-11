@@ -4,13 +4,17 @@ import { findSectionEntry, MENTOR_NAV, SectionPage, sectionEntries } from '@/fea
 
 const BASE_PATH = '/mentor';
 
+/** O'z papkasi bor bo'limlar (`groups`, `students/[id]`) — catch-all ularni yaratmaydi. */
+const IMPLEMENTED_SECTIONS: ReadonlySet<string> = new Set(['groups', 'students']);
+
 /** Faqat menyudagi bo'limlar; boshqa yo'llar — 404. */
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return sectionEntries(MENTOR_NAV, BASE_PATH, BASE_PATH).map(({ segments }) => ({
-    section: segments.join('/'),
-  }));
+  return sectionEntries(MENTOR_NAV, BASE_PATH, BASE_PATH)
+    .map(({ segments }) => segments.join('/'))
+    .filter((section) => !IMPLEMENTED_SECTIONS.has(section))
+    .map((section) => ({ section }));
 }
 
 /** Mentor menyusidagi hali qilinmagan bo'limlar ("Tez orada"). */

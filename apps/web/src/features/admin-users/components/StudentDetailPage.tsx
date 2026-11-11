@@ -3,7 +3,12 @@
 import { ErrorCode } from '@lms/shared';
 import type { StudentDetail } from '@lms/shared';
 
-import { QueryErrorAlert, UserStatusBadge } from '@/components/shared';
+import {
+  QueryErrorAlert,
+  ResetPasswordAction,
+  studentIdentityItems,
+  UserStatusBadge,
+} from '@/components/shared';
 import {
   Card,
   CardContent,
@@ -19,11 +24,11 @@ import {
 import { isApiError } from '@/lib/api';
 import { formatDateTime, personName } from '@/lib/format';
 
+import { adminUsersKeys } from '../api/admin-users.query-keys';
 import { studentsApi } from '../api/students.api';
 import { useStudent } from '../hooks/useStudent';
 import { AdminUsersPath } from '../lib/admin-users-paths';
 
-import { ResetPasswordAction } from './ResetPasswordAction';
 import { StatusToggleAction } from './StatusToggleAction';
 import { StudentEditCard } from './StudentEditCard';
 
@@ -36,9 +41,7 @@ function StudentInfoCard({ student }: { student: StudentDetail }) {
       <CardContent>
         <DescriptionList
           items={[
-            { term: 'Student ID', value: student.studentCode },
-            { term: 'Ism-familiya', value: personName(student) },
-            { term: 'Holat', value: <UserStatusBadge status={student.status} /> },
+            ...studentIdentityItems(student),
             { term: 'Guruh', value: student.group?.name },
             {
               term: 'Vaqtinchalik parol',
@@ -62,11 +65,11 @@ function StudentActionsCard({ student }: { student: StudentDetail }) {
       <CardContent>
         <Stack direction="horizontal" gap="2" wrap>
           <ResetPasswordAction
-            kind="students"
             userId={student.id}
             userName={personName(student)}
             loginItem={{ term: 'Student ID (login)', value: student.studentCode }}
             reset={studentsApi.resetPassword}
+            invalidateKey={adminUsersKeys.kind('students')}
             size="md"
           />
           <StatusToggleAction

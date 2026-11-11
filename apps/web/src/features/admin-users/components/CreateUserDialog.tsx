@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import type { CreatedUserResponse } from '@lms/shared';
 
+import { SecretResultContent, temporaryPasswordSecrets } from '@/components/shared';
 import {
   Button,
   Dialog,
@@ -14,10 +15,10 @@ import {
 } from '@/components/ui';
 import type { DescriptionItem } from '@/components/ui';
 import type { ServerFieldMap } from '@/lib/forms';
+import { useSecretMutation } from '@/lib/hooks';
 
-import { useSecretMutation } from '../hooks/useSecretMutation';
+import { adminUsersKeys } from '../api/admin-users.query-keys';
 
-import { SecretResultContent } from './SecretResultDialog';
 import { UserForm } from './UserForm';
 
 import type { UserFieldConfig } from '../lib/user-fields';
@@ -54,7 +55,7 @@ function useCreateUserDialog<TOutput, TResult>(
 ) {
   const [open, setOpen] = useState(false);
   const [created, setCreated] = useState<CreatedState<TOutput, TResult> | null>(null);
-  const { run, clear } = useSecretMutation(kind, create);
+  const { run, clear } = useSecretMutation(create, adminUsersKeys.kind(kind));
 
   const changeOpen = (next: boolean) => {
     clear();
@@ -106,7 +107,7 @@ export function CreateUserDialog<
         ) : (
           <SecretResultContent
             items={describe(created.result, created.values)}
-            temporaryPassword={created.result.temporaryPassword}
+            secrets={temporaryPasswordSecrets(created.result.temporaryPassword)}
             onDone={close}
           />
         )}

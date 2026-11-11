@@ -1,14 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-
 import type { PasswordResetResponse } from '@lms/shared';
 
-import { Alert, Button, ConfirmDialog } from '@/components/ui';
 import type { ButtonSize, DescriptionItem } from '@/components/ui';
-import { errorMessage } from '@/lib/api';
-import { useSecretMutation } from '@/lib/hooks';
 
+import { ConfirmSecretAction } from './ConfirmSecretAction';
 import { SecretResultDialog, temporaryPasswordSecrets } from './SecretResultDialog';
 
 import type { QueryKey } from '@tanstack/react-query';
@@ -32,48 +28,25 @@ export function ResetPasswordAction({
   loginItem,
   reset,
   invalidateKey,
-  size = 'sm',
+  size,
 }: ResetPasswordActionProps) {
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const { run, result, clear, isPending, error } = useSecretMutation(reset, invalidateKey);
-
-  const changeOpen = (next: boolean) => {
-    clear();
-    setConfirmOpen(next);
-  };
-  const close = () => {
-    changeOpen(false);
-  };
-  const openConfirm = () => {
-    changeOpen(true);
-  };
-
   return (
-    <>
-      <Button variant="secondary" size={size} onClick={openConfirm}>
-        Parolni tiklash
-      </Button>
-      <ConfirmDialog
-        open={confirmOpen && result === null}
-        onOpenChange={changeOpen}
-        title={`${userName}: parol tiklansinmi?`}
-        description="Yangi vaqtinchalik parol yaratiladi, eski parol va barcha sessiyalar bekor bo'ladi. Foydalanuvchi keyingi kirishda parolni almashtiradi."
-        confirmLabel="Tiklash"
-        loading={isPending}
-        onConfirm={() => {
-          run(userId).catch(() => undefined);
-        }}
-      >
-        {error !== null ? <Alert variant="danger">{errorMessage(error)}</Alert> : null}
-      </ConfirmDialog>
-      {result !== null ? (
+    <ConfirmSecretAction
+      label="Parolni tiklash"
+      size={size}
+      confirmTitle={`${userName}: parol tiklansinmi?`}
+      confirmDescription="Yangi vaqtinchalik parol yaratiladi, eski parol va barcha sessiyalar bekor bo'ladi. Foydalanuvchi keyingi kirishda parolni almashtiradi."
+      confirmLabel="Tiklash"
+      action={() => reset(userId)}
+      invalidateKey={invalidateKey}
+      renderResult={(result, onDone) => (
         <SecretResultDialog
           title="Parol tiklandi"
           items={[{ term: 'Ism-familiya', value: userName }, loginItem]}
           secrets={temporaryPasswordSecrets(result.temporaryPassword)}
-          onDone={close}
+          onDone={onDone}
         />
-      ) : null}
-    </>
+      )}
+    />
   );
 }

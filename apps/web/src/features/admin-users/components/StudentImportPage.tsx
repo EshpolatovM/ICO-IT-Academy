@@ -14,9 +14,10 @@ import {
   Stack,
   Text,
 } from '@/components/ui';
+import { useSecretMutation } from '@/lib/hooks';
 
+import { adminUsersKeys } from '../api/admin-users.query-keys';
 import { studentsApi } from '../api/students.api';
-import { useSecretMutation } from '../hooks/useSecretMutation';
 import { AdminUsersPath } from '../lib/admin-users-paths';
 
 import { ImportResultTable } from './ImportResultTable';
@@ -61,8 +62,8 @@ function ImportResult({ result, onReset }: { result: StudentImportResult; onRese
 /** `/admin/students/import` — CSV orqali ommaviy yaratish (S-21, docs/12 §2.1). */
 export function StudentImportPage() {
   const { run, result, clear, isPending, error } = useSecretMutation(
-    'students',
     studentsApi.import,
+    adminUsersKeys.kind('students'),
   );
 
   return (

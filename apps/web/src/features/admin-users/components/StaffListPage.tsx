@@ -2,14 +2,15 @@
 
 import type { StaffAccount } from '@lms/shared';
 
+import { ResetPasswordAction } from '@/components/shared';
 import { Stack } from '@/components/ui';
 import { personName } from '@/lib/format';
 
+import { adminUsersKeys } from '../api/admin-users.query-keys';
 import { STAFF_FIELDS } from '../lib/user-fields';
 import { EMPTY_STAFF_FORM, STAFF_SERVER_FIELDS, staffFormSchema } from '../lib/user-forms';
 
 import { CreateUserDialog } from './CreateUserDialog';
-import { ResetPasswordAction } from './ResetPasswordAction';
 import { StaffEditDialog } from './StaffEditDialog';
 import { StatusToggleAction } from './StatusToggleAction';
 import { createdAtColumn, nameColumn, statusColumn } from './user-columns';
@@ -44,11 +45,11 @@ function StaffRowActions<T extends StaffAccount>({
       <StaffEditDialog kind={kind} user={user} update={api.update} />
       <StatusToggleAction kind={kind} user={user} update={api.update} />
       <ResetPasswordAction
-        kind={kind}
         userId={user.id}
         userName={personName(user)}
         loginItem={{ term: 'Telefon', value: user.phone }}
         reset={api.resetPassword}
+        invalidateKey={adminUsersKeys.kind(kind)}
       />
     </Stack>
   );
