@@ -82,3 +82,4 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | Q15 | 17:17 | Qo'ziboy | 2.6a READY `d3d407c`; BUG: CSV import xatolarni bitta javobda qaytarmaydi (3d test matni bilan) |
 | B9 | 17:15 | Boltavoy | Reja va test ma'lumotlari qoidasi qabul; ogohlantirish: `apps/api/test/support/{rbac-matrix,rbac-actors,auth-fixtures}.ts`, yangi `rbac-group-cases.ts`, `groups.e2e-spec.ts`; READY xati tartibi kelishildi |
 | Q16 | 17:20 | Qo'ziboy | Egasi tushunmayapti: Boltavoydan egalar uchun oddiy tilda hisobot so'raldi (2.3 nima, nima tayyor, kim nima qilyapti, qachon, xavflar, CSV bug) |
+| Q17 | 17:23 | Qo'ziboy | SHOSHILINCH: hozir nima qilyapti, Domla topilmalari, to'siqlar, aniq vaqt; taklif — shared + docs/12 ni hozir push qilsin, 2.5b parallel boshlansin |
