@@ -770,6 +770,7 @@ erDiagram
 | `user:{id}:ver` | string | 1 soat | `token_version` |
 | `parent_token:{id}:valid` | string | 5 daqiqa | Token faolligi |
 | `mentor:{id}:studentIds` | set | 60 s | Scope keshi |
+| `mentor:{id}:gen` | string (son) | 1 kun | Scope keshi generatsiya hisoblagichi: har invalidatsiyada oshadi, keshga yozish faqat qiymat o'zgarmagan bo'lsa (kesh poygasidan himoya) |
 | `path:{studentId}` | string (json) | 10 daqiqa | Xarita keshi |
 | `league:{cohortId}` | zset | hafta | Real-time liga jadvali |
 | `battle:queue` | zset | — | Matchmaking |

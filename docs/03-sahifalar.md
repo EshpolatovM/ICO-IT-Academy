@@ -131,6 +131,7 @@ Tablar:
 | Portfolio baholash | `/mentor/reviews` | Topshirilgan loyihalar navbati | Ball va izoh yozish, qaytarish (qayta ishlashga) | `GET /mentor/projects?status=SUBMITTED`, `POST /mentor/projects/:id/review` |
 | Profil | `/mentor/profile` | Ism, rasm, bio | Tahrirlash, parolni o'zgartirish | `PATCH /me/profile` |
 
+- **2-bosqichda (2.3/2.5c) amalga oshgani:** Guruhlar, Guruh tafsiloti va Student profili faqat asosiy ma'lumotlar bilan (ID, ism, holat, oxirgi kirish, guruh, ota-ona tokenlari). Progress, XP, streak, davomat va "o'rtacha progress" keyingi bosqichlarda qo'shiladi (docs/12 §12).
 - **Taxmin:** Mentor uchun "hisobotlar" o'z guruhlari bo'yicha CSV eksport ko'rinishida bo'ladi. → S-21
 
 ---
