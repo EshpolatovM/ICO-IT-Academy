@@ -4,8 +4,11 @@ import { Container, Heading, Stack, Text } from '@/components/ui';
 
 import { ColorsSection } from './_components/ColorsSection';
 import { ComponentsSection } from './_components/ComponentsSection';
+import { DataSection } from './_components/DataSection';
+import { FieldsExtraSection } from './_components/FieldsExtraSection';
 import { FormsSection } from './_components/FormsSection';
 import { LayoutSection } from './_components/LayoutSection';
+import { OverlaySection } from './_components/OverlaySection';
 import { ScalesSection } from './_components/ScalesSection';
 
 import type { Metadata } from 'next';
@@ -43,6 +46,9 @@ export default function DesignPreviewPage() {
           <ScalesSection />
           <ComponentsSection />
           <FormsSection />
+          <FieldsExtraSection />
+          <DataSection />
+          <OverlaySection />
           <LayoutSection />
         </Stack>
       </Container>

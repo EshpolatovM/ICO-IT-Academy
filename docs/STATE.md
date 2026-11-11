@@ -7,7 +7,7 @@
 | Maydon | Qiymat |
 |---|---|
 | Joriy modul | 2-bosqich: Admin asosi — foydalanuvchilar va guruhlar (reja: `docs/tasks/02-reja.md`) |
-| Joriy bosqich | 2.1 baza commit qilindi; 2.4 UI (`rassom-dizayner`) bajarilmoqda; keyingisi 2.2 backend foydalanuvchilar (`oga-backend`) |
+| Joriy bosqich | 2.1 va 2.4 commit qilindi; 2.2 backend foydalanuvchilar (`oga-backend`, `docs/tasks/02-2.2-users.md`) bajarilmoqda |
 | Joriy git branch | `feature/02-admin-asosi` |
 | Ish rejimi | **To'liq avtonom** (egasi 2026-11-11: savol berma, tasdiq kutma, Tech Lead o'zi qaror qiladi; faqat haqiqiy xavfli amallarda to'xtash). Har vazifadan keyin commit + STATE/PROGRESS; hisobot `docs/HISOBOT-*.md` |
 
@@ -31,8 +31,10 @@
 ## Oxirgi bajarilgan vazifa
 **2.1 — baza** (`usta-baza`, Tech Lead tekshirdi): `ContentStatus`, `GroupStatus`, `learning_paths`, `groups` (soft delete), `group_members` (partial unique `uq_group_members_active_student`, partial IX), migratsiya `20261111090000_groups_and_paths`, idempotent seed (yo'l `frontend`, "Dev guruh", seed mentor, `ST-10001`). Relation'lar: `User.mentoredGroups`, `User.groupMemberships`, `Group.path/mentor/members`. Ikkinchi faol guruh → P2002 `uq_group_members_active_student` (servis domen xatosiga aylantirishi kerak). Test user'lar guruhga qo'shilsa `deleteTestUsers` avval `group_members` ni o'chirishi kerak.
 
+**2.4 — UI** (`rassom-dizayner`, Tech Lead tekshirdi): Table/TableHead (saralash, `aria-sort`), Pagination (`getPageCount`), Select, SearchInput (debounce feature'da), Textarea, FileInput, Badge, DescriptionList, Dialog + ConfirmDialog (Radix dialog 1.3.1; `onConfirm` oynani o'zi yopmaydi), Tabs (Radix 1.2.1), SecretReveal (+`useCopyToClipboard`), `toneClasses`. Web 144 test.
+
 ## Keyingi aniq vazifa
-**2.2 — backend: foydalanuvchilar** (`oga-backend`, `docs/tasks/02-2.2-users.md` yoziladi) — 2.4 UI tugagach (lockfile to'qnashmasligi uchun). Keyin 2.3, 2.5, 2.6, 2.7 (`docs/tasks/02-reja.md`).
+**2.2 — backend: foydalanuvchilar** (`oga-backend`, `docs/tasks/02-2.2-users.md`) — bajarilmoqda. Keyin 2.3, 2.5, 2.6, 2.7 (`docs/tasks/02-reja.md`).
 
 ## 2-bosqich uchun eslatmalar
 - `RoleBasedStudentScopeResolver` MENTOR tarmog'i → `group_members` asosida (scope tashqarisi 404).

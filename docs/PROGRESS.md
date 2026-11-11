@@ -150,3 +150,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Nima qilindi:** `learning_paths`, `groups`, `group_members` + enum'lar, migratsiya `groups_and_paths` (partial index'lar qo'lda), idempotent dev seed, soft delete config'ga `Group`.
 - **Fayllar:** `apps/api/prisma/{schema.prisma,migrations/20261111090000_groups_and_paths,seed/**}`, `apps/api/src/infra/prisma/soft-delete.config.ts`, `.env.example`, `README.md`.
 - **Testlar:** toza bazada migrate + drift yo'q, partial unique psql bilan, seed 2× idempotent, api unit 325, api e2e 170.
+
+## 2026-11-11 — 2.4: admin/mentor UI komponentlari
+- **Nima qilindi:** 12 ta komponent (Table, Pagination, Select, SearchInput, Textarea, FileInput, Badge, DescriptionList, Dialog, ConfirmDialog, Tabs, SecretReveal), `/design-preview` bo'limlari, testlar. Radix dialog/tabs qo'shildi.
+- **Fayllar:** `apps/web/src/components/ui/**`, `apps/web/src/app/design-preview/**`, `apps/web/package.json`, `pnpm-lock.yaml`.
+- **Testlar:** `pnpm check` (web 144), `format:check` — yashil.

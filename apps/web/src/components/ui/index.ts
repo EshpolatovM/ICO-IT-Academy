@@ -2,13 +2,32 @@ export { Alert } from './Alert';
 export type { AlertProps, AlertVariant } from './Alert';
 export { AppShell } from './AppShell';
 export type { AppShellProps } from './AppShell';
+export { Badge } from './Badge';
+export type { BadgeProps, BadgeVariant } from './Badge';
 export { Button } from './Button';
 export type { ButtonProps, ButtonSize, ButtonVariant } from './Button';
 export { Card, CardContent, CardFooter, CardHeader, CardTitle } from './Card';
+export { ConfirmDialog } from './ConfirmDialog';
+export type { ConfirmDialogProps, ConfirmDialogVariant } from './ConfirmDialog';
 export { Container } from './Container';
 export type { ContainerProps, ContainerSize } from './Container';
+export { DescriptionList } from './DescriptionList';
+export type { DescriptionItem, DescriptionListProps } from './DescriptionList';
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './Dialog';
+export type { DialogContentProps, DialogSize } from './Dialog';
 export { EmptyState } from './EmptyState';
 export type { EmptyStateProps } from './EmptyState';
+export { FileInput } from './FileInput';
+export type { FileInputProps } from './FileInput';
 export { FormField } from './FormField';
 export type { FormFieldControlProps, FormFieldProps } from './FormField';
 export { Heading } from './Heading';
@@ -19,15 +38,30 @@ export { Label } from './Label';
 export type { LabelProps } from './Label';
 export { NavItem } from './NavItem';
 export type { NavItemProps } from './NavItem';
+export { getPageCount, Pagination } from './Pagination';
+export type { PaginationProps } from './Pagination';
 export { PasswordInput } from './PasswordInput';
 export type { PasswordInputProps } from './PasswordInput';
+export { SearchInput } from './SearchInput';
+export type { SearchInputProps } from './SearchInput';
+export { SecretReveal } from './SecretReveal';
+export type { SecretRevealProps } from './SecretReveal';
+export { Select } from './Select';
+export type { SelectOption, SelectProps } from './Select';
 export { Sidebar } from './Sidebar';
 export type { SidebarProps } from './Sidebar';
 export { Spinner } from './Spinner';
 export type { SpinnerProps, SpinnerSize } from './Spinner';
 export { Stack } from './Stack';
 export type { StackAlign, StackDirection, StackGap, StackJustify, StackProps } from './Stack';
+export { Table, TableBody, TableCell, TableEmpty, TableHeader, TableRow } from './Table';
+export type { TableEmptyProps, TableProps } from './Table';
+export { TableHead } from './TableHead';
+export type { SortDirection, TableHeadProps } from './TableHead';
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs';
 export { Text } from './Text';
+export { Textarea } from './Textarea';
+export type { TextareaProps } from './Textarea';
 export { TextLink } from './TextLink';
 export type { TextLinkProps, TextLinkVariant } from './TextLink';
 export type { TextElement, TextProps, TextVariant } from './Text';
