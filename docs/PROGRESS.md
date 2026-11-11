@@ -246,3 +246,7 @@ Yangi yozuvlar pastga qo'shiladi.
 - Yangi: `apps/web/e2e/{admin-groups,mentor-panel}.spec.ts`, `support/groups-api.ts`; o'zgargan: `support/{admin-fixtures,admin-api}.ts`, `admin-student-import.spec.ts` (3d qaytarildi).
 - Natija: Playwright 23/23, `pnpm check` yashil. Jonli 2.3 API docs/12 ga mos, bug yo'q.
 - Saboq: Playwright'ni ikki jarayon parallel yurgizmasin (port/test-results to'qnashadi).
+
+## 2026-11-11 (kech) — 2.7 review va yakuniy tekshiruv
+- domla-reviewer: blocker yo'q, shartli HA (`docs/reviews/02-admin-asosi-review.md`). Combobox fix (`5928ebb`), web 🟡 tuzatildi (`1d38dc7`), docs 🟡 (`7f34cdf`).
+- Yakuniy: `pnpm check`, `pnpm build`, api e2e 416/416, Playwright 23/23 — hammasi yashil. 2-bosqich merge'ga tayyor (ikkala ega ruxsati kutilmoqda).

@@ -13,8 +13,8 @@
 5. jscpd: `admin-mentors.controller` ↔ `super-admins.controller`, `student-account-creator` ↔ `student-import-writer` (import bloklari).
 
 ## (B) apps/web — Qo'ziboy sohasi
-🟡 1. a'zolik mutatsiyalaridan keyin admin-users studentlar keshi invalidate qilinmaydi. → tuzatilmoqda (chaqqon-tuzatkich).
-🟡 2. `POST /students/:id/reset-password` o'rami ikki joyda yozilgan (admin-users, mentor-panel). → umumiy `lib/api` ga chiqarilmoqda (+ parent-tokens api).
+🟡 1. a'zolik mutatsiyalaridan keyin admin-users studentlar keshi invalidate qilinmaydi. → **tuzatildi** (`1d38dc7`, kalitlar `@/lib/query/admin-keys.ts` ga — sikl bo'lmasin).
+🟡 2. `POST /students/:id/reset-password` o'rami ikki joyda yozilgan (admin-users, mentor-panel). → **tuzatildi** (`1d38dc7`, `lib/api/student-actions.api.ts` + parent-tokens api).
 🟢 `lookupsApi.group(id)` to'liq tafsilot yuklaydi; filtrlarda `w-64`/`w-48` (FormField `width` prop'i taklif); AddMembersForm'da studentning joriy guruhini variant yorlig'ida ko'rsatish; Combobox fix'dan keyin Playwright qayta tekshirilsin.
 
 ## (C) docs
@@ -25,3 +25,6 @@
 1. (B) 🟡 1–2 tuzatilsin.
 2. Keyin `pnpm build`, api e2e va Playwright (bitta jarayonda) to'liq yashil.
 3. Ikkala ega ruxsati (Boltavoy qaytgach).
+
+## Yakuniy tekshiruv (2026-11-11 23:25, bitta jarayonda)
+`pnpm check` ✅ · `pnpm build` ✅ · api e2e **416/416** ✅ (15 suite) · Playwright **23/23** ✅. Merge sharti (1) va (2) bajarildi; qoldi (3): ikkala ega ruxsati (Boltavoy qaytgach).

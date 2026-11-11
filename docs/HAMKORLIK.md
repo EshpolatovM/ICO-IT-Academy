@@ -58,7 +58,7 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | 2.5c Mentor paneli | Qo'ziboy (Frontendcha) | **READY** (18:30; mock bilan, jonli API sinovi 2.6b da) |
 | 2.5b-2 student guruh filtri/tanlovi, DateInput ulash, CSV klient limiti | Qo'ziboy (Frontendcha) | **READY** (18:40). Qaror: guruh a'zoligi o'zgarganda admin-users keshi staleTime (30 s) bilan yangilanadi, sikl bo'lmasin |
 | 2.6b Playwright guruh + mentor (jonli API), 3d qaytarish | Qo'ziboy (Sinchkovbek) | **READY** (22:55, 23/23). API bug topilmadi |
-| 2.7 review (butun bosqich, B17 ruxsati bilan api/shared ham) | Qo'ziboy (Domla) | IN_PROGRESS (23:00), `docs/tasks/02-2.7-review.md` |
+| 2.7 review (butun bosqich, B17 ruxsati bilan api/shared ham) | Qo'ziboy (Domla) | **READY** (23:25): blocker yo'q, (A) da faqat 🟢 (Boltavoyga), barcha testlar yashil. Merge — ikkala ega ruxsati bilan |
 | Combobox multiple: ro'yxat tugmani yopadi | Qo'ziboy (Rassomjon) | **READY**: tashqariga bosilganda yoki fokus chiqqanda yopiladi (standart combobox xatti-harakati); ro'yxat ochiqligida tugma ustida turishi qabul qilindi |
 | 3-bosqich rejasi: baza + backend vazifa fayllari (3.1–3.3), faqat `docs/tasks/03-*.md` | Boltavoy (taklif Q21, egasi "ha"sini kutadi) | — |
 | 3-bosqich kodi: baza+backend — Boltavoy, frontend — Qo'ziboy | `main` ga merge'dan keyin, `feature/03-ilm-yoli` | — |

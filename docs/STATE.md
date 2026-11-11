@@ -18,7 +18,7 @@ Limit tugashi oldidan ikki agent ishlab turgan edi. Ularning ishi diskda qolgan 
 - Test tozalash: dev bazada `e2e-` prefiksli arxivlangan guruhlar yig'ilyapti (API'da guruhni o'chirish yo'q). Taklif: `apps/api/test/support/web-e2e-users.ts` ga `delete-groups` buyrug'i (`deleteTestGroups` tayyor) + `apps/web/e2e/support/users-script.ts` da `deleteGroups`. Bu Boltavoy sohasi: qilinsa `docs/boltavoy/QOZIBOY-OZGARISHLARI.md` ga yoziladi.
 - **GitHub push ishlamayapti** (Authentication failed, eski token o'chirilgan). Ega `gh auth login` qilishi kerak; local commitlar push kutmoqda.
 
-**Hozir (23:00):** 2.7 — domla-reviewer butun bosqichni review qilyapti (`docs/tasks/02-2.7-review.md`); rassom-dizayner Combobox fix. Keyin: topilmalar tuzatiladi (api/shared bo'lsa `docs/boltavoy/QOZIBOY-OZGARISHLARI.md` ga yoziladi) → check + Playwright (bitta jarayon!) → Boltavoyga xat → egalardan merge ruxsati (Boltavoy qaytgach).
+**2.7 TAYYOR (23:25):** review `docs/reviews/02-admin-asosi-review.md` — blocker yo'q; web 🟡 va docs 🟡 tuzatildi; check, build, api e2e 416/416, Playwright 23/23 yashil. **2-bosqich `main` ga qo'shishga TAYYOR — faqat ikkala ega ruxsati qoldi** (Boltavoy qaytgach). Boltavoy sohasida kod o'zgarmadi; (A) 🟢 tavsiyalar unga qoldirildi. **Push kutmoqda:** ega `gh auth login` qilishi kerak (gh o'rnatilmagan: `sudo dnf install -y gh`).
 
 **Yangi sessiya qiladigan ishlar:**
 1. `git status` va `git diff --stat`: qaysi fayllar bor, ko'rib chiq.
