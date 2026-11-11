@@ -18,6 +18,8 @@ Limit tugashi oldidan ikki agent ishlab turgan edi. Ularning ishi diskda qolgan 
 - Test tozalash: dev bazada `e2e-` prefiksli arxivlangan guruhlar yig'ilyapti (API'da guruhni o'chirish yo'q). Taklif: `apps/api/test/support/web-e2e-users.ts` ga `delete-groups` buyrug'i (`deleteTestGroups` tayyor) + `apps/web/e2e/support/users-script.ts` da `deleteGroups`. Bu Boltavoy sohasi: qilinsa `docs/boltavoy/QOZIBOY-OZGARISHLARI.md` ga yoziladi.
 - **GitHub push ishlamayapti** (Authentication failed, eski token o'chirilgan). Ega `gh auth login` qilishi kerak; local commitlar push kutmoqda.
 
+**Hozir (23:00):** 2.7 — domla-reviewer butun bosqichni review qilyapti (`docs/tasks/02-2.7-review.md`); rassom-dizayner Combobox fix. Keyin: topilmalar tuzatiladi (api/shared bo'lsa `docs/boltavoy/QOZIBOY-OZGARISHLARI.md` ga yoziladi) → check + Playwright (bitta jarayon!) → Boltavoyga xat → egalardan merge ruxsati (Boltavoy qaytgach).
+
 **Yangi sessiya qiladigan ishlar:**
 1. `git status` va `git diff --stat`: qaysi fayllar bor, ko'rib chiq.
 2. Vazifa fayllaridagi tayyorlik mezoni bo'yicha nima chala qolganini aniqla. Chala bo'lsa, o'sha agentni o'sha vazifa fayli bilan qayta ishga tushir: "diskda chala ish bor, davom ettir".

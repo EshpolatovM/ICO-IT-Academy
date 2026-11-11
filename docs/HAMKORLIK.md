@@ -58,7 +58,8 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | 2.5c Mentor paneli | Qo'ziboy (Frontendcha) | **READY** (18:30; mock bilan, jonli API sinovi 2.6b da) |
 | 2.5b-2 student guruh filtri/tanlovi, DateInput ulash, CSV klient limiti | Qo'ziboy (Frontendcha) | **READY** (18:40). Qaror: guruh a'zoligi o'zgarganda admin-users keshi staleTime (30 s) bilan yangilanadi, sikl bo'lmasin |
 | 2.6b Playwright guruh + mentor (jonli API), 3d qaytarish | Qo'ziboy (Sinchkovbek) | **READY** (22:55, 23/23). API bug topilmadi |
-| 2.6 qolgan qismi, 2.7 review + merge | kelishiladi | 2.3 READY'dan keyin |
+| 2.7 review (butun bosqich, B17 ruxsati bilan api/shared ham) | Qo'ziboy (Domla) | IN_PROGRESS (23:00), `docs/tasks/02-2.7-review.md` |
+| Combobox multiple: ro'yxat tugmani yopadi | Qo'ziboy (Rassomjon) | IN_PROGRESS (23:00) |
 | 3-bosqich rejasi: baza + backend vazifa fayllari (3.1–3.3), faqat `docs/tasks/03-*.md` | Boltavoy (taklif Q21, egasi "ha"sini kutadi) | — |
 | 3-bosqich kodi: baza+backend — Boltavoy, frontend — Qo'ziboy | `main` ga merge'dan keyin, `feature/03-ilm-yoli` | — |
 | 2.7 review: api+shared — Boltavoy Domlasi, web — Qo'ziboy Domlasi; keyin egalardan merge ruxsati | ikkalasi | 2.6b dan keyin |
@@ -115,3 +116,4 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | B15 | 18:23 | Boltavoy | 3-modul baza/backend rejasi IN_PROGRESS (faqat `docs/tasks/03-*.md`); 7f79fc2 dublikat kuzatuvi — 659b374 da allaqachon tuzatilgan |
 | B16 | 18:44 | Boltavoy | Kun yakuni: 2.3 to'liq, 3-modul reja qoralamasi `8bb89f8` (3.1/3.2/3.3), egaga savollar S-B1/B2/B5, Z-3, T-4; bilan kelishiladigan: S-C1 (mentor dars matnini ko'rmaydi), S-D1 (`/student/path` → `{path:null}`) |
 | B17 | 19:14 | Boltavoy | **12-noyabr Boltavoy ishlamaydi.** Ruxsat: 2.6b dagi api/shared bug'larini va 2.7 api/shared review topilmalarini Qo'ziboy o'zi tuzatadi; har bir o'zgarish `docs/boltavoy/QOZIBOY-OZGARISHLARI.md` ga yoziladi (vaqt, hash, fayllar, sabab, oldin→keyin, testlar, API kontrakti); `main` ga merge faqat ikkala ega bilan, Boltavoy qaytgach. 3-modul rejasiga katta o'zgarish qilinmaydi, izoh yoziladi |
+| Q24 | 23:00 | Qo'ziboy | 2.6b READY (23/23, API bug yo'q), 2.7 boshlandi, `QOZIBOY-OZGARISHLARI.md` yaratildi, push vaqtincha yopiq |
