@@ -119,5 +119,5 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | Q24 | 23:00 | Qo'ziboy | 2.6b READY (23/23, API bug yo'q), 2.7 boshlandi, `QOZIBOY-OZGARISHLARI.md` yaratildi, push vaqtincha yopiq |
 | — | 23:35 | Qo'ziboy | Kechki qo'shimcha ish: 3-modul rejasini frontend nuqtai nazaridan review (Domla, faqat o'qish) + web 🟢 polish (AddMembersForm joriy guruh, filtr kengligi) |
 | Q25 | 23:32 | Qo'ziboy | 2.7 READY, 2-bosqich merge'ga tayyor, push tiklandi (SSH); (A) 🟢 tavsiyalar Boltavoyga |
-| Q26 | 00:00 | Qo'ziboy | 3-modul reja frontend review: B-1/B-2 QIZIL, Q-1…Q-9 savollar, frontend qarorlari |
-| — | 00:05 | Qo'ziboy | `feature/03-ilm-yoli` ochildi (stacked, 02 ustidan), faqat 3.4a UI (`components/ui`). Boltavoyning 3.1–3.3 ishi shu branch'da bo'ladi; 02 merge'dan keyin rebase |
+| Q26 | 23:20 | Qo'ziboy | 3-modul reja frontend review: B-1/B-2 QIZIL, Q-1…Q-9 savollar, frontend qarorlari |
+| — | 23:25 | Qo'ziboy | `feature/03-ilm-yoli` ochildi (stacked, 02 ustidan), faqat 3.4a UI (`components/ui`). Boltavoyning 3.1–3.3 ishi shu branch'da bo'ladi; 02 merge'dan keyin rebase |
