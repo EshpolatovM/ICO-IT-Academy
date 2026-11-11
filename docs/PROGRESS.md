@@ -199,3 +199,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - Yangi: `components/ui/{Checkbox,Combobox,ComboboxListbox,ComboboxChips,useCombobox,comboboxSelection,Combobox.types,StatCard,PageHeader,joinIds,assignRef,isPresentNode}`, design-preview bo'limlari. `FormField`/`FileInput` umumiy `joinIds` ga o'tdi.
 - Testlar: 17 yangi; `pnpm check` yashil (web 43 fayl, api 380). Yangi paket va token yo'q.
 - Qaror: Combobox `value` — option obyekti (`{value,label}`), tanlangan element qidiruv natijasida bo'lmasa ham nomi ko'rinadi.
+
+## 2026-11-11 — 2.5b admin Guruhlar sahifalari (birchka-frontend)
+- `/admin/groups` (jadval, qidiruv, status/yo'l/mentor filtri, yaratish), `/admin/groups/[id]` (tahrirlash, arxivlash, mentor biriktirish/olib tashlash, a'zolar qo'shish/chiqarish, 409 xatolari).
+- Fayllar: `apps/web/src/features/admin-groups/**`, `apps/web/src/app/(admin)/admin/groups/**`, catch-all (1 qator).
+- Testlar: 37 yangi; `pnpm check` yashil (web 50 fayl, api 380). Backend 2.3 hali push qilinmagan — testlar mock bilan.

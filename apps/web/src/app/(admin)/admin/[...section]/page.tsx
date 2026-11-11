@@ -5,7 +5,7 @@ import { ADMIN_NAV, findSectionEntry, SectionPage, sectionEntries } from '@/feat
 const BASE_PATH = '/admin';
 
 /** O'z route'i bor (qilingan) bo'limlar — catch-all ularni yaratmaydi. */
-const IMPLEMENTED_SECTIONS: ReadonlySet<string> = new Set(['students', 'admins']);
+const IMPLEMENTED_SECTIONS: ReadonlySet<string> = new Set(['students', 'admins', 'groups']);
 
 /** Faqat menyudagi bo'limlar (`/admin/settings/rewards` kabi ko'p segmentli ham); boshqalari — 404. */
 export const dynamicParams = false;

@@ -55,6 +55,8 @@
 **2.6a TAYYOR** (17:17): Playwright admin users yashil. Ochiq: CSV import bug (Boltavoyda); 3d test matni `docs/tasks/02-2.6a-playwright-admin-users.md` da, bug tuzatilgach qaytarib yurgiziladi.
 **Eski yozuv:** 2.6a Playwright admin users (sinchkov-tester, `docs/tasks/02-2.6a-playwright-admin-users.md`). Tugagach: tekshirish → commit/push → HAMKORLIK + Boltavoyga READY. Boltavoyning 2.3 READY'i ≈ 21:30 (21:33 da tekshiriladi); erta push (shared + docs/12) bo'lsa 2.5b darhol boshlanadi.
 **2.4b TAYYOR** (17:45): Checkbox, Combobox (single/multiple, o'z WAI-ARIA yechimi, `value` = option obyekti — Tech Lead tasdiqladi), StatCard, PageHeader; `joinIds` umumiylashtirildi. Web 43 fayl yashil. **2.5e** (chaqqon-tuzatkich): admin-users sahifalaridagi takroriy sarlavhalarni PageHeader'ga o'tkazish. 3-bosqich qoralama rejasi: `docs/tasks/03-reja.md`.
+**2.5b TAYYOR (kod):** `/admin/groups`, `/admin/groups/[id]` (mentor biriktirish, a'zolar, arxivlash), 37 test, `pnpm check` yashil. Haqiqiy API bilan sinov 2.3 READY'dan keyin (ro'yxat `docs/tasks/02-2.5b-admin-groups-ui.md` oxirida).
+**Hozir parallel:** 2.5f DRY (chaqqon-tuzatkich, `docs/tasks/02-2.5f-dry-lib.md`) + 2.4c DateInput (rassom-dizayner). Keyin: 2.5c mentor paneli, student guruh filtri (2.5b-2).
 **Keyingi:** Boltavoy 2.3 READY yozishini kutish → 2.5b (Guruhlar sahifalari) + 2.5c (Mentor paneli) birchka-frontend'ga; student guruh filtri/tanlovini ulash. UX savollari hal qilindi (yuqoridagi "Tech Lead qarorlari").
 
 Eski yozuv:

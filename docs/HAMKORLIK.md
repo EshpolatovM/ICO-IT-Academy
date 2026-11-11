@@ -51,7 +51,9 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | 2.5b Guruhlar sahifalari + guruh filtri + CSV limit, 2.5c Mentor paneli, 2.6b Playwright | Qo'ziboy | 2.3 READY bo'lgach, ketma-ket |
 | 2.4b UI bloklar (Checkbox, Combobox, StatCard, PageHeader) | Qo'ziboy (Rassomjon) | **READY** (17:45) |
 | 2.5e admin-users sahifalarini PageHeader'ga o'tkazish | Qo'ziboy (Tuzatvoy) | **READY** (17:55) |
-| 2.5b admin Guruhlar sahifalari | Qo'ziboy (Frontendcha) | IN_PROGRESS (17:44) |
+| 2.5b admin Guruhlar sahifalari | Qo'ziboy (Frontendcha) | **READY** (kod; haqiqiy API bilan sinov 2.3 READY'dan keyin) |
+| 2.5f DRY: admin-users/admin-groups umumiy hook va komponentlarini `@/lib` ga | Qo'ziboy (Tuzatvoy) | IN_PROGRESS |
+| 2.4c DateInput | Qo'ziboy (Rassomjon) | IN_PROGRESS |
 | 2.6 qolgan qismi, 2.7 review + merge | kelishiladi | 2.3 READY'dan keyin |
 | 3-bosqich (qoralama `docs/tasks/03-reja.md`) | taqsimot 2.7 da kelishiladi | — |
 
