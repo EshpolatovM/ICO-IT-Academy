@@ -1,5 +1,6 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import type { CreatedUserResponse } from '@lms/shared';
@@ -23,7 +24,9 @@ import { UserForm } from './UserForm';
 
 import type { UserFieldConfig } from '../lib/user-fields';
 import type { ManagedUserKind } from '../types/admin-users.types';
-import type { DefaultValues, FieldValues } from 'react-hook-form';
+import type { QueryKey } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
+import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form';
 import type { z } from 'zod';
 
 export interface CreateUserDialogProps<
@@ -41,7 +44,13 @@ export interface CreateUserDialogProps<
   create: (values: TOutput) => Promise<TResult>;
   /** Natija oynasidagi login ma'lumotlari (ID yoki telefon, ism). */
   describe: (result: TResult, values: TOutput) => DescriptionItem[];
+  /** Matn maydonlaridan keyingi qo'shimcha maydonlar (`UserForm`). */
+  renderExtraFields?: (form: UseFormReturn<TInput, unknown, TOutput>) => ReactNode;
+  /** Muvaffaqiyatdan keyin qo'shimcha yangilanadigan keshlar (masalan guruh a'zolari soni). */
+  invalidateAlso?: readonly QueryKey[];
 }
+
+const NO_EXTRA_KEYS: readonly QueryKey[] = [];
 
 interface CreatedState<TOutput, TResult> {
   values: TOutput;
@@ -52,7 +61,9 @@ interface CreatedState<TOutput, TResult> {
 function useCreateUserDialog<TOutput, TResult>(
   kind: ManagedUserKind,
   create: (values: TOutput) => Promise<TResult>,
+  invalidateAlso: readonly QueryKey[],
 ) {
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [created, setCreated] = useState<CreatedState<TOutput, TResult> | null>(null);
   const { run, clear } = useSecretMutation(create, adminUsersKeys.kind(kind));
@@ -65,6 +76,9 @@ function useCreateUserDialog<TOutput, TResult>(
 
   const submit = async (values: TOutput) => {
     const result = await run(values);
+    invalidateAlso.forEach((queryKey) => {
+      void queryClient.invalidateQueries({ queryKey });
+    });
     setCreated({ values, result });
   };
 
@@ -89,9 +103,14 @@ export function CreateUserDialog<
   title,
   create,
   describe,
+  invalidateAlso = NO_EXTRA_KEYS,
   ...formProps
 }: CreateUserDialogProps<TInput, TOutput, TResult>) {
-  const { open, changeOpen, close, created, submit } = useCreateUserDialog(kind, create);
+  const { open, changeOpen, close, created, submit } = useCreateUserDialog(
+    kind,
+    create,
+    invalidateAlso,
+  );
 
   return (
     <Dialog open={open} onOpenChange={changeOpen}>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Controller } from 'react-hook-form';
 
 import type { AdminGroupDetail } from '@lms/shared';
 
@@ -15,7 +16,7 @@ import {
   editGroupFormSchema,
 } from '../lib/group-forms';
 
-import { DateTextField } from './DateTextField';
+import { StartsAtField } from './StartsAtField';
 
 /** Tahrirlash: nom va boshlanish sanasi (`PATCH /admin/groups/:id`). */
 export function GroupEditCard({ group }: { group: AdminGroupDetail }) {
@@ -47,10 +48,12 @@ export function GroupEditCard({ group }: { group: AdminGroupDetail }) {
               registration={form.register('name')}
               error={errors.name?.message}
             />
-            <DateTextField
-              label="Boshlanish sanasi"
-              registration={form.register('startsAt')}
-              error={errors.startsAt?.message}
+            <Controller
+              control={form.control}
+              name="startsAt"
+              render={({ field }) => (
+                <StartsAtField field={field} error={errors.startsAt?.message} />
+              )}
             />
             <FormRootError message={errors.root?.server?.message} />
             {saved ? <Alert variant="success">Saqlandi</Alert> : null}

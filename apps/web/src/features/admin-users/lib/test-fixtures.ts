@@ -1,4 +1,9 @@
-import type { MentorListItem, PaginatedResult, StudentDetail } from '@lms/shared';
+import type {
+  AdminGroupListItem,
+  MentorListItem,
+  PaginatedResult,
+  StudentDetail,
+} from '@lms/shared';
 
 /** Testlar uchun namunaviy ma'lumotlar (docs/12 §2.1 javob shakllari). */
 export const STUDENT_FIXTURE: StudentDetail = {
@@ -27,6 +32,18 @@ export const MENTOR_FIXTURE: MentorListItem = {
     { id: 'g1', name: 'FE-12' },
     { id: 'g2', name: 'BE-3' },
   ],
+};
+
+/** Faol guruh (docs/12 §2.2 `GET /admin/groups` elementi) — guruh tanlovlari uchun. */
+export const GROUP_FIXTURE: AdminGroupListItem = {
+  id: '0190a000-0000-7000-8000-000000000001',
+  name: 'FE-12',
+  status: 'ACTIVE',
+  startsAt: null,
+  createdAt: '2026-11-11T08:00:00.000Z',
+  path: { id: '0190a000-0000-7000-8000-000000000002', title: 'Frontend dasturchi' },
+  mentor: null,
+  membersCount: 3,
 };
 
 export function pageOf<T>(items: T[]): PaginatedResult<T> {

@@ -10,7 +10,7 @@ import { DEFAULT_LIST_STATE, parseListState, toListParams } from '../lib/list-st
 import type { UserListState } from '../types/admin-users.types';
 
 /**
- * Jadval holati URL query'da (`?q=&status=&sort=&page=`): sahifani yangilash, orqaga qaytish va
+ * Jadval holati URL query'da (`?q=&status=&sort=&page=&groupId=`): sahifani yangilash, orqaga qaytish va
  * havolani ulashishda saqlanadi. Filtr/qidiruv/saralash o'zgarsa — 1-sahifaga qaytiladi.
  */
 export function useListUrlState() {
@@ -41,6 +41,10 @@ export function useListUrlState() {
     },
     setSort: (sort: UserSort) => {
       update({ sort });
+    },
+    /** Faqat studentlar: guruh filtri (`undefined` — hammasi). */
+    setGroupId: (groupId: string | undefined) => {
+      update({ groupId });
     },
   };
 }

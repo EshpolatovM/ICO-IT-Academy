@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -163,5 +163,23 @@ describe('GroupsPage', () => {
 
     expect(await within(dialog).findByText("Bunday yo'l yo'q")).toBeInTheDocument();
     expect(within(dialog).getByLabelText(/Yo'l/)).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('"Yangi guruh": sana DateInput orqali — POST startsAt', async () => {
+    const user = userEvent.setup();
+    const dialog = await openCreateDialog(fetchMock, () => jsonResponse(201, GROUP_FIXTURE));
+    await fillRequired(user, dialog);
+    const date = within(dialog).getByLabelText('Boshlanish sanasi');
+    expect(date).toHaveAttribute('type', 'date');
+    fireEvent.change(date, { target: { value: '2026-12-01' } });
+    await user.click(within(dialog).getByRole('button', { name: 'Yaratish' }));
+
+    await vi.waitFor(() => {
+      expect(navigation.push).toHaveBeenCalledWith(`/admin/groups/${IDS.group}`);
+    });
+    const post = fetchMock.mock.calls.find(([, init]) => init?.method === 'POST');
+    expect(post?.[1] === undefined ? null : requestJson(post[1])).toMatchObject({
+      startsAt: '2026-12-01',
+    });
   });
 });

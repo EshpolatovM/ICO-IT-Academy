@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -185,5 +185,42 @@ describe('GroupDetailPage', () => {
     );
     renderWithQuery(<GroupDetailPage id={IDS.group} />);
     expect(await screen.findByText('Guruh topilmadi')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Guruhlar/ })).toHaveAttribute('href', '/admin/groups');
+  });
+
+  it('403 — xato xabari va "Qayta urinish"', async () => {
+    fetchMock.mockImplementation(() =>
+      Promise.resolve(errorResponse(403, 'FORBIDDEN', "Ruxsat yo'q")),
+    );
+    renderWithQuery(<GroupDetailPage id={IDS.group} />);
+    expect(await screen.findByText("Ruxsat yo'q")).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Qayta urinish' })).toBeInTheDocument();
+  });
+
+  it('sana — DateInput: yangi sana yuboriladi, tozalansa null', async () => {
+    const user = userEvent.setup();
+    routeFetch(
+      fetchMock,
+      routes({ [`PATCH ${GROUP_URL}`]: () => jsonResponse(200, GROUP_FIXTURE) }),
+    );
+    renderWithQuery(<GroupDetailPage id={IDS.group} />);
+
+    const date = await screen.findByLabelText('Boshlanish sanasi');
+    expect(date).toHaveAttribute('type', 'date');
+    expect(date).toHaveValue('2026-12-01');
+    fireEvent.change(date, { target: { value: '2027-01-15' } });
+    await user.click(screen.getByRole('button', { name: 'Saqlash' }));
+    await vi.waitFor(() => {
+      expect(lastRequestBody(fetchMock, 'PATCH')).toEqual({
+        name: 'FE-12',
+        startsAt: '2027-01-15',
+      });
+    });
+
+    fireEvent.change(screen.getByLabelText('Boshlanish sanasi'), { target: { value: '' } });
+    await user.click(screen.getByRole('button', { name: 'Saqlash' }));
+    await vi.waitFor(() => {
+      expect(lastRequestBody(fetchMock, 'PATCH')).toEqual({ name: 'FE-12', startsAt: null });
+    });
   });
 });

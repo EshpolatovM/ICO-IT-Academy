@@ -7,7 +7,8 @@ import { useUserForm } from '../hooks/useUserForm';
 
 import type { UseUserFormOptions } from '../hooks/useUserForm';
 import type { UserFieldConfig } from '../lib/user-fields';
-import type { FieldValues } from 'react-hook-form';
+import type { ReactNode } from 'react';
+import type { FieldValues, UseFormReturn } from 'react-hook-form';
 
 export interface UserFormProps<TInput extends FieldValues, TOutput> extends UseUserFormOptions<
   TInput,
@@ -17,6 +18,8 @@ export interface UserFormProps<TInput extends FieldValues, TOutput> extends UseU
   submitLabel: string;
   /** Berilsa — "Bekor qilish" tugmasi. */
   onCancel?: () => void;
+  /** Matn maydonlaridan keyingi qo'shimcha maydonlar (masalan studentda guruh tanlovi). */
+  renderExtraFields?: (form: UseFormReturn<TInput, unknown, TOutput>) => ReactNode;
 }
 
 /** Foydalanuvchi formasi (yaratish/tahrirlash): maydonlar, umumiy xato, tugmalar. */
@@ -24,6 +27,7 @@ export function UserForm<TInput extends FieldValues, TOutput>({
   fields,
   submitLabel,
   onCancel,
+  renderExtraFields,
   ...options
 }: UserFormProps<TInput, TOutput>) {
   const { form, submit } = useUserForm(options);
@@ -44,6 +48,7 @@ export function UserForm<TInput extends FieldValues, TOutput>({
             error={form.getFieldState(field.name, form.formState).error?.message}
           />
         ))}
+        {renderExtraFields?.(form)}
         <FormRootError message={errors.root?.server?.message} />
         <Stack direction="horizontal" gap="2" justify="end">
           {onCancel !== undefined ? (

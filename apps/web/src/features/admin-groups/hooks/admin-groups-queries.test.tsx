@@ -11,7 +11,12 @@ import { GROUP_FIXTURE, IDS, MENTOR_FIXTURE, pageOf } from '../lib/test-fixtures
 
 import { useAssignGroupMentor, useRemoveGroupMember } from './useGroupMutations';
 import { useGroup, useGroupList } from './useGroupQueries';
-import { useMentorFilterOption, useMentorOptions } from './useLookupOptions';
+import {
+  useGroupFilterOption,
+  useGroupOptions,
+  useMentorFilterOption,
+  useMentorOptions,
+} from './useLookupOptions';
 
 const GROUP_URL = `/api/v1/admin/groups/${IDS.group}`;
 
@@ -106,5 +111,35 @@ describe('admin-groups query hooks', () => {
     const { result } = renderHookWithQuery(() => useMentorFilterOption(undefined));
     expect(result.current.option).toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("useGroupOptions — faqat faol guruhlar, sort'siz, q bilan qidiruv", async () => {
+    fetchMock.mockImplementation(() => Promise.resolve(jsonResponse(200, pageOf([GROUP_FIXTURE]))));
+    const { result } = renderHookWithQuery(() => useGroupOptions());
+
+    await waitFor(() => {
+      expect(result.current.options).toEqual([
+        { value: IDS.group, label: 'FE-12', description: 'Frontend dasturchi' },
+      ]);
+    });
+    expect(fetchCall(fetchMock, 0).url).toBe('/api/v1/admin/groups?status=ACTIVE');
+
+    act(() => {
+      result.current.onSearch(' fe ');
+    });
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+    expect(fetchCall(fetchMock, 1).url).toBe('/api/v1/admin/groups?status=ACTIVE&q=fe');
+  });
+
+  it("useGroupFilterOption — URL'dagi id yorlig'i GET /admin/groups/:id dan", async () => {
+    fetchMock.mockResolvedValue(jsonResponse(200, GROUP_FIXTURE));
+    const { result } = renderHookWithQuery(() => useGroupFilterOption(IDS.group));
+
+    await waitFor(() => {
+      expect(result.current.option?.label).toBe('FE-12');
+    });
+    expect(fetchCall(fetchMock, 0).url).toBe(GROUP_URL);
   });
 });

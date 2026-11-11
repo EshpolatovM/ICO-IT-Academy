@@ -1,38 +1,22 @@
 'use client';
 
-import { Combobox } from '@/components/ui';
-import type { ComboboxOption, FormFieldControlProps } from '@/components/ui';
-
 import { useMentorOptions } from '../hooks/useLookupOptions';
 
-export interface MentorComboboxProps {
-  control: FormFieldControlProps;
-  value: ComboboxOption | null;
-  onChange: (value: ComboboxOption | null) => void;
-  placeholder?: string;
-  disabled?: boolean;
-}
+import { LookupCombobox } from './LookupCombobox';
+
+import type { SingleLookupComboboxProps } from './LookupCombobox';
+
+export type MentorComboboxProps = SingleLookupComboboxProps;
 
 /** Faol mentorni qidirib tanlash (bitta). `FormField` render-prop'i ichida ishlatiladi. */
-export function MentorCombobox({
-  control: { required: _required, ...control },
-  value,
-  onChange,
-  placeholder = 'Mentor ismi yoki telefoni',
-  disabled,
-}: MentorComboboxProps) {
+export function MentorCombobox(props: MentorComboboxProps) {
   const mentors = useMentorOptions();
   return (
-    <Combobox
-      {...control}
-      value={value}
-      onChange={onChange}
-      options={mentors.options}
-      loading={mentors.loading}
-      onSearchChange={mentors.onSearch}
+    <LookupCombobox
+      props={props}
+      lookup={mentors}
       listLabel="Mentorlar"
-      placeholder={placeholder}
-      disabled={disabled}
+      placeholder="Mentor ismi yoki telefoni"
     />
   );
 }

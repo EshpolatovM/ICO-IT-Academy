@@ -4,7 +4,7 @@ import { createGroupSchema, groupNameSchema } from '@lms/shared';
 import type { AdminGroupDetail } from '@lms/shared';
 
 /**
- * Sana maydoni matn sifatida kiritiladi (`YYYY-MM-DD`); bo'sh satr — "sanasiz" (`null`).
+ * Sana maydoni (`DateInput`) qiymati — `YYYY-MM-DD`; bo'sh satr — "sanasiz" (`null`).
  * Qolgan qoida — `@lms/shared` dagi `createGroupSchema.startsAt` (bir joyda).
  */
 const startsAtFieldSchema = z.union([

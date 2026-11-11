@@ -1,4 +1,4 @@
-import type { MentorListItem, StudentListItem } from '@lms/shared';
+import type { AdminGroupListItem, MentorListItem, StudentListItem } from '@lms/shared';
 
 import type { ComboboxOption } from '@/components/ui';
 import { personName } from '@/lib/format';
@@ -16,4 +16,9 @@ export function toStudentOption(student: StudentListItem): ComboboxOption {
     label: personName(student),
     description: `${student.studentCode} · ${group}`,
   };
+}
+
+/** Guruh → Combobox varianti (tavsif — yo'l nomi). */
+export function toGroupOption(group: AdminGroupListItem): ComboboxOption {
+  return { value: group.id, label: group.name, description: group.path.title };
 }

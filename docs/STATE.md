@@ -9,7 +9,7 @@
 ## ⚠️ SESSIYA TO'XTADI (2026-11-11 ~18:35, Claude limiti tugadi) — YANGI SESSIYA SHU YERDAN BOSHLAYDI
 Limit tugashi oldidan ikki agent ishlab turgan edi. Ularning ishi diskda qolgan bo'lishi mumkin, lekin **commit qilinmagan**:
 - **2.6b** (sinchkov-tester, `docs/tasks/02-2.6b-playwright-groups-mentor.md`): `apps/web/e2e/admin-groups.spec.ts`, `mentor-panel.spec.ts`, 3d test qaytarilgan `admin-student-import.spec.ts`.
-- **2.5b-2** (birchka-frontend, `docs/tasks/02-2.5b-2-group-wiring.md`): `features/admin-users/**`, `features/admin-groups/**` (guruh filtri va tanlovi, DateInput, CSV limiti, QueryView).
+- **2.5b-2: TAYYOR va commit qilingan** (18:40; web 280 test, Playwright admin 13/13). Eslatma: Playwright'ni ikki agent parallel yurgizmasin (port, DB, test-results umumiy).
 
 **Yangi sessiya qiladigan ishlar:**
 1. `git status` va `git diff --stat`: qaysi fayllar bor, ko'rib chiq.

@@ -2,22 +2,29 @@
 
 import Link from 'next/link';
 
-import type { StudentListItem } from '@lms/shared';
+import type { CreatedStudentResponse, StudentListItem } from '@lms/shared';
 
 import { Button, TextLink } from '@/components/ui';
+import { adminGroupsKeys } from '@/features/admin-groups';
 import { personName } from '@/lib/format';
 
 import { studentsApi } from '../api/students.api';
 import { AdminUsersPath, studentDetailPath } from '../lib/admin-users-paths';
 import { STUDENT_FIELDS } from '../lib/user-fields';
-import { EMPTY_STUDENT_FORM, STUDENT_SERVER_FIELDS, studentFormSchema } from '../lib/user-forms';
+import {
+  CREATE_STUDENT_SERVER_FIELDS,
+  createStudentFormSchema,
+  EMPTY_CREATE_STUDENT_FORM,
+} from '../lib/user-forms';
 
 import { CreateUserDialog } from './CreateUserDialog';
-import { GroupFilterPlaceholder } from './GroupFilterPlaceholder';
+import { StudentGroupField } from './StudentGroupField';
+import { StudentGroupFilter } from './StudentGroupFilter';
 import { createdAtColumn, nameColumn, statusColumn } from './user-columns';
 import { UserListView } from './UserListView';
 import { UsersSectionNav } from './UsersSectionNav';
 
+import type { CreateStudentFormInput, CreateStudentFormValues } from '../lib/user-forms';
 import type { UserListColumn } from '../types/admin-users.types';
 
 const COLUMNS: readonly UserListColumn<StudentListItem>[] = [
@@ -31,23 +38,27 @@ const COLUMNS: readonly UserListColumn<StudentListItem>[] = [
   nameColumn((student) => (
     <TextLink href={studentDetailPath(student.id)}>{personName(student)}</TextLink>
   )),
-  // Guruh boshqaruvi — 2.3; hozir API qaytargan faol guruh nomi ko'rsatiladi.
   { key: 'group', header: 'Guruh', render: (student) => student.group?.name ?? '—' },
   statusColumn(),
   createdAtColumn(),
 ];
 
+/** Guruh bilan yaratilganda guruhning a'zolari soni o'zgaradi — admin-groups keshi yangilanadi. */
+const GROUP_KEYS = [adminGroupsKeys.all] as const;
+
 function CreateStudentDialog() {
   return (
-    <CreateUserDialog
+    <CreateUserDialog<CreateStudentFormInput, CreateStudentFormValues, CreatedStudentResponse>
       kind="students"
       triggerLabel="Yangi student"
       title="Yangi student"
-      schema={studentFormSchema}
-      defaultValues={EMPTY_STUDENT_FORM}
+      schema={createStudentFormSchema}
+      defaultValues={EMPTY_CREATE_STUDENT_FORM}
       fields={STUDENT_FIELDS}
-      serverFields={STUDENT_SERVER_FIELDS}
-      create={(values) => studentsApi.create({ ...values, groupId: null, password: null })}
+      serverFields={CREATE_STUDENT_SERVER_FIELDS}
+      renderExtraFields={(form) => <StudentGroupField form={form} />}
+      invalidateAlso={GROUP_KEYS}
+      create={(values) => studentsApi.create({ ...values, password: null })}
       describe={(result, values) => [
         { term: 'Ism-familiya', value: personName(values) },
         { term: 'Student ID (login)', value: result.studentCode },
@@ -66,7 +77,7 @@ export function StudentsPage() {
       columns={COLUMNS}
       searchPlaceholder="Student ID (ST-10245) yoki ism"
       nav={<UsersSectionNav />}
-      extraFilters={<GroupFilterPlaceholder />}
+      extraFilters={<StudentGroupFilter />}
       actions={
         <>
           <Button asChild variant="secondary">

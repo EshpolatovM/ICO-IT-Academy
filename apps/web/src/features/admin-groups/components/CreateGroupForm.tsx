@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Controller } from 'react-hook-form';
 
 import { Button, FormField, Stack } from '@/components/ui';
 import type { ComboboxOption } from '@/components/ui';
@@ -13,9 +14,9 @@ import {
   EMPTY_CREATE_GROUP_FORM,
 } from '../lib/group-forms';
 
-import { DateTextField } from './DateTextField';
 import { MentorCombobox } from './MentorCombobox';
 import { PathSelect } from './PathSelect';
+import { StartsAtField } from './StartsAtField';
 
 import type { CreateGroupFormValues } from '../lib/group-forms';
 
@@ -77,10 +78,10 @@ export function CreateGroupForm({ onValid, onCancel }: CreateGroupFormProps) {
             />
           )}
         </FormField>
-        <DateTextField
-          label="Boshlanish sanasi"
-          registration={form.register('startsAt')}
-          error={errors.startsAt?.message}
+        <Controller
+          control={form.control}
+          name="startsAt"
+          render={({ field }) => <StartsAtField field={field} error={errors.startsAt?.message} />}
         />
         <FormRootError message={errors.root?.server?.message} />
         <FormActions onCancel={onCancel} submitting={isSubmitting} />

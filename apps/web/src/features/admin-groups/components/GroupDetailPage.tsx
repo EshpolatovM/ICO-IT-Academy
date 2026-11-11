@@ -1,10 +1,9 @@
 'use client';
 
-import { ErrorCode } from '@lms/shared';
+import type { AdminGroupDetail } from '@lms/shared';
 
-import { QueryErrorAlert } from '@/components/shared';
-import { EmptyState, PageHeader, Spinner, Stack, TextLink } from '@/components/ui';
-import { isApiError } from '@/lib/api';
+import { QueryView } from '@/components/shared';
+import { PageHeader, Stack } from '@/components/ui';
 
 import { useGroup } from '../hooks/useGroupQueries';
 import { AdminGroupsPath } from '../lib/admin-groups-paths';
@@ -18,32 +17,7 @@ import { GroupStatusBadge } from './GroupStatusBadge';
 
 const BACK_LINK = { href: AdminGroupsPath.GROUPS, label: 'Guruhlar' } as const;
 
-function GroupLoadState({ error, onRetry }: { error: unknown; onRetry: () => void }) {
-  const notFound = isApiError(error) && error.code === ErrorCode.NOT_FOUND;
-  return (
-    <Stack gap="4">
-      <TextLink href={BACK_LINK.href} variant="muted">
-        ← {BACK_LINK.label}
-      </TextLink>
-      {notFound ? (
-        <EmptyState title="Guruh topilmadi" description="U o'chirilgan yoki havola noto'g'ri." />
-      ) : (
-        <QueryErrorAlert error={error} onRetry={onRetry} />
-      )}
-    </Stack>
-  );
-}
-
-/** `/admin/groups/[id]` — ma'lumotlar, tahrirlash, arxivlash, mentor, a'zolar. */
-export function GroupDetailPage({ id }: { id: string }) {
-  const query = useGroup(id);
-  if (query.isPending) {
-    return <Spinner />;
-  }
-  if (query.isError) {
-    return <GroupLoadState error={query.error} onRetry={() => void query.refetch()} />;
-  }
-  const group = query.data;
+function GroupDetailContent({ group }: { group: AdminGroupDetail }) {
   return (
     <Stack gap="6">
       <PageHeader
@@ -57,5 +31,14 @@ export function GroupDetailPage({ id }: { id: string }) {
       <GroupMentorCard key={group.mentor?.id ?? 'none'} group={group} />
       <GroupMembersCard group={group} />
     </Stack>
+  );
+}
+
+/** `/admin/groups/[id]` — ma'lumotlar, tahrirlash, arxivlash, mentor, a'zolar. */
+export function GroupDetailPage({ id }: { id: string }) {
+  return (
+    <QueryView query={useGroup(id)} notFoundTitle="Guruh topilmadi" back={BACK_LINK}>
+      {(group) => <GroupDetailContent group={group} />}
+    </QueryView>
   );
 }

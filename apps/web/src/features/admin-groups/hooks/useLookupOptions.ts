@@ -8,49 +8,77 @@ import { useDebouncedValue } from '@/lib/hooks';
 
 import { adminGroupsKeys } from '../api/admin-groups.query-keys';
 import { lookupsApi } from '../api/lookups.api';
-import { toMentorOption, toStudentOption } from '../lib/options';
+import { toGroupOption, toMentorOption, toStudentOption } from '../lib/options';
 
-/** Combobox qidiruvi: matn debounce bilan so'rovga aylanadi. */
-function useSearchText() {
+import type { QueryKey } from '@tanstack/react-query';
+
+/** Combobox variantlari: qidiruv matni (debounce bilan) → so'rov → variantlar. */
+function useSearchOptions(
+  queryKey: (q: string) => QueryKey,
+  load: (q: string) => Promise<ComboboxOption[]>,
+) {
   const [text, setText] = useState('');
-  return { text: useDebouncedValue(text), setText };
+  const q = useDebouncedValue(text);
+  const query = useQuery({
+    queryKey: queryKey(q),
+    queryFn: () => load(q),
+    placeholderData: keepPreviousData,
+  });
+  return { options: query.data ?? [], loading: query.isFetching, onSearch: setText };
+}
+
+/**
+ * Filtrdagi tanlangan variant (URL'da faqat id): yorlig'i id bo'yicha so'rovdan;
+ * foydalanuvchi tanlaganda — keshga darhol yoziladi (qayta so'rov yo'q).
+ */
+function useSelectedOption(
+  id: string | undefined,
+  queryKey: (id: string) => QueryKey,
+  load: (id: string) => Promise<ComboboxOption>,
+) {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: queryKey(id ?? ''),
+    queryFn: () => load(id ?? ''),
+    enabled: id !== undefined,
+  });
+  const remember = (option: ComboboxOption) => {
+    queryClient.setQueryData(queryKey(option.value), option);
+  };
+  return { option: id === undefined ? null : (query.data ?? null), remember };
 }
 
 /** Faol mentorlar qidiruvi (`GET /admin/mentors?q=&status=ACTIVE`) → Combobox variantlari. */
 export function useMentorOptions() {
-  const search = useSearchText();
-  const query = useQuery({
-    queryKey: adminGroupsKeys.mentorOptions(search.text),
-    queryFn: async () => (await lookupsApi.mentors(search.text)).items.map(toMentorOption),
-    placeholderData: keepPreviousData,
-  });
-  return { options: query.data ?? [], loading: query.isFetching, onSearch: search.setText };
+  return useSearchOptions(adminGroupsKeys.mentorOptions, async (q) =>
+    (await lookupsApi.mentors(q)).items.map(toMentorOption),
+  );
 }
 
 /** Faol studentlar qidiruvi (`GET /admin/students?q=&status=ACTIVE`) → Combobox variantlari. */
 export function useStudentOptions() {
-  const search = useSearchText();
-  const query = useQuery({
-    queryKey: adminGroupsKeys.studentOptions(search.text),
-    queryFn: async () => (await lookupsApi.students(search.text)).items.map(toStudentOption),
-    placeholderData: keepPreviousData,
-  });
-  return { options: query.data ?? [], loading: query.isFetching, onSearch: search.setText };
+  return useSearchOptions(adminGroupsKeys.studentOptions, async (q) =>
+    (await lookupsApi.students(q)).items.map(toStudentOption),
+  );
 }
 
-/**
- * Filtrdagi tanlangan mentor (URL'da faqat id): yorlig'i `GET /admin/mentors/:id` dan;
- * foydalanuvchi tanlaganda — keshga darhol yoziladi (qayta so'rov yo'q).
- */
+/** Faol guruhlar qidiruvi (`GET /admin/groups?q=&status=ACTIVE`, `sort`siz) → variantlar. */
+export function useGroupOptions() {
+  return useSearchOptions(adminGroupsKeys.groupOptions, async (q) =>
+    (await lookupsApi.groups(q)).items.map(toGroupOption),
+  );
+}
+
+/** Guruhlar filtridagi mentor: yorlig'i `GET /admin/mentors/:id` dan. */
 export function useMentorFilterOption(mentorId: string | undefined) {
-  const queryClient = useQueryClient();
-  const query = useQuery({
-    queryKey: adminGroupsKeys.mentorOption(mentorId ?? ''),
-    queryFn: async () => toMentorOption(await lookupsApi.mentor(mentorId ?? '')),
-    enabled: mentorId !== undefined,
-  });
-  const remember = (option: ComboboxOption) => {
-    queryClient.setQueryData(adminGroupsKeys.mentorOption(option.value), option);
-  };
-  return { option: mentorId === undefined ? null : (query.data ?? null), remember };
+  return useSelectedOption(mentorId, adminGroupsKeys.mentorOption, async (id) =>
+    toMentorOption(await lookupsApi.mentor(id)),
+  );
+}
+
+/** Studentlar filtridagi guruh: yorlig'i `GET /admin/groups/:id` dan. */
+export function useGroupFilterOption(groupId: string | undefined) {
+  return useSelectedOption(groupId, adminGroupsKeys.groupOption, async (id) =>
+    toGroupOption(await lookupsApi.group(id)),
+  );
 }

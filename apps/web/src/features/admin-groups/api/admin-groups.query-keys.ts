@@ -8,4 +8,6 @@ export const adminGroupsKeys = {
   mentorOptions: (q: string) => ['admin-groups', 'mentor-options', q] as const,
   mentorOption: (id: string) => ['admin-groups', 'mentor-option', id] as const,
   studentOptions: (q: string) => ['admin-groups', 'student-options', q] as const,
+  groupOptions: (q: string) => ['admin-groups', 'group-options', q] as const,
+  groupOption: (id: string) => ['admin-groups', 'group-option', id] as const,
 };

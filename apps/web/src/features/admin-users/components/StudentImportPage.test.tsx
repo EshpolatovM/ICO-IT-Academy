@@ -2,7 +2,11 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { STUDENT_IMPORT_FILE_FIELD } from '@lms/shared';
+import {
+  STUDENT_IMPORT_DEFAULT_MAX_FILE_BYTES,
+  STUDENT_IMPORT_DEFAULT_MAX_ROWS,
+  STUDENT_IMPORT_FILE_FIELD,
+} from '@lms/shared';
 
 import { errorResponse, fetchCall, jsonResponse, mockFetch } from '@/lib/testing/http';
 import type { FetchMock } from '@/lib/testing/http';
@@ -87,5 +91,30 @@ describe('StudentImportPage', () => {
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent(/Fayl hajmi juda katta.*kichik faylga/);
     });
+  });
+
+  it("hint'da standart chegaralar: fayl hajmi va qatorlar soni", () => {
+    renderWithQuery(<StudentImportPage />);
+
+    const hint = screen.getByText(/Standart chegaralar/);
+    expect(hint).toHaveTextContent('1 MiB');
+    expect(hint).toHaveTextContent(String(STUDENT_IMPORT_DEFAULT_MAX_ROWS));
+  });
+
+  it("standart chegaradan katta fayl — so'rov yuborilmaydi, ogohlantirish chiqadi", async () => {
+    const user = userEvent.setup();
+    renderWithQuery(<StudentImportPage />);
+    const big = new File([new Uint8Array(STUDENT_IMPORT_DEFAULT_MAX_FILE_BYTES + 1)], 'big.csv', {
+      type: 'text/csv',
+    });
+    await user.upload(screen.getByLabelText(/CSV fayl/), big);
+
+    const warning = screen.getByRole('alert');
+    expect(warning).toHaveTextContent(/1 MiB dan katta/);
+    expect(warning).toHaveTextContent(/Server chegarasi boshqacha/i);
+    const submit = screen.getByRole('button', { name: 'Import qilish' });
+    expect(submit).toBeDisabled();
+    await user.click(submit);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

@@ -8,6 +8,7 @@ import {
   jsonResponse,
   mockFetch,
   requestJson,
+  requestUrl,
   routeFetch,
 } from '@/lib/testing/http';
 import type { FetchMock } from '@/lib/testing/http';
@@ -25,6 +26,14 @@ vi.mock(
 );
 
 const LIST_URL = '/api/v1/admin/students';
+const GROUPS_ROUTE = { 'GET /api/v1/admin/groups': () => jsonResponse(200, pageOf([])) };
+
+/** Ro'yxat so'rovining URL'i (guruh tanlovi ham parallel so'rov yuboradi). */
+function listCallUrl(fetchMock: FetchMock): string | undefined {
+  return fetchMock.mock.calls
+    .map(([input]) => requestUrl(input))
+    .find((url) => url.startsWith(LIST_URL));
+}
 const CREATED = {
   id: 's2',
   studentCode: 'ST-10246',
@@ -46,6 +55,7 @@ describe('StudentsPage', () => {
 
   it("ro'yxatni ko'rsatadi: ID va ism tafsilot havolasi, guruh, holat", async () => {
     routeFetch(fetchMock, {
+      ...GROUPS_ROUTE,
       [`GET ${LIST_URL}`]: () => jsonResponse(200, pageOf([STUDENT_FIXTURE])),
     });
     renderWithQuery(<StudentsPage />);
@@ -55,21 +65,26 @@ describe('StudentsPage', () => {
     expect(screen.getByRole('link', { name: 'Ali Valiyev' })).toBeInTheDocument();
     expect(within(screen.getByRole('table')).getByText('Faol')).toBeInTheDocument();
     expect(screen.getByText('1 ta natija')).toBeInTheDocument();
-    expect(screen.getByLabelText('Guruh')).toBeDisabled();
+    expect(screen.getByRole('combobox', { name: 'Guruh' })).toBeEnabled();
   });
 
   it('URL query API so\'roviga uzatiladi; bo\'sh natija — "Hech narsa topilmadi"', async () => {
     resetNavigation('/admin/students', 'q=zz&status=INACTIVE');
-    routeFetch(fetchMock, { [`GET ${LIST_URL}`]: () => jsonResponse(200, pageOf([])) });
+    routeFetch(fetchMock, {
+      ...GROUPS_ROUTE,
+      [`GET ${LIST_URL}`]: () => jsonResponse(200, pageOf([])),
+    });
     renderWithQuery(<StudentsPage />);
 
     expect(await screen.findByText('Hech narsa topilmadi')).toBeInTheDocument();
-    expect(fetchCall(fetchMock, 0).url).toBe(`${LIST_URL}?q=zz&status=INACTIVE`);
+    expect(listCallUrl(fetchMock)).toBe(`${LIST_URL}?q=zz&status=INACTIVE`);
     expect(screen.getByLabelText('Qidiruv')).toHaveValue('zz');
   });
 
   it('xato holati — xabar va "Qayta urinish"', async () => {
-    fetchMock.mockResolvedValue(errorResponse(403, 'FORBIDDEN', "Ruxsat yo'q"));
+    fetchMock.mockImplementation(() =>
+      Promise.resolve(errorResponse(403, 'FORBIDDEN', "Ruxsat yo'q")),
+    );
     renderWithQuery(<StudentsPage />);
 
     expect(await screen.findByText("Ruxsat yo'q")).toBeInTheDocument();
@@ -79,6 +94,7 @@ describe('StudentsPage', () => {
   it("saralash va holat filtri URL query'ni yangilaydi", async () => {
     const user = userEvent.setup();
     routeFetch(fetchMock, {
+      ...GROUPS_ROUTE,
       [`GET ${LIST_URL}`]: () => jsonResponse(200, pageOf([STUDENT_FIXTURE])),
     });
     renderWithQuery(<StudentsPage />);
@@ -96,6 +112,7 @@ describe('StudentsPage', () => {
   it('yaratish: validatsiya, POST, vaqtinchalik parol BIR MARTA (keshsiz)', async () => {
     const user = userEvent.setup();
     routeFetch(fetchMock, {
+      ...GROUPS_ROUTE,
       [`GET ${LIST_URL}`]: () => jsonResponse(200, pageOf([])),
       [`POST ${LIST_URL}`]: () => jsonResponse(201, CREATED),
     });

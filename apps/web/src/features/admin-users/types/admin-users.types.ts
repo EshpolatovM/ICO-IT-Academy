@@ -13,7 +13,7 @@ export interface UserListState {
   q: string;
   status: UserStatus | undefined;
   sort: UserSort;
-  /** Faqat studentlar: guruh filtri (2.3 dan keyin ulanadi). */
+  /** Faqat studentlar: guruh filtri (`GET /admin/students?groupId=`). */
   groupId: string | undefined;
 }
 
