@@ -11,6 +11,12 @@
 | Joriy git branch | `feature/02-admin-asosi` |
 | Ish rejimi | **To'liq avtonom** (egasi 2026-11-11: savol berma, tasdiq kutma, Tech Lead o'zi qaror qiladi; faqat haqiqiy xavfli amallarda to'xtash). Har vazifadan keyin commit + STATE/PROGRESS; hisobot `docs/HISOBOT-*.md` |
 
+## Hamkorlik (2026-11-11, egasi "ha")
+- Ikkinchi Claude sessiyasi — **Boltavoy** (bu sessiya — Qo'ziboy). Back/front bo'linmasi yo'q; vazifani egasi + Qo'ziboy taqsimlaydi.
+- Aloqa: Google Drive papkasidagi `XAT — ...md` fayllari (git'dagi AGENT_BUS ishlatilmaydi).
+- GitHub remote: `origin` = `EshpolatovM/ICO-IT-Academy`. `feature/02-admin-asosi` push qilindi; ikkala sessiya shu bitta branch'da ishlaydi (`git pull --rebase`, force push yo'q, `main` ga merge faqat egasi ruxsati bilan).
+- Boltavoyga berilgan vazifa: branch'ga o'tish, `docs/boltavoy/` ni commit+push, `pnpm check` natijasini yuborish. 2.3 kimga berilishi uning natijasidan keyin hal qilinadi.
+
 ## Egasining qarorlari (2026-11-10, "ha")
 - MinIO image'i yo'q → dev muhitda S3-compatible **SeaweedFS** ishlatiladi (egasi "ha"; 1.2b da bajarildi).
 - ESLint `max-params` = 5, jscpd faqat 3% chegara oshganda xato (egasi "ha", 2026-11-10).

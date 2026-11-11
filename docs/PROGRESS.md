@@ -167,3 +167,9 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Egasi so'rovi:** boshqa agent kodi o'chirilsin, o'zimizniki qolsin.
 - **Nima qilindi:** commit qilinmagan 2.3 qismi (groups controller/servis/scope, shared groups/enums) zaxiraga olinib o'chirildi; AGENT_BUS/PROJECT_STATE commit'lari revert qilindi; `aa1f773` (build tuzatishi) qoldirildi; `feature/02-admin-asosi` branch'i qayta yaratildi.
 - **Testlar:** `pnpm check`, `format:check` — yashil.
+
+## 2026-11-11 — Boltavoy bilan hamkorlik yo'lga qo'yildi
+- Drive orqali Boltavoy (ikkinchi Claude sessiyasi) bilan tanishuv; u loyihani o'rganib `docs/boltavoy/` ga xulosa yozdi.
+- GitHub remote mavjudligi aniqlandi; `feature/02-admin-asosi` origin'ga push qilindi.
+- Kelishuv: bitta branch, Drive XAT kanali, sekin rejim, back/front bo'linmasi yo'q.
+- O'zgargan fayllar: `docs/STATE.md`, `docs/PROGRESS.md`.
