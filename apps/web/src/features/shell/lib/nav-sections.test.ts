@@ -47,4 +47,38 @@ describe('nav-sections', () => {
     expect(isNavEntryActive(groups, '/mentor/groups/1', '/mentor')).toBe(true);
     expect(isNavEntryActive({ label: 'X' }, '/mentor', '/mentor')).toBe(false);
   });
+
+  it("faol band: activePrefixes dagi yo'llar va ichki sahifalari ham faol", () => {
+    const users = { label: 'U', href: '/admin/students', activePrefixes: ['/admin/mentors'] };
+    expect(isNavEntryActive(users, '/admin/students', '/admin')).toBe(true);
+    expect(isNavEntryActive(users, '/admin/mentors', '/admin')).toBe(true);
+    expect(isNavEntryActive(users, '/admin/mentors/5', '/admin')).toBe(true);
+    expect(isNavEntryActive(users, '/admin/mentorship', '/admin')).toBe(false);
+    expect(isNavEntryActive(users, '/admin/groups', '/admin')).toBe(false);
+  });
+
+  it("admin 'Foydalanuvchilar' — students, mentors da faol; admins da alohida band faol", () => {
+    const byLabel = (label: string) => ADMIN_NAV.find((entry) => entry.label === label);
+    const users = byLabel('Foydalanuvchilar');
+    expect(users).toBeDefined();
+    if (users === undefined) {
+      return;
+    }
+    for (const path of ['/admin/students', '/admin/students/7', '/admin/mentors']) {
+      expect(isNavEntryActive(users, path, '/admin')).toBe(true);
+    }
+    expect(isNavEntryActive(users, '/admin/admins', '/admin')).toBe(false);
+    const admins = byLabel('Adminlar');
+    expect(admins !== undefined && isNavEntryActive(admins, '/admin/admins', '/admin')).toBe(true);
+    expect(isNavEntryActive(users, '/admin', '/admin')).toBe(false);
+    expect(isNavEntryActive(users, '/admin/groups', '/admin')).toBe(false);
+    const groups = byLabel('Guruhlar');
+    expect(groups !== undefined && isNavEntryActive(groups, '/admin/mentors', '/admin')).toBe(
+      false,
+    );
+    const dashboard = byLabel('Dashboard');
+    expect(dashboard !== undefined && isNavEntryActive(dashboard, '/admin/admins', '/admin')).toBe(
+      false,
+    );
+  });
 });

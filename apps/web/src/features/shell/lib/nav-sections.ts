@@ -27,7 +27,15 @@ export function findSectionEntry(
   return nav.find((entry) => entry.href === href);
 }
 
-/** Joriy yo'l menyu bandiga tegishlimi (bosh sahifa — faqat aniq mos kelganda). */
+/** Yo'l berilgan prefiksning o'zi yoki uning ichki sahifasimi (`/a/b` → `/a/b`, `/a/b/1`; `/a/bc` emas). */
+function isUnderPath(pathname: string, prefix: string): boolean {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
+
+/**
+ * Joriy yo'l menyu bandiga tegishlimi. Bosh sahifa — faqat aniq mos kelganda;
+ * boshqa bandlar — `href` yoki `activePrefixes` dagi yo'llar va ularning ichki sahifalarida.
+ */
 export function isNavEntryActive(entry: NavEntry, pathname: string, homePath: string): boolean {
   if (entry.href === undefined) {
     return false;
@@ -35,5 +43,6 @@ export function isNavEntryActive(entry: NavEntry, pathname: string, homePath: st
   if (entry.href === homePath) {
     return pathname === homePath;
   }
-  return pathname === entry.href || pathname.startsWith(`${entry.href}/`);
+  const prefixes = [entry.href, ...(entry.activePrefixes ?? [])];
+  return prefixes.some((prefix) => isUnderPath(pathname, prefix));
 }

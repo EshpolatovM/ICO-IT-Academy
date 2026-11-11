@@ -32,7 +32,11 @@ export const MENTOR_NAV: readonly NavEntry[] = [
 
 export const ADMIN_NAV: readonly NavEntry[] = [
   { label: 'Dashboard', href: '/admin' },
-  { label: 'Foydalanuvchilar', href: '/admin/students' },
+  {
+    label: 'Foydalanuvchilar',
+    href: '/admin/students',
+    activePrefixes: ['/admin/mentors'],
+  },
   { label: 'Guruhlar', href: '/admin/groups' },
   { label: 'Kontent', href: '/admin/paths' },
   { label: 'Savollar', href: '/admin/questions' },

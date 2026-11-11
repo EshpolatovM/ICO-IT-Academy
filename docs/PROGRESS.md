@@ -184,3 +184,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - Yangi `docs/HAMKORLIK.md`: kim kim, Drive kanali, git qoidalari, agentlar, joriy taqsimot, xatlar jurnali.
 - `docs/STATE.md`: holat jadvali yangilandi, Tech Lead qarorlari (Sidebar active prefix, mentor tafsilot sahifasi yo'q, CSV limitlari).
 - `CLAUDE.md`: yangi sessiya HAMKORLIK.md ni o'qiydi va Drive/git'ni tekshiradi; chatdagi har qaror darhol faylga yoziladi.
+
+## 2026-11-11 — 2.5d sidebar faol holati (birchka-frontend + Tech Lead tuzatish)
+- `NavEntry.activePrefixes` (umumiy imkoniyat); "Foydalanuvchilar" `/admin/students/**`, `/admin/mentors/**` da faol; `/admin/admins` da faqat "Adminlar" bandi.
+- Fayllar: `apps/web/src/features/shell/{types/nav.types.ts,config/nav.config.ts,lib/nav-sections.ts,lib/nav-sections.test.ts}`.
+- Testlar: shell 11/11, web lint + typecheck yashil (agent `pnpm check` yashil, 191 test).
