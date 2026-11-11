@@ -1,4 +1,4 @@
-import { itemPath } from './request-path';
+import { itemPath } from '@/lib/api';
 
 /** Admin guruhlar sahifalari yo'llari (docs/03 §4). */
 export const AdminGroupsPath = {

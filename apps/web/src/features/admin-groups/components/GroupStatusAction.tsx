@@ -6,9 +6,9 @@ import { GroupStatus } from '@lms/shared';
 import type { AdminGroupDetail } from '@lms/shared';
 
 import { Alert, Button, ConfirmDialog } from '@/components/ui';
+import { errorMessage } from '@/lib/api';
 
 import { useUpdateGroup } from '../hooks/useGroupMutations';
-import { errorText } from '../lib/group-errors';
 
 const ARCHIVE_DESCRIPTION =
   "Guruhga yangi student qo'shib bo'lmaydi va u mentor ro'yxatidan chiqadi. A'zoliklar saqlanadi, keyin qayta faollashtirish mumkin.";
@@ -55,7 +55,7 @@ export function GroupStatusAction({ group }: { group: AdminGroupDetail }) {
           );
         }}
       >
-        {update.isError ? <Alert variant="danger">{errorText(update.error)}</Alert> : null}
+        {update.isError ? <Alert variant="danger">{errorMessage(update.error)}</Alert> : null}
       </ConfirmDialog>
     </>
   );

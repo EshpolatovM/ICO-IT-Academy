@@ -42,6 +42,12 @@ export function requestJson(init: RequestInit): unknown {
   return typeof init.body === 'string' ? (JSON.parse(init.body) as unknown) : undefined;
 }
 
+/** Berilgan metod bilan yuborilgan oxirgi so'rovning JSON body'si (bo'lmasa — `undefined`). */
+export function lastRequestBody(fetchMock: FetchMock, method: string): unknown {
+  const call = fetchMock.mock.calls.findLast(([, init]) => init?.method === method);
+  return call?.[1] === undefined ? undefined : requestJson(call[1]);
+}
+
 /** `fetch` chaqiruvining URL va sozlamalari. */
 export function fetchCall(fetchMock: FetchMock, index: number): { url: string; init: RequestInit } {
   const call = fetchMock.mock.calls[index];

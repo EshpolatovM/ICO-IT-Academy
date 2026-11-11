@@ -7,11 +7,10 @@ import type { ManagedUserBase } from '@lms/shared';
 
 import { Alert, Button, ConfirmDialog } from '@/components/ui';
 import type { ButtonSize } from '@/components/ui';
+import { errorMessage } from '@/lib/api';
+import { personName } from '@/lib/format';
 
 import { useUpdateUser } from '../hooks/useUpdateUser';
-import { fullName } from '../lib/format';
-
-import { errorMessage } from './QueryErrorAlert';
 
 import type { ManagedUserKind } from '../types/admin-users.types';
 
@@ -38,7 +37,7 @@ export function StatusToggleAction<T extends ManagedUserBase>({
   const [open, setOpen] = useState(false);
   const mutation = useUpdateUser(kind, update);
   const deactivate = user.status === UserStatus.ACTIVE;
-  const name = fullName(user);
+  const name = personName(user);
   const status = deactivate ? UserStatus.INACTIVE : UserStatus.ACTIVE;
 
   const changeOpen = (next: boolean) => {

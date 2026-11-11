@@ -4,12 +4,11 @@ import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-quer
 import { useState } from 'react';
 
 import type { ComboboxOption } from '@/components/ui';
+import { useDebouncedValue } from '@/lib/hooks';
 
 import { adminGroupsKeys } from '../api/admin-groups.query-keys';
 import { lookupsApi } from '../api/lookups.api';
 import { toMentorOption, toStudentOption } from '../lib/options';
-
-import { useDebouncedValue } from './useDebouncedValue';
 
 /** Combobox qidiruvi: matn debounce bilan so'rovga aylanadi. */
 function useSearchText() {

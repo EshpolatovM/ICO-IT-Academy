@@ -204,3 +204,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - `/admin/groups` (jadval, qidiruv, status/yo'l/mentor filtri, yaratish), `/admin/groups/[id]` (tahrirlash, arxivlash, mentor biriktirish/olib tashlash, a'zolar qo'shish/chiqarish, 409 xatolari).
 - Fayllar: `apps/web/src/features/admin-groups/**`, `apps/web/src/app/(admin)/admin/groups/**`, catch-all (1 qator).
 - Testlar: 37 yangi; `pnpm check` yashil (web 50 fayl, api 380). Backend 2.3 hali push qilinmagan — testlar mock bilan.
+
+## 2026-11-11 — 2.5f DRY refaktor (chaqqon-tuzatkich) + 2.4c DateInput (rassom-dizayner)
+- Umumiy: `apps/web/src/lib/{hooks,format}/**`, `lib/api/{request-path,error-message}.ts`, `components/shared/**`; admin-users va admin-groups eski nusxalari o'chirildi.
+- `components/ui/DateInput.tsx` (+6 test), design-preview.
+- `pnpm check` yashil (web 50 fayl, api 380), web jscpd klonlari 0, Playwright admin 8/8.

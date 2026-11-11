@@ -3,8 +3,8 @@
 import type { StaffAccount } from '@lms/shared';
 
 import { Stack } from '@/components/ui';
+import { personName } from '@/lib/format';
 
-import { fullName } from '../lib/format';
 import { STAFF_FIELDS } from '../lib/user-fields';
 import { EMPTY_STAFF_FORM, STAFF_SERVER_FIELDS, staffFormSchema } from '../lib/user-forms';
 
@@ -46,7 +46,7 @@ function StaffRowActions<T extends StaffAccount>({
       <ResetPasswordAction
         kind={kind}
         userId={user.id}
-        userName={fullName(user)}
+        userName={personName(user)}
         loginItem={{ term: 'Telefon', value: user.phone }}
         reset={api.resetPassword}
       />
@@ -95,7 +95,7 @@ export function StaffListPage<T extends StaffAccount>({
           serverFields={STAFF_SERVER_FIELDS}
           create={(values) => api.create({ ...values, password: null })}
           describe={(result, values) => [
-            { term: 'Ism-familiya', value: fullName(values) },
+            { term: 'Ism-familiya', value: personName(values) },
             { term: 'Telefon (login)', value: result.phone },
           ]}
         />

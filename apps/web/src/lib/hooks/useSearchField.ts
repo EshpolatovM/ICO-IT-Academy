@@ -2,10 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { useDebouncedValue } from './useDebouncedValue';
-
-/** Qidiruv yozilgandan keyin so'rov yuborilishigacha kutish (ms). */
-export const SEARCH_DEBOUNCE_MS = 300;
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from './useDebouncedValue';
 
 /**
  * Qidiruv maydoni: kiritish darhol ko'rinadi, URL'dagi `q` esa debounce bilan yangilanadi.

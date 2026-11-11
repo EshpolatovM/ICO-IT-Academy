@@ -1,15 +1,14 @@
 import type { ManagedUserBase } from '@lms/shared';
 
-import { formatDate, fullName } from '../lib/format';
-
-import { UserStatusBadge } from './UserStatusBadge';
+import { UserStatusBadge } from '@/components/shared';
+import { formatDate, personName } from '@/lib/format';
 
 import type { UserListColumn } from '../types/admin-users.types';
 import type { ReactNode } from 'react';
 
 /** Ism-familiya ustuni (familiya bo'yicha saralanadi); `render` — masalan tafsilot havolasi. */
 export function nameColumn<T extends ManagedUserBase>(
-  render: (item: T) => ReactNode = fullName,
+  render: (item: T) => ReactNode = personName,
 ): UserListColumn<T> {
   return { key: 'name', header: 'Ism-familiya', sortField: 'lastName', render };
 }

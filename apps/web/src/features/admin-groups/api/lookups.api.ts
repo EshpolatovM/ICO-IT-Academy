@@ -1,9 +1,7 @@
 import { UserStatus } from '@lms/shared';
 import type { MentorListItem, PaginatedResult, StudentListItem } from '@lms/shared';
 
-import { apiRequest } from '@/lib/api';
-
-import { itemPath, pathWithSearch } from '../lib/request-path';
+import { apiRequest, itemPath, withQuery } from '@/lib/api';
 
 const MENTORS_PATH = '/admin/mentors';
 const STUDENTS_PATH = '/admin/students';
@@ -21,10 +19,10 @@ function activeSearch(q: string): URLSearchParams {
 /** Combobox'lar uchun mentor va student qidiruvi (faqat o'qish). */
 export const lookupsApi = {
   mentors: (q: string) =>
-    apiRequest<PaginatedResult<MentorListItem>>(pathWithSearch(MENTORS_PATH, activeSearch(q))),
+    apiRequest<PaginatedResult<MentorListItem>>(withQuery(MENTORS_PATH, activeSearch(q))),
 
   mentor: (id: string) => apiRequest<MentorListItem>(itemPath(MENTORS_PATH, id)),
 
   students: (q: string) =>
-    apiRequest<PaginatedResult<StudentListItem>>(pathWithSearch(STUDENTS_PATH, activeSearch(q))),
+    apiRequest<PaginatedResult<StudentListItem>>(withQuery(STUDENTS_PATH, activeSearch(q))),
 };

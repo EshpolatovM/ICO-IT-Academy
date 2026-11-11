@@ -4,7 +4,7 @@ export function withQuery(path: string, query: URLSearchParams): string {
   return search === '' ? path : `${path}?${search}`;
 }
 
-/** URL segmenti sifatida xavfsiz id. */
-export function idSegment(id: string): string {
-  return encodeURIComponent(id);
+/** `/bosh/yo'l/:id` — id URL segmenti sifatida kodlanadi. */
+export function itemPath(basePath: string, id: string): string {
+  return `${basePath}/${encodeURIComponent(id)}`;
 }

@@ -5,10 +5,10 @@ import Link from 'next/link';
 import type { StudentListItem } from '@lms/shared';
 
 import { Button, TextLink } from '@/components/ui';
+import { personName } from '@/lib/format';
 
 import { studentsApi } from '../api/students.api';
 import { AdminUsersPath, studentDetailPath } from '../lib/admin-users-paths';
-import { fullName } from '../lib/format';
 import { STUDENT_FIELDS } from '../lib/user-fields';
 import { EMPTY_STUDENT_FORM, STUDENT_SERVER_FIELDS, studentFormSchema } from '../lib/user-forms';
 
@@ -29,7 +29,7 @@ const COLUMNS: readonly UserListColumn<StudentListItem>[] = [
     ),
   },
   nameColumn((student) => (
-    <TextLink href={studentDetailPath(student.id)}>{fullName(student)}</TextLink>
+    <TextLink href={studentDetailPath(student.id)}>{personName(student)}</TextLink>
   )),
   // Guruh boshqaruvi — 2.3; hozir API qaytargan faol guruh nomi ko'rsatiladi.
   { key: 'group', header: 'Guruh', render: (student) => student.group?.name ?? '—' },
@@ -49,7 +49,7 @@ function CreateStudentDialog() {
       serverFields={STUDENT_SERVER_FIELDS}
       create={(values) => studentsApi.create({ ...values, groupId: null, password: null })}
       describe={(result, values) => [
-        { term: 'Ism-familiya', value: fullName(values) },
+        { term: 'Ism-familiya', value: personName(values) },
         { term: 'Student ID (login)', value: result.studentCode },
       ]}
     />

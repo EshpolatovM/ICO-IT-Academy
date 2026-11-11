@@ -5,12 +5,11 @@ import { useState } from 'react';
 import { ErrorCode } from '@lms/shared';
 
 import { Alert, Button, FileInput, FormField, Stack } from '@/components/ui';
-import { isApiError } from '@/lib/api';
+import { errorMessage, isApiError } from '@/lib/api';
 
 import { importRowErrors } from '../lib/import-errors';
 
 import { ImportErrorsTable } from './ImportErrorsTable';
-import { errorMessage } from './QueryErrorAlert';
 
 const CSV_ACCEPT = '.csv,text/csv';
 const FILE_HINT = "UTF-8, sarlavhali CSV. Fayl hajmi standart bo'yicha 1 MiB gacha.";

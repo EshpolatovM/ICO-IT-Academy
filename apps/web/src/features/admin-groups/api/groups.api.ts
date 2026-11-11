@@ -9,16 +9,14 @@ import type {
   UpdateGroupRequest,
 } from '@lms/shared';
 
-import { apiRequest } from '@/lib/api';
-
-import { itemPath, pathWithSearch } from '../lib/request-path';
+import { apiRequest, itemPath, withQuery } from '@/lib/api';
 
 const GROUPS_PATH = '/admin/groups';
 
 /** Guruhlar boshqaruvi (docs/12 §2.2): SA, A. Mutatsiyalar javobi — guruh tafsiloti. */
 export const groupsApi = {
   list: (search: URLSearchParams) =>
-    apiRequest<PaginatedResult<AdminGroupListItem>>(pathWithSearch(GROUPS_PATH, search)),
+    apiRequest<PaginatedResult<AdminGroupListItem>>(withQuery(GROUPS_PATH, search)),
 
   get: (id: string) => apiRequest<AdminGroupDetail>(itemPath(GROUPS_PATH, id)),
 

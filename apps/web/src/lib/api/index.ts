@@ -8,3 +8,5 @@ export {
 } from './api.constants';
 export { ApiError, isApiError, isSessionRejectedError } from './api-error';
 export { refreshAccessToken } from './refresh-session';
+export { errorMessage } from './error-message';
+export { itemPath, withQuery } from './request-path';

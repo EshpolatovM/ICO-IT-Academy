@@ -1,8 +1,7 @@
 import type { ImportedStudent } from '@lms/shared';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui';
-
-import { fullName } from '../lib/format';
+import { personName } from '@/lib/format';
 
 /** Import natijasi: yaratilgan studentlar va vaqtinchalik parollari (BIR MARTA ko'rsatiladi). */
 export function ImportResultTable({ students }: { students: readonly ImportedStudent[] }) {
@@ -20,7 +19,7 @@ export function ImportResultTable({ students }: { students: readonly ImportedStu
         {students.map((student) => (
           <TableRow key={student.id}>
             <TableCell>{student.studentCode}</TableCell>
-            <TableCell>{fullName(student)}</TableCell>
+            <TableCell>{personName(student)}</TableCell>
             <TableCell>{student.groupName ?? '—'}</TableCell>
             <TableCell className="font-mono">{student.temporaryPassword}</TableCell>
           </TableRow>

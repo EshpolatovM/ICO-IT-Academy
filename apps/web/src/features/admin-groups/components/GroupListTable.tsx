@@ -13,9 +13,9 @@ import {
   TableRow,
   TextLink,
 } from '@/components/ui';
+import { formatDateOnly, personName } from '@/lib/format';
 
 import { groupDetailPath } from '../lib/admin-groups-paths';
-import { formatDateOnly, personName } from '../lib/format';
 
 import { GroupStatusBadge } from './GroupStatusBadge';
 

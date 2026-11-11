@@ -9,9 +9,7 @@ import type {
   UpdateStaffRequest,
 } from '@lms/shared';
 
-import { apiRequest } from '@/lib/api';
-
-import { idSegment, withQuery } from './request-path';
+import { apiRequest, itemPath, withQuery } from '@/lib/api';
 
 export interface StaffApi<T extends StaffAccount> {
   list: (query: URLSearchParams) => Promise<PaginatedResult<T>>;
@@ -25,9 +23,9 @@ function createStaffApi<T extends StaffAccount>(basePath: string): StaffApi<T> {
   return {
     list: (query) => apiRequest<PaginatedResult<T>>(withQuery(basePath, query)),
     create: (body) => apiRequest<CreatedStaffResponse>(basePath, { method: 'POST', body }),
-    update: (id, body) => apiRequest<T>(`${basePath}/${idSegment(id)}`, { method: 'PATCH', body }),
+    update: (id, body) => apiRequest<T>(itemPath(basePath, id), { method: 'PATCH', body }),
     resetPassword: (id) =>
-      apiRequest<PasswordResetResponse>(`/staff/${idSegment(id)}/reset-password`, {
+      apiRequest<PasswordResetResponse>(`${itemPath('/staff', id)}/reset-password`, {
         method: 'POST',
       }),
   };

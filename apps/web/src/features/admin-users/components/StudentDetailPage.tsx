@@ -3,6 +3,7 @@
 import { ErrorCode } from '@lms/shared';
 import type { StudentDetail } from '@lms/shared';
 
+import { QueryErrorAlert, UserStatusBadge } from '@/components/shared';
 import {
   Card,
   CardContent,
@@ -16,17 +17,15 @@ import {
   TextLink,
 } from '@/components/ui';
 import { isApiError } from '@/lib/api';
+import { formatDateTime, personName } from '@/lib/format';
 
 import { studentsApi } from '../api/students.api';
 import { useStudent } from '../hooks/useStudent';
 import { AdminUsersPath } from '../lib/admin-users-paths';
-import { formatDateTime, fullName } from '../lib/format';
 
-import { QueryErrorAlert } from './QueryErrorAlert';
 import { ResetPasswordAction } from './ResetPasswordAction';
 import { StatusToggleAction } from './StatusToggleAction';
 import { StudentEditCard } from './StudentEditCard';
-import { UserStatusBadge } from './UserStatusBadge';
 
 function StudentInfoCard({ student }: { student: StudentDetail }) {
   return (
@@ -38,7 +37,7 @@ function StudentInfoCard({ student }: { student: StudentDetail }) {
         <DescriptionList
           items={[
             { term: 'Student ID', value: student.studentCode },
-            { term: 'Ism-familiya', value: fullName(student) },
+            { term: 'Ism-familiya', value: personName(student) },
             { term: 'Holat', value: <UserStatusBadge status={student.status} /> },
             { term: 'Guruh', value: student.group?.name },
             {
@@ -65,7 +64,7 @@ function StudentActionsCard({ student }: { student: StudentDetail }) {
           <ResetPasswordAction
             kind="students"
             userId={student.id}
-            userName={fullName(student)}
+            userName={personName(student)}
             loginItem={{ term: 'Student ID (login)', value: student.studentCode }}
             reset={studentsApi.resetPassword}
             size="md"
@@ -98,7 +97,7 @@ function StudentDetailContent({ id }: { id: string }) {
   return (
     <Stack gap="6">
       <PageHeader
-        title={fullName(student)}
+        title={personName(student)}
         titleAddon={<UserStatusBadge status={student.status} />}
       />
       <StudentInfoCard student={student} />

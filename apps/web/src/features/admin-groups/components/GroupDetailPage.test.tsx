@@ -5,8 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   errorResponse,
   jsonResponse,
+  lastRequestBody,
   mockFetch,
-  requestJson,
   routeFetch,
 } from '@/lib/testing/http';
 import type { FetchMock, FetchRoutes } from '@/lib/testing/http';
@@ -26,11 +26,6 @@ function routes(extra: FetchRoutes = {}, group = GROUP_FIXTURE): FetchRoutes {
     'GET /api/v1/admin/students': () => jsonResponse(200, pageOf([STUDENT_FIXTURE])),
     ...extra,
   };
-}
-
-function lastBody(fetchMock: FetchMock, method: string): unknown {
-  const call = fetchMock.mock.calls.findLast(([, init]) => init?.method === method);
-  return call?.[1] === undefined ? undefined : requestJson(call[1]);
 }
 
 async function pickStudent(user: ReturnType<typeof userEvent.setup>) {
@@ -74,7 +69,7 @@ describe('GroupDetailPage', () => {
     );
 
     expect(await screen.findByRole('button', { name: 'Qayta faollashtirish' })).toBeInTheDocument();
-    expect(lastBody(fetchMock, 'PATCH')).toEqual({ status: 'ARCHIVED' });
+    expect(lastRequestBody(fetchMock, 'PATCH')).toEqual({ status: 'ARCHIVED' });
   });
 
   it('tahrirlash: 400 details[].field — xato maydonga tushadi', async () => {
@@ -92,7 +87,7 @@ describe('GroupDetailPage', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Saqlash' }));
     expect(await screen.findByText('Nom juda uzun')).toBeInTheDocument();
-    expect(lastBody(fetchMock, 'PATCH')).toEqual({ name: 'FE-12', startsAt: '2026-12-01' });
+    expect(lastRequestBody(fetchMock, 'PATCH')).toEqual({ name: 'FE-12', startsAt: '2026-12-01' });
   });
 
   it('mentorni olib tashlash — PUT …/mentor { mentorId: null }', async () => {
@@ -109,7 +104,7 @@ describe('GroupDetailPage', () => {
     await vi.waitFor(() => {
       expect(screen.queryByRole('button', { name: 'Olib tashlash' })).not.toBeInTheDocument();
     });
-    expect(lastBody(fetchMock, 'PUT')).toEqual({ mentorId: null });
+    expect(lastRequestBody(fetchMock, 'PUT')).toEqual({ mentorId: null });
   });
 
   it("student qo'shish — POST …/members, jadval yangilanadi", async () => {
@@ -132,7 +127,7 @@ describe('GroupDetailPage', () => {
     await pickStudent(user);
 
     expect(await screen.findByRole('link', { name: 'ST-10246' })).toBeInTheDocument();
-    expect(lastBody(fetchMock, 'POST')).toEqual({ studentIds: [IDS.student2] });
+    expect(lastRequestBody(fetchMock, 'POST')).toEqual({ studentIds: [IDS.student2] });
   });
 
   it('409 STUDENT_ALREADY_IN_GROUP — studentlar nomi bilan aniq xabar', async () => {

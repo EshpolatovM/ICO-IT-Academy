@@ -2,12 +2,12 @@
 
 import type { ManagedUserBase } from '@lms/shared';
 
-import { PageHeader, Pagination, Stack } from '@/components/ui';
+import { ListPagination, QueryErrorAlert } from '@/components/shared';
+import { PageHeader, Stack } from '@/components/ui';
 
 import { useListUrlState } from '../hooks/useListUrlState';
 import { useUserList } from '../hooks/useUserList';
 
-import { QueryErrorAlert } from './QueryErrorAlert';
 import { UserListTable } from './UserListTable';
 import { UserListToolbar } from './UserListToolbar';
 
@@ -70,14 +70,7 @@ export function UserListView<T extends ManagedUserBase>({
         emptyTitle={filtered ? 'Hech narsa topilmadi' : "Hali hech kim yo'q"}
         emptyDescription={filtered ? "Qidiruv yoki filtrni o'zgartirib ko'ring." : undefined}
       />
-      {list.data !== undefined && list.data.total > 0 ? (
-        <Pagination
-          page={list.data.page}
-          pageSize={list.data.pageSize}
-          total={list.data.total}
-          onPageChange={setPage}
-        />
-      ) : null}
+      <ListPagination data={list.data} onPageChange={setPage} />
     </Stack>
   );
 }

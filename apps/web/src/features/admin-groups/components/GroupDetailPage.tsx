@@ -2,6 +2,7 @@
 
 import { ErrorCode } from '@lms/shared';
 
+import { QueryErrorAlert } from '@/components/shared';
 import { EmptyState, PageHeader, Spinner, Stack, TextLink } from '@/components/ui';
 import { isApiError } from '@/lib/api';
 
@@ -12,7 +13,6 @@ import { GroupEditCard } from './GroupEditCard';
 import { GroupInfoCard } from './GroupInfoCard';
 import { GroupMembersCard } from './GroupMembersCard';
 import { GroupMentorCard } from './GroupMentorCard';
-import { GroupQueryError } from './GroupQueryError';
 import { GroupStatusAction } from './GroupStatusAction';
 import { GroupStatusBadge } from './GroupStatusBadge';
 
@@ -28,7 +28,7 @@ function GroupLoadState({ error, onRetry }: { error: unknown; onRetry: () => voi
       {notFound ? (
         <EmptyState title="Guruh topilmadi" description="U o'chirilgan yoki havola noto'g'ri." />
       ) : (
-        <GroupQueryError error={error} onRetry={onRetry} />
+        <QueryErrorAlert error={error} onRetry={onRetry} />
       )}
     </Stack>
   );

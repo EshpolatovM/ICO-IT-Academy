@@ -14,9 +14,9 @@ import {
   Stack,
 } from '@/components/ui';
 import type { ComboboxOption } from '@/components/ui';
+import { personName } from '@/lib/format';
 
 import { useAssignGroupMentor } from '../hooks/useGroupMutations';
-import { personName } from '../lib/format';
 import { mentorErrorText } from '../lib/group-errors';
 
 import { MentorCombobox } from './MentorCombobox';

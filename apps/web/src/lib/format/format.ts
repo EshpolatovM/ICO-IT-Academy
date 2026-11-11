@@ -1,4 +1,4 @@
-/** Sana ko'rinishi (o'zbek lokali). */
+/** Sana va vaqt ko'rinishi (o'zbek lokali). */
 const DATE_LOCALE = 'uz-UZ';
 const EMPTY_VALUE = '—';
 const DATE_ONLY_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -16,12 +16,17 @@ export function formatDateOnly(value: string | null): string {
   return `${day ?? ''}.${month ?? ''}.${year ?? ''}`;
 }
 
-/** ISO-8601 vaqt → sana. */
-export function formatIsoDate(iso: string): string {
+/** ISO-8601 vaqt → sana (`11.11.2026`). */
+export function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(DATE_LOCALE);
 }
 
-/** Ism-familiya; shaxs yo'q bo'lsa — "—". */
+/** ISO-8601 → sana va vaqt; `null` — "—" (masalan hali kirmagan). */
+export function formatDateTime(iso: string | null): string {
+  return iso === null ? EMPTY_VALUE : new Date(iso).toLocaleString(DATE_LOCALE);
+}
+
+/** "Ism Familiya"; shaxs yo'q bo'lsa — "—". */
 export function personName(person: { firstName: string; lastName: string } | null): string {
   return person === null ? EMPTY_VALUE : `${person.firstName} ${person.lastName}`;
 }

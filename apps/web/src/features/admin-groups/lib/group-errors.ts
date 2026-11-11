@@ -7,11 +7,6 @@ export const GROUP_ARCHIVED_MESSAGE = "Arxivlangan guruhga qo'shib bo'lmaydi";
 const ALREADY_IN_GROUP_PREFIX = 'Allaqachon boshqa faol guruhda';
 const STUDENT_ID_FIELD_RE = /^studentIds\.(\d+)$/;
 
-/** Xato matni: API xabari yoki umumiy matn. */
-export function errorText(error: unknown): string {
-  return isApiError(error) ? error.message : UNKNOWN_ERROR_MESSAGE;
-}
-
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string');
 }

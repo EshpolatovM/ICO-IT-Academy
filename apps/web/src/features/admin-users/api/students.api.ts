@@ -10,9 +10,7 @@ import type {
   UpdateStudentRequest,
 } from '@lms/shared';
 
-import { apiRequest } from '@/lib/api';
-
-import { idSegment, withQuery } from './request-path';
+import { apiRequest, itemPath, withQuery } from '@/lib/api';
 
 const BASE_PATH = '/admin/students';
 
@@ -21,13 +19,13 @@ export const studentsApi = {
   list: (query: URLSearchParams) =>
     apiRequest<PaginatedResult<StudentListItem>>(withQuery(BASE_PATH, query)),
 
-  get: (id: string) => apiRequest<StudentDetail>(`${BASE_PATH}/${idSegment(id)}`),
+  get: (id: string) => apiRequest<StudentDetail>(itemPath(BASE_PATH, id)),
 
   create: (body: CreateStudentRequest) =>
     apiRequest<CreatedStudentResponse>(BASE_PATH, { method: 'POST', body }),
 
   update: (id: string, body: UpdateStudentRequest) =>
-    apiRequest<StudentDetail>(`${BASE_PATH}/${idSegment(id)}`, { method: 'PATCH', body }),
+    apiRequest<StudentDetail>(itemPath(BASE_PATH, id), { method: 'PATCH', body }),
 
   /** CSV import: `multipart/form-data`, fayl maydoni `STUDENT_IMPORT_FILE_FIELD`. */
   import: (file: File) => {
@@ -37,7 +35,7 @@ export const studentsApi = {
   },
 
   resetPassword: (id: string) =>
-    apiRequest<PasswordResetResponse>(`/students/${idSegment(id)}/reset-password`, {
+    apiRequest<PasswordResetResponse>(`${itemPath('/students', id)}/reset-password`, {
       method: 'POST',
     }),
 };

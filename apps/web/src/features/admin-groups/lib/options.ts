@@ -1,8 +1,7 @@
 import type { MentorListItem, StudentListItem } from '@lms/shared';
 
 import type { ComboboxOption } from '@/components/ui';
-
-import { personName } from './format';
+import { personName } from '@/lib/format';
 
 /** Mentor → Combobox varianti (tavsif — telefon). */
 export function toMentorOption(mentor: MentorListItem): ComboboxOption {

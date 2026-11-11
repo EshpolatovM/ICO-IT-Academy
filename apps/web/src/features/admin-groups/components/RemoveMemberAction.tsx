@@ -5,10 +5,10 @@ import { useState } from 'react';
 import type { AdminGroupMember } from '@lms/shared';
 
 import { Alert, Button, ConfirmDialog } from '@/components/ui';
+import { errorMessage } from '@/lib/api';
+import { personName } from '@/lib/format';
 
 import { useRemoveGroupMember } from '../hooks/useGroupMutations';
-import { personName } from '../lib/format';
-import { errorText } from '../lib/group-errors';
 
 export interface RemoveMemberActionProps {
   groupId: string;
@@ -55,7 +55,7 @@ export function RemoveMemberAction({ groupId, groupName, member }: RemoveMemberA
           });
         }}
       >
-        {remove.isError ? <Alert variant="danger">{errorText(remove.error)}</Alert> : null}
+        {remove.isError ? <Alert variant="danger">{errorMessage(remove.error)}</Alert> : null}
       </ConfirmDialog>
     </>
   );

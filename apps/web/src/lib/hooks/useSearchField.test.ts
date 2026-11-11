@@ -1,7 +1,8 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SEARCH_DEBOUNCE_MS, useSearchField } from './useSearchField';
+import { SEARCH_DEBOUNCE_MS } from './useDebouncedValue';
+import { useSearchField } from './useSearchField';
 
 describe('useSearchField', () => {
   beforeEach(() => {

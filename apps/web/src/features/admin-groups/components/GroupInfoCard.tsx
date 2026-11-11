@@ -1,8 +1,7 @@
 import type { AdminGroupDetail } from '@lms/shared';
 
 import { Card, CardContent, CardHeader, CardTitle, DescriptionList } from '@/components/ui';
-
-import { formatDateOnly, formatIsoDate, personName } from '../lib/format';
+import { formatDate, formatDateOnly, personName } from '@/lib/format';
 
 import { GroupStatusBadge } from './GroupStatusBadge';
 
@@ -21,7 +20,7 @@ export function GroupInfoCard({ group }: { group: AdminGroupDetail }) {
             { term: 'Studentlar soni', value: group.membersCount },
             { term: 'Holat', value: <GroupStatusBadge status={group.status} /> },
             { term: 'Boshlanish sanasi', value: formatDateOnly(group.startsAt) },
-            { term: 'Yaratilgan', value: formatIsoDate(group.createdAt) },
+            { term: 'Yaratilgan', value: formatDate(group.createdAt) },
           ]}
         />
       </CardContent>

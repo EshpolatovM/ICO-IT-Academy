@@ -3,12 +3,13 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 
+import { withQuery } from '@/lib/api';
+
 import {
   DEFAULT_GROUP_LIST_STATE,
   parseGroupListState,
   toGroupListParams,
 } from '../lib/group-list-state';
-import { pathWithSearch } from '../lib/request-path';
 
 import type { GroupListPatch } from '../types/admin-groups.types';
 
@@ -29,7 +30,7 @@ export function useGroupListUrlState() {
         page: DEFAULT_GROUP_LIST_STATE.page,
         ...changes,
       });
-      router.replace(pathWithSearch(pathname, params), { scroll: false });
+      router.replace(withQuery(pathname, params), { scroll: false });
     },
     [router, pathname, state],
   );

@@ -1,10 +1,9 @@
 'use client';
 
-import { UserStatus } from '@lms/shared';
 import type { AdminGroupDetail } from '@lms/shared';
 
+import { UserStatusBadge } from '@/components/shared';
 import {
-  Badge,
   Card,
   CardContent,
   CardHeader,
@@ -19,22 +18,14 @@ import {
   TableRow,
   TextLink,
 } from '@/components/ui';
+import { formatDate, personName } from '@/lib/format';
 
 import { studentDetailHref } from '../lib/admin-groups-paths';
-import { formatIsoDate, personName } from '../lib/format';
 
 import { AddMembersForm } from './AddMembersForm';
 import { RemoveMemberAction } from './RemoveMemberAction';
 
 const HEADERS = ['ID', 'Ism-familiya', 'Holat', "Qo'shilgan", ''] as const;
-
-function MemberStatus({ status }: { status: UserStatus }) {
-  return status === UserStatus.ACTIVE ? (
-    <Badge variant="success">Faol</Badge>
-  ) : (
-    <Badge variant="neutral">Nofaol</Badge>
-  );
-}
 
 function MemberRows({ group }: { group: AdminGroupDetail }) {
   if (group.members.length === 0) {
@@ -47,9 +38,9 @@ function MemberRows({ group }: { group: AdminGroupDetail }) {
       </TableCell>
       <TableCell>{personName(member)}</TableCell>
       <TableCell>
-        <MemberStatus status={member.status} />
+        <UserStatusBadge status={member.status} />
       </TableCell>
-      <TableCell>{formatIsoDate(member.joinedAt)}</TableCell>
+      <TableCell>{formatDate(member.joinedAt)}</TableCell>
       <TableCell>
         <RemoveMemberAction groupId={group.id} groupName={group.name} member={member} />
       </TableCell>

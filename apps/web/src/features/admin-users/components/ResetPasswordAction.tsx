@@ -6,10 +6,10 @@ import type { PasswordResetResponse } from '@lms/shared';
 
 import { Alert, Button, ConfirmDialog } from '@/components/ui';
 import type { ButtonSize, DescriptionItem } from '@/components/ui';
+import { errorMessage } from '@/lib/api';
 
 import { useSecretMutation } from '../hooks/useSecretMutation';
 
-import { errorMessage } from './QueryErrorAlert';
 import { SecretResultDialog } from './SecretResultDialog';
 
 import type { ManagedUserKind } from '../types/admin-users.types';

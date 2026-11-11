@@ -1,10 +1,5 @@
 import { Alert, Button, Stack } from '@/components/ui';
-import { isApiError, UNKNOWN_ERROR_MESSAGE } from '@/lib/api';
-
-/** Xato matni: API xabari yoki umumiy matn. */
-export function errorMessage(error: unknown): string {
-  return isApiError(error) ? error.message : UNKNOWN_ERROR_MESSAGE;
-}
+import { errorMessage } from '@/lib/api';
 
 export interface QueryErrorAlertProps {
   error: unknown;
