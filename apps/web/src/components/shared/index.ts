@@ -1,5 +1,7 @@
 export { ConfirmSecretAction } from './ConfirmSecretAction';
 export type { ConfirmSecretActionProps } from './ConfirmSecretAction';
+export { FilterField } from './FilterField';
+export type { FilterFieldProps, FilterFieldWidth } from './FilterField';
 export { HeadedTable } from './HeadedTable';
 export type { HeadedTableProps } from './HeadedTable';
 export { ListPagination } from './ListPagination';

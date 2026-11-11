@@ -1,7 +1,7 @@
 'use client';
 
-import { ListSearchField, StatusFilterSelect } from '@/components/shared';
-import { FormField, Stack } from '@/components/ui';
+import { FilterField, ListSearchField, StatusFilterSelect } from '@/components/shared';
+import { Stack } from '@/components/ui';
 
 import { useMentorFilterOption } from '../hooks/useLookupOptions';
 
@@ -19,7 +19,7 @@ export interface GroupListToolbarProps {
 function MentorFilter({ state, onChange }: GroupListToolbarProps) {
   const selected = useMentorFilterOption(state.mentorId);
   return (
-    <FormField label="Mentor" className="w-64">
+    <FilterField label="Mentor" width="wide">
       {(control) => (
         <MentorCombobox
           control={control}
@@ -33,7 +33,7 @@ function MentorFilter({ state, onChange }: GroupListToolbarProps) {
           }}
         />
       )}
-    </FormField>
+    </FilterField>
   );
 }
 
@@ -55,7 +55,7 @@ export function GroupListToolbar({ state, onChange }: GroupListToolbarProps) {
           onChange({ status });
         }}
       />
-      <FormField label="Yo'l" className="w-64">
+      <FilterField label="Yo'l" width="wide">
         {(control) => (
           <PathSelect
             control={{ ...control, required: false }}
@@ -66,7 +66,7 @@ export function GroupListToolbar({ state, onChange }: GroupListToolbarProps) {
             }}
           />
         )}
-      </FormField>
+      </FilterField>
       <MentorFilter state={state} onChange={onChange} />
     </Stack>
   );

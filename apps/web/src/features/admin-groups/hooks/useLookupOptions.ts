@@ -55,10 +55,17 @@ export function useMentorOptions() {
   );
 }
 
-/** Faol studentlar qidiruvi (`GET /admin/students?q=&status=ACTIVE`) → Combobox variantlari. */
-export function useStudentOptions() {
-  return useSearchOptions(adminGroupsKeys.studentOptions, async (q) =>
-    (await lookupsApi.students(q)).items.map(toStudentOption),
+/**
+ * Guruhga qo'shish uchun faol studentlar (`GET /admin/students?q=&status=ACTIVE`) → variantlar.
+ * Shu guruhning o'z a'zolari chiqarib tashlanadi (ularni qayta qo'shib bo'lmaydi).
+ */
+export function useStudentOptions(groupId: string) {
+  return useSearchOptions(
+    (q) => adminGroupsKeys.studentOptions(groupId, q),
+    async (q) =>
+      (await lookupsApi.students(q)).items
+        .filter((student) => student.group?.id !== groupId)
+        .map(toStudentOption),
   );
 }
 

@@ -1,6 +1,8 @@
 'use client';
 
-import { FormField, Select } from '@/components/ui';
+import { Select } from '@/components/ui';
+
+import { FilterField } from './FilterField';
 
 export interface StatusFilterSelectProps<T extends string> {
   /** Holatlar va ularning nomlari. */
@@ -19,7 +21,7 @@ export function StatusFilterSelect<T extends string>({
   const statuses = Object.keys(labels) as T[];
   const options = statuses.map((status) => ({ value: status, label: labels[status] }));
   return (
-    <FormField label="Holat" className="w-48">
+    <FilterField label="Holat" width="narrow">
       {({ invalid: _invalid, required: _required, ...control }) => (
         <Select
           {...control}
@@ -31,6 +33,6 @@ export function StatusFilterSelect<T extends string>({
           }}
         />
       )}
-    </FormField>
+    </FilterField>
   );
 }

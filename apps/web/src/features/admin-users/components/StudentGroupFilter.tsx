@@ -1,6 +1,6 @@
 'use client';
 
-import { FormField } from '@/components/ui';
+import { FilterField } from '@/components/shared';
 import { GroupCombobox, useGroupFilterOption } from '@/features/admin-groups';
 
 import { useListUrlState } from '../hooks/useListUrlState';
@@ -10,7 +10,7 @@ export function StudentGroupFilter() {
   const { state, setGroupId } = useListUrlState();
   const selected = useGroupFilterOption(state.groupId);
   return (
-    <FormField label="Guruh" className="w-64">
+    <FilterField label="Guruh" width="wide">
       {(control) => (
         <GroupCombobox
           control={control}
@@ -24,6 +24,6 @@ export function StudentGroupFilter() {
           }}
         />
       )}
-    </FormField>
+    </FilterField>
   );
 }

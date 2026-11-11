@@ -1,7 +1,9 @@
 'use client';
 
-import { FormField, SearchInput } from '@/components/ui';
+import { SearchInput } from '@/components/ui';
 import { useSearchField } from '@/lib/hooks';
+
+import { FilterField } from './FilterField';
 
 export interface ListSearchFieldProps {
   /** URL'dagi joriy qidiruv. */
@@ -14,7 +16,7 @@ export interface ListSearchFieldProps {
 export function ListSearchField({ q, onSearch, placeholder }: ListSearchFieldProps) {
   const search = useSearchField(q, onSearch);
   return (
-    <FormField label="Qidiruv" className="min-w-64 flex-1">
+    <FilterField label="Qidiruv" width="fill">
       {({ invalid: _invalid, required: _required, ...control }) => (
         <SearchInput
           {...control}
@@ -23,6 +25,6 @@ export function ListSearchField({ q, onSearch, placeholder }: ListSearchFieldPro
           placeholder={placeholder}
         />
       )}
-    </FormField>
+    </FilterField>
   );
 }

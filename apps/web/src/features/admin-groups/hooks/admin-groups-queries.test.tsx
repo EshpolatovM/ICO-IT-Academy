@@ -8,7 +8,7 @@ import { renderHookWithQuery } from '@/lib/testing/render';
 
 import { adminGroupsKeys } from '../api/admin-groups.query-keys';
 import { DEFAULT_GROUP_LIST_STATE } from '../lib/group-list-state';
-import { GROUP_FIXTURE, IDS, MENTOR_FIXTURE, pageOf } from '../lib/test-fixtures';
+import { GROUP_FIXTURE, IDS, MENTOR_FIXTURE, pageOf, STUDENT_FIXTURE } from '../lib/test-fixtures';
 
 import {
   useAddGroupMembers,
@@ -21,6 +21,7 @@ import {
   useGroupOptions,
   useMentorFilterOption,
   useMentorOptions,
+  useStudentOptions,
 } from './useLookupOptions';
 
 const GROUP_URL = `/api/v1/admin/groups/${IDS.group}`;
@@ -162,5 +163,20 @@ describe('admin-groups query hooks', () => {
       expect(result.current.option?.label).toBe('FE-12');
     });
     expect(fetchCall(fetchMock, 0).url).toBe(GROUP_URL);
+  });
+
+  it("useStudentOptions — shu guruh a'zolarisiz, tavsifda joriy guruh", async () => {
+    const member = { ...STUDENT_FIXTURE, id: IDS.student, group: { id: IDS.group, name: 'FE-12' } };
+    const free = { ...STUDENT_FIXTURE, id: 'free', studentCode: 'ST-10247', group: null };
+    fetchMock.mockResolvedValue(jsonResponse(200, pageOf([member, STUDENT_FIXTURE, free])));
+    const { result } = renderHookWithQuery(() => useStudentOptions(IDS.group));
+
+    await waitFor(() => {
+      expect(result.current.options.map((option) => option.description)).toEqual([
+        'ST-10246 · BE-3 guruhida',
+        'ST-10247 · guruhsiz',
+      ]);
+    });
+    expect(fetchCall(fetchMock, 0).url).toBe('/api/v1/admin/students?status=ACTIVE');
   });
 });

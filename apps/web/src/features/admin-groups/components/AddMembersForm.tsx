@@ -28,6 +28,7 @@ export function AddMembersForm({ group }: { group: AdminGroupDetail }) {
         >
           {(control) => (
             <StudentsCombobox
+              groupId={group.id}
               control={control}
               value={selected}
               onChange={select}

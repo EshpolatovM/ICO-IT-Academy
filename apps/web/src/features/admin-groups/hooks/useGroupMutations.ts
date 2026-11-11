@@ -15,8 +15,18 @@ import { adminUsersKeys } from '@/lib/query';
 import { adminGroupsKeys } from '../api/admin-groups.query-keys';
 import { groupsApi } from '../api/groups.api';
 
+import type { QueryClient } from '@tanstack/react-query';
+
 /** Studentlar ro'yxati va tafsilotidagi "Guruh" ma'lumoti (admin-users keshi). */
 const STUDENTS_KEY = adminUsersKeys.kind('students');
+
+/** Guruh a'zoligi o'zgarsa: studentlar keshi va "Student qo'shish" variantlari eskiradi. */
+function invalidateStudents(queryClient: QueryClient): Promise<void>[] {
+  return [
+    queryClient.invalidateQueries({ queryKey: STUDENTS_KEY }),
+    queryClient.invalidateQueries({ queryKey: adminGroupsKeys.allStudentOptions() }),
+  ];
+}
 
 /**
  * Guruh tafsilotini qaytaradigan mutatsiya: javob keshga, ro'yxatlar qayta yuklanadi.
@@ -32,7 +42,7 @@ function useGroupDetailMutation<TVariables>(
     onSuccess: (group) => {
       queryClient.setQueryData(adminGroupsKeys.detail(group.id), group);
       void queryClient.invalidateQueries({ queryKey: adminGroupsKeys.lists() });
-      if (affectsStudents) void queryClient.invalidateQueries({ queryKey: STUDENTS_KEY });
+      if (affectsStudents) void Promise.all(invalidateStudents(queryClient));
     },
   });
 }
@@ -71,7 +81,7 @@ export function useRemoveGroupMember(id: string) {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: adminGroupsKeys.detail(id) }),
         queryClient.invalidateQueries({ queryKey: adminGroupsKeys.lists() }),
-        queryClient.invalidateQueries({ queryKey: STUDENTS_KEY }),
+        ...invalidateStudents(queryClient),
       ]);
     },
   });

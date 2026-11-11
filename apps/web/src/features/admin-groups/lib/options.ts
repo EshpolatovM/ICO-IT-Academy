@@ -8,9 +8,9 @@ export function toMentorOption(mentor: MentorListItem): ComboboxOption {
   return { value: mentor.id, label: personName(mentor), description: mentor.phone };
 }
 
-/** Student → Combobox varianti (tavsif — ID va joriy guruhi). */
+/** Student → Combobox varianti (tavsif — ID va joriy guruhi: "FE-12 guruhida" yoki "guruhsiz"). */
 export function toStudentOption(student: StudentListItem): ComboboxOption {
-  const group = student.group === null ? 'guruhsiz' : student.group.name;
+  const group = student.group === null ? 'guruhsiz' : `${student.group.name} guruhida`;
   return {
     value: student.id,
     label: personName(student),
