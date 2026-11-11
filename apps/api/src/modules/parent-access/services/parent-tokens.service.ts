@@ -1,0 +1,148 @@
+import { Injectable } from '@nestjs/common';
+
+import { AuditAction, ErrorCode } from '@lms/shared';
+import type {
+  ParentTokenCreatedResponse,
+  ParentTokensListResponse,
+  ParentTokenSummary,
+} from '@lms/shared';
+
+import { AppException } from '../../../common/exceptions/app.exception.js';
+import { UsersRepository } from '../../users/repositories/users.repository.js';
+import { ParentAccessTokensRepository } from '../repositories/parent-access-tokens.repository.js';
+
+import { ParentTokenAuditor, parentTokenAuditView } from './parent-token-auditor.service.js';
+import { ParentTokenIssuer } from './parent-token-issuer.service.js';
+import { ParentTokenValidityCache } from './parent-token-validity.service.js';
+
+import type { ActorContext } from '../../../common/auth/request-user.types.js';
+import type { CreateParentTokenDto } from '../dto/parent-tokens.dto.js';
+import type { ParentTokenRecord } from '../parent-access.types.js';
+
+function toSummary(record: ParentTokenRecord): ParentTokenSummary {
+  return {
+    id: record.id,
+    prefix: record.tokenPrefix,
+    label: record.label,
+    createdAt: record.createdAt.toISOString(),
+    lastUsedAt: record.lastUsedAt?.toISOString() ?? null,
+    useCount: record.useCount,
+    expiresAt: record.expiresAt?.toISOString() ?? null,
+  };
+}
+
+/**
+ * Ota-ona tokenlarini boshqarish (docs/02 §4.4, §5, §7): ro'yxat, yaratish (limit, S-17),
+ * bekor qilish va qayta yaratish. Xom token faqat yaratish javobida bir marta qaytadi.
+ * Scope (kim qaysi studentga) — controller'dagi `@StudentScope`; bu yerda student mavjudligi.
+ * Amal va uning auditi — bitta tranzaksiyada (`ParentTokenAuditor.runAudited`, docs/01 §4). Bekor qilingach Redis
+ * keshi tozalanadi (tombstone) — tranzaksiyadan keyin; Redis xatosi amalni 500 ga aylantirmaydi.
+ */
+@Injectable()
+export class ParentTokensService {
+  constructor(
+    private readonly tokens: ParentAccessTokensRepository,
+    private readonly users: UsersRepository,
+    private readonly issuer: ParentTokenIssuer,
+    private readonly validity: ParentTokenValidityCache,
+    private readonly auditor: ParentTokenAuditor,
+  ) {}
+
+  async list(studentId: string): Promise<ParentTokensListResponse> {
+    await this.assertStudentExists(studentId);
+    const records = await this.tokens.listActive(studentId, new Date());
+    return { items: records.map(toSummary) };
+  }
+
+  async create(
+    studentId: string,
+    dto: CreateParentTokenDto,
+    actor: ActorContext,
+  ): Promise<ParentTokenCreatedResponse> {
+    await this.assertStudentExists(studentId);
+    const generated = this.issuer.generate();
+    const limit = this.issuer.maxActiveTokens;
+    const record = await this.auditor.runAudited(
+      actor,
+      () =>
+        this.tokens.createWithinLimit(
+          {
+            studentId,
+            tokenHash: generated.tokenHash,
+            tokenPrefix: generated.tokenPrefix,
+            label: dto.label ?? null,
+            createdById: actor.user.id,
+          },
+          limit,
+          new Date(),
+        ),
+      (created) => ({
+        action: AuditAction.PARENT_TOKEN_CREATED,
+        tokenId: created.id,
+        after: parentTokenAuditView(created),
+      }),
+    );
+    if (!record) {
+      throw new AppException({
+        code: ErrorCode.CONFLICT,
+        message: `Bitta studentda ${limit} tadan ortiq faol ota-ona tokeni bo'lishi mumkin emas`,
+        details: { limit },
+      });
+    }
+    return this.issuer.toCreatedResponse(record, generated.token);
+  }
+
+  async revoke(studentId: string, tokenId: string, actor: ActorContext): Promise<void> {
+    const revoked = await this.auditor.runAudited(
+      actor,
+      () => this.tokens.revoke({ tokenId, studentId, revokedById: actor.user.id, at: new Date() }),
+      (record) => ({
+        action: AuditAction.PARENT_TOKEN_REVOKED,
+        tokenId,
+        before: parentTokenAuditView(record),
+      }),
+    );
+    if (!revoked) {
+      throw new AppException({ code: ErrorCode.NOT_FOUND });
+    }
+    await this.validity.markRevoked(tokenId);
+  }
+
+  async regenerate(
+    studentId: string,
+    tokenId: string,
+    actor: ActorContext,
+  ): Promise<ParentTokenCreatedResponse> {
+    const generated = this.issuer.generate();
+    const result = await this.auditor.runAudited(
+      actor,
+      () =>
+        this.tokens.regenerate(
+          { tokenId, studentId, revokedById: actor.user.id, at: new Date() },
+          {
+            studentId,
+            tokenHash: generated.tokenHash,
+            tokenPrefix: generated.tokenPrefix,
+            createdById: actor.user.id,
+          },
+        ),
+      ({ revoked, created }) => ({
+        action: AuditAction.PARENT_TOKEN_REGENERATED,
+        tokenId: created.id,
+        before: { ...parentTokenAuditView(revoked), tokenId },
+        after: parentTokenAuditView(created),
+      }),
+    );
+    if (!result) {
+      throw new AppException({ code: ErrorCode.NOT_FOUND });
+    }
+    await this.validity.markRevoked(tokenId);
+    return this.issuer.toCreatedResponse(result.created, generated.token);
+  }
+
+  private async assertStudentExists(studentId: string): Promise<void> {
+    if (!(await this.users.findStudent(studentId))) {
+      throw new AppException({ code: ErrorCode.NOT_FOUND });
+    }
+  }
+}

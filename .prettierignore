@@ -1,0 +1,13 @@
+node_modules
+pnpm-lock.yaml
+dist
+build
+.next
+out
+coverage
+.turbo
+docs
+CLAUDE.md
+.claude
+apps/web/next-env.d.ts
+apps/api/src/infra/prisma/generated

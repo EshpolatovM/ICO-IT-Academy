@@ -90,7 +90,7 @@ Yuqori panel ma'lumotlari: `GET /me/summary` → `{xp, coin, streak, unreadNotif
 - **Amallar:** post yaratish (rasm yuklash), tahrirlash, o'chirish, like/unlike, komment yozish/o'chirish, shikoyat qilish.
 - **API:** `GET /blog/posts`, `GET /blog/posts/:id`, `POST /blog/posts`, `PATCH/DELETE /blog/posts/:id`, `POST/DELETE /blog/posts/:id/like`, `GET/POST /blog/posts/:id/comments`, `DELETE /blog/comments/:id`, `POST /blog/reports`, `POST /files/upload-url`.
 
-### 2.11 Mentor sahifasi — `/mentor`
+### 2.11 Mentor sahifasi — `/my-mentor` (S-69)
 Tablar:
 - **Chat** — mentor bilan 1:1 real-time chat. API: `GET /chat/conversations/me`, `GET /chat/conversations/:id/messages?cursor`, `POST /chat/conversations/:id/messages`, WS `chat:*`.
 - **Meetinglar** — kelgusi va o'tgan meetinglar, "Qo'shilish" tugmasi, o'z davomati. API: `GET /student/meetings`, `POST /meetings/:id/join-token`.

@@ -1,0 +1,64 @@
+# Dev muhit uchun tashqi servislar (S-68: podman compose).
+# Barcha qiymatlar .env dan olinadi (namuna: .env.example).
+name: ico-it-academy
+
+services:
+  postgres:
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: docker.io/library/redis:7-alpine
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes', '--requirepass', '${REDIS_PASSWORD}']
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - '127.0.0.1:${REDIS_PORT}:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli -a "$${REDIS_PASSWORD}" --no-auth-warning ping | grep -q PONG']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # Dev S3-compatible object storage: SeaweedFS (master + volume + filer + S3 bitta jarayonda).
+  # Admin kalitlari AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY env orqali beriladi.
+  s3:
+    image: docker.io/chrislusf/seaweedfs:4.51
+    restart: unless-stopped
+    command: ['server', '-dir=/data', '-s3', '-s3.port=8333', '-volume.max=0', '-ip.bind=0.0.0.0']
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY}
+    ports:
+      - '127.0.0.1:${S3_PORT}:8333'
+    volumes:
+      - s3_data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:8333/healthz']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  postgres_data:
+  redis_data:
+  s3_data:

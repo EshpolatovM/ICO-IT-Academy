@@ -1,0 +1,21 @@
+{
+  "path": ["apps", "packages"],
+  "format": ["typescript", "tsx", "javascript", "jsx"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.next/**",
+    "**/.turbo/**",
+    "**/coverage/**",
+    "**/*.d.ts"
+  ],
+  "minTokens": 50,
+  "minLines": 5,
+  "threshold": 3,
+  "mode": "mild",
+  "reporters": ["console"],
+  "gitignore": true,
+  "noTips": true,
+  "crossFormats": ["js-ts"]
+}

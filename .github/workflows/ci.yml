@@ -1,0 +1,134 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Sifat nazorati
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TURBO_TELEMETRY_DISABLED: '1'
+      # E2E testlar uchun (service konteynerlar; faqat CI, haqiqiy sir emas).
+      DATABASE_URL: postgresql://lms:lms_ci@localhost:5432/lms?schema=public
+      REDIS_URL: redis://localhost:6379/0
+      # Auth (faqat CI uchun soxta sir; muddatlar .env.example dagi S-12 taxmini bilan bir xil).
+      JWT_ACCESS_SECRET: ci-only-not-a-real-secret-0123456789abcdef
+      JWT_ACCESS_TTL_SECONDS: '900'
+      REFRESH_TTL_STUDENT_SECONDS: '2592000'
+      REFRESH_TTL_STAFF_SECONDS: '604800'
+      COOKIE_SECURE: 'false'
+      LOGIN_RATE_LIMIT_MAX_ATTEMPTS: '5'
+      LOGIN_RATE_LIMIT_WINDOW_SECONDS: '900'
+      LOGIN_IP_RATE_LIMIT_MAX_ATTEMPTS: '50'
+      LOGIN_IP_RATE_LIMIT_WINDOW_SECONDS: '900'
+      REFRESH_REUSE_GRACE_SECONDS: '30'
+      CHANGE_PASSWORD_RATE_LIMIT_MAX_ATTEMPTS: '5'
+      CHANGE_PASSWORD_RATE_LIMIT_WINDOW_SECONDS: '900'
+      # Ota-ona kirishi (faqat CI uchun soxta sirlar; raqamlar .env.example bilan bir xil).
+      WEB_BASE_URL: http://localhost:3000
+      PARENT_TOKEN_PEPPER: ci-only-not-a-real-pepper-0123456789abcdef
+      PARENT_COOKIE_KEY: Y2ktb25seS1ub3QtYS1yZWFsLWtleS0wMTIzNDU2Nzg=
+      PARENT_SESSION_TTL_SECONDS: '43200'
+      PARENT_TOKENS_COOKIE_MAX_AGE_SECONDS: '15552000'
+      PARENT_MAX_ACTIVE_TOKENS: '3'
+      PARENT_EXCHANGE_MAX_ATTEMPTS: '10'
+      PARENT_EXCHANGE_WINDOW_SECONDS: '900'
+      PARENT_EXCHANGE_MAX_FAILURES: '20'
+      PARENT_EXCHANGE_BLOCK_SECONDS: '3600'
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: lms
+          POSTGRES_PASSWORD: lms_ci
+          POSTGRES_DB: lms
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U lms -d lms"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # pnpm versiyasi ildizdagi package.json "packageManager" maydonidan olinadi (pnpm@10.34.9).
+      - name: pnpm o'rnatish
+        uses: pnpm/action-setup@v6
+
+      - name: Node.js 22
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Turbo kesh
+        uses: actions/cache@v6
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: turbo-${{ runner.os }}-
+
+      - name: Bog'liqliklarni o'rnatish
+        run: pnpm install --frozen-lockfile
+
+      # docs/13 §8 "Bog'liqliklar": high/critical zaiflik bo'lsa CI yiqiladi.
+      - name: Bog'liqliklar auditi (pnpm audit)
+        run: pnpm audit --audit-level high
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Takroriy kod (jscpd)
+        run: pnpm dup
+
+      - name: Arxitektura qoidalari (dependency-cruiser)
+        run: pnpm depcheck
+
+      - name: Testlar
+        run: pnpm test
+
+      - name: Migratsiyalar (e2e uchun)
+        run: pnpm --filter @lms/api db:migrate:deploy
+
+      # Web e2e (Playwright, apps/web/e2e): faqat Chromium; tizim kutubxonalari bilan.
+      - name: Playwright brauzeri
+        run: pnpm --filter @lms/web exec playwright install --with-deps chromium
+
+      - name: E2E testlar (PostgreSQL + Redis; API jest, so'ng web Playwright)
+        run: pnpm test:e2e
+
+      - name: Playwright hisoboti
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report
+          retention-days: 7
+
+      - name: Build
+        run: pnpm build

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "globalPassThroughEnv": [
+    "NODE_ENV",
+    "LOG_LEVEL",
+    "CI",
+    "DATABASE_URL",
+    "REDIS_URL",
+    "JWT_*",
+    "REFRESH_*",
+    "COOKIE_SECURE",
+    "LOGIN_*",
+    "CHANGE_PASSWORD_*",
+    "PARENT_*",
+    "TRUST_PROXY",
+    "API_*",
+    "WEB_*",
+    "E2E_*",
+    "PLAYWRIGHT_*",
+    "NEXT_DIST_DIR",
+    "SEED_*",
+    "SUPER_ADMIN_PASSWORD",
+    "S3_*"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build", "db:generate"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "@lms/web#build": {
+      "dependsOn": ["^build", "db:generate"],
+      "env": ["API_INTERNAL_URL", "NEXT_DIST_DIR"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "dependsOn": ["^build", "db:generate"],
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^build", "db:generate"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build", "db:generate"]
+    },
+    "test": {
+      "dependsOn": ["^build", "db:generate"],
+      "outputs": []
+    },
+    "test:e2e": {
+      "dependsOn": ["^build", "db:generate"],
+      "cache": false
+    },
+    "@lms/web#test:e2e": {
+      "dependsOn": ["^build", "@lms/api#db:generate", "@lms/api#test:e2e"],
+      "cache": false
+    },
+    "db:generate": {
+      "inputs": ["prisma/schema.prisma", "prisma.config.ts"],
+      "outputs": ["src/infra/prisma/generated/**"]
+    }
+  }
+}

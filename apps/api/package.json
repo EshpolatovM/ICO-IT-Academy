@@ -1,0 +1,74 @@
+{
+  "name": "@lms/api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "nest build",
+    "dev": "nest start --watch --exec \"node --env-file-if-exists=../../.env\"",
+    "start": "node --env-file-if-exists=../../.env dist/main.js",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "jest",
+    "test:e2e": "NODE_OPTIONS=--experimental-vm-modules jest --config test/jest-e2e.json --runInBand",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "create-super-admin": "tsx --env-file-if-exists=../../.env prisma/seed/create-super-admin.ts",
+    "e2e:web-users": "tsx --env-file-if-exists=../../.env test/support/web-e2e-users.ts"
+  },
+  "dependencies": {
+    "@lms/shared": "workspace:*",
+    "@nestjs/common": "11.2.9",
+    "@nestjs/core": "11.2.9",
+    "@nestjs/jwt": "11.0.2",
+    "@nestjs/platform-express": "11.2.9",
+    "@node-rs/argon2": "2.2.2",
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "cookie-parser": "1.4.7",
+    "helmet": "8.3.0",
+    "ioredis": "5.11.1",
+    "nestjs-pino": "5.3.1",
+    "pino": "10.4.0",
+    "pino-http": "11.0.0",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@lms/config": "workspace:*",
+    "@nestjs/cli": "11.0.24",
+    "@nestjs/testing": "11.2.9",
+    "@types/cookie-parser": "1.4.10",
+    "@types/express": "5.0.6",
+    "@types/jest": "30.0.0",
+    "@types/node": "22.20.5",
+    "@types/supertest": "7.2.1",
+    "eslint": "9.39.5",
+    "globals": "17.14.0",
+    "jest": "30.5.2",
+    "prisma": "7.10.1",
+    "supertest": "7.3.1",
+    "ts-jest": "29.4.15",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3"
+  },
+  "jest": {
+    "rootDir": "src",
+    "testEnvironment": "node",
+    "testRegex": ".*\\.spec\\.ts$",
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    }
+  }
+}

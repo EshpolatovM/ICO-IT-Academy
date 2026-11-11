@@ -1,0 +1,30 @@
+{
+  "name": "ico-it-academy",
+  "private": true,
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "dup": "jscpd --config .jscpd.json",
+    "depcheck": "depcruise apps/api/src apps/web/src packages/shared/src --config .dependency-cruiser.cjs",
+    "check": "pnpm lint && pnpm typecheck && pnpm dup && pnpm depcheck && pnpm test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "dependency-cruiser": "18.7.0",
+    "husky": "9.1.7",
+    "jscpd": "5.4.2",
+    "lint-staged": "17.6.0",
+    "prettier": "3.9.10",
+    "turbo": "2.11.10"
+  }
+}

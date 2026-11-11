@@ -34,6 +34,14 @@
 
 **Rol qisqartmalari:** `SA` super admin, `A` admin, `M` mentor (scope: o'z guruhi), `S` student (scope: o'zi), `P` ota-ona (scope: farzand), `PUB` public, `ANY` har qanday autentifikatsiyalangan foydalanuvchi.
 
+**RBAC deny-by-default (1.11a):** har bir endpointda `@Public()` (`PUB`), `@Roles(...)` yoki `@AnyAuthenticated()` (`ANY`) bo'lishi shart, aks holda `RolesGuard` 403 beradi; buni barcha route'larni aylanib chiquvchi test (`app.module.spec.ts`) tekshiradi.
+
+**Qo'shimcha xato qoidalari (1.11a):**
+- URL'dagi UUID parametr noto'g'ri — 400 `VALIDATION_ERROR`, `details: [{ field: "<parametr>", message }]`.
+- Auth va ota-ona so'rov sxemalari qat'iy (`z.strictObject`): noma'lum maydon — 400 `VALIDATION_ERROR`.
+- `401 REFRESH_SUPERSEDED` — `POST /auth/refresh` da token grace oynasi ichida almashtirilgan (02 §3).
+- Javoblarda xavfsizlik header'lari (helmet): `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`; HSTS faqat production'da.
+
 ---
 
 ## 1. Auth
@@ -43,10 +51,11 @@
 | POST | `/auth/staff/login` | PUB | |
 | POST | `/auth/student/login` | PUB | |
 | POST | `/auth/parent/exchange` | PUB | |
-| POST | `/auth/refresh` | cookie | Rotation |
-| POST | `/auth/logout` | ANY | |
+| POST | `/auth/refresh` | cookie | Rotation; grace ichida eski token — 401 `REFRESH_SUPERSEDED` (02 §3) |
+| POST | `/auth/logout` | ANY | `X-Requested-With` majburiy (CSRF), yo'q bo'lsa 403 |
+| POST | `/auth/parent/logout` | PUB (cookie + `X-Requested-With`) | Ota-ona chiqishi, sessiya talab qilinmaydi; `ps` va `parent_tokens` cookie'larini o'chiradi, 204 |
 | GET | `/auth/me` | ANY + P | |
-| POST | `/auth/change-password` | SA A M S | |
+| POST | `/auth/change-password` | SA A M S | Eski parol urinishlari limiti — 429 (02 §6) |
 | GET | `/auth/sessions` | SA A M S | |
 | DELETE | `/auth/sessions/:id` | SA A M S | |
 
@@ -76,7 +85,7 @@ POST /auth/parent/exchange
 Set-Cookie: ps=...; HttpOnly; Secure; SameSite=Strict
 Set-Cookie: parent_tokens=<shifrlangan>; HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth/parent; Max-Age=15552000
 ```
-Body'siz `POST /auth/parent/exchange` → cookie'dagi saqlangan tokenlar bo'yicha session yangilanadi (S-15, 02 §5.1).
+Body'siz `POST /auth/parent/exchange` → cookie'dagi saqlangan tokenlar bo'yicha session yangilanadi (S-15, 02 §5.1). Body ham, cookie ham bo'lmasa → 401, rate limitga sanalmaydi. Cookie bilan muvaffaqiyatli body'siz exchange ham rate limitga sanalmaydi (02 §5).
 
 ---
 
@@ -118,7 +127,7 @@ POST /students/0190.../parent-tokens
 { "label": "Onasi" }
 
 201
-{ "id": "0191...", "token": "k2Jd8...", "link": "https://app.example.uz/parent?t=k2Jd8...",
+{ "id": "0191...", "token": "k2Jd8...", "link": "https://app.example.uz/parent#t=k2Jd8...",
   "prefix": "k2Jd8x", "createdAt": "2026-11-10T08:00:00Z" }
 ```
 
