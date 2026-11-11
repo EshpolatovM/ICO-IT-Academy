@@ -25,7 +25,10 @@ async function issueParentToken(request: APIRequestContext): Promise<string> {
   return ((await created.json()) as ParentTokenCreatedResponse).token;
 }
 
-test("(e) ota-ona: havola → token URL'dan yo'qoladi → farzand kartochkasi → chiqish → kod formasi", async ({
+const EXCHANGE_PATH = '/api/v1/auth/parent/exchange';
+const ME_PATH = '/api/v1/auth/me';
+
+test("(e) ota-ona: havola → token URL'dan yo'qoladi → kartochka → qayta yuklash (exchange yo'q) → chiqish", async ({
   page,
   request,
 }) => {
@@ -38,6 +41,17 @@ test("(e) ota-ona: havola → token URL'dan yo'qoladi → farzand kartochkasi �
 
   const card = page.getByTestId('parent-child-card');
   await expect(card).toContainText(`${child.firstName} ${child.lastName}`);
+
+  // H3: `ps` amalda — qayta yuklashda faqat GET /auth/me, exchange CHAQIRILMAYDI (IP limiti to'lmaydi).
+  const apiPaths: string[] = [];
+  page.on('request', (request) => {
+    apiPaths.push(new URL(request.url()).pathname);
+  });
+  const reloaded = await page.reload();
+  expect(reloaded?.headers()['referrer-policy']).toBe('no-referrer');
+  await expect(card).toContainText(`${child.firstName} ${child.lastName}`);
+  expect(apiPaths).toContain(ME_PATH);
+  expect(apiPaths).not.toContain(EXCHANGE_PATH);
 
   await page.getByRole('button', { name: 'Chiqish' }).click();
   await expectPath(page, '/parent');

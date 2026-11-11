@@ -101,3 +101,17 @@ export function networkError(): ApiError {
 export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError;
 }
+
+/** Sessiya (yoki huquq) rad etilganini bildiruvchi holatlar — vaqtinchalik xatolardan farqli. */
+const SESSION_REJECTED_STATUSES: ReadonlySet<number> = new Set([
+  HttpStatus.UNAUTHORIZED,
+  HttpStatus.FORBIDDEN,
+]);
+
+/**
+ * Xato sessiya rad etilganini bildiradimi (401/403)? Tarmoq xatosi, 5xx, 429 — yo'q: ular
+ * vaqtinchalik, sessiya holati saqlanadi (M6).
+ */
+export function isSessionRejectedError(error: unknown): boolean {
+  return isApiError(error) && SESSION_REJECTED_STATUSES.has(error.status);
+}

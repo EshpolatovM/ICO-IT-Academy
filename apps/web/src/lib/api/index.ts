@@ -6,5 +6,5 @@ export {
   SERVER_ERROR_MIN_STATUS,
   UNKNOWN_ERROR_MESSAGE,
 } from './api.constants';
-export { ApiError, isApiError } from './api-error';
+export { ApiError, isApiError, isSessionRejectedError } from './api-error';
 export { refreshAccessToken } from './refresh-session';

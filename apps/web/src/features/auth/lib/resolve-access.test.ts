@@ -23,6 +23,12 @@ describe('resolveAccess', () => {
     expect(resolveAccess('guest', context)).toEqual({ type: 'wait' });
   });
 
+  it("tiklashda vaqtinchalik xato — unavailable (login sahifasiga yo'naltirilmaydi)", () => {
+    const context: AccessContext = { status: 'unavailable', user: null, lastRole: 'MENTOR' };
+    expect(resolveAccess('mentor', context)).toEqual({ type: 'unavailable' });
+    expect(resolveAccess('guest', context)).toEqual({ type: 'unavailable' });
+  });
+
   it.each([
     ['student', '/login'],
     ['mentor', '/login/staff'],

@@ -10,6 +10,8 @@ export type { FormTextFieldProps } from './components/FormTextField';
 export { FullPageSpinner } from './components/FullPageSpinner';
 export { LoginForm } from './components/LoginForm';
 export { LogoutButton } from './components/LogoutButton';
+export { SessionUnavailable } from './components/SessionUnavailable';
+export type { SessionUnavailableProps } from './components/SessionUnavailable';
 export { useCurrentUser } from './hooks/useCurrentUser';
 export { AuthPath, ROLE_HOME_PATH } from './lib/auth-paths';
 export type { AccountZone, GuardArea } from './types/auth.types';

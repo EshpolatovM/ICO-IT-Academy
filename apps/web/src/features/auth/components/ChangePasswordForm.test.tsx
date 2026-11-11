@@ -109,4 +109,21 @@ describe('ChangePasswordForm', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(replace).not.toHaveBeenCalled();
   });
+
+  it('urinishlar limiti (429 RATE_LIMITED) — formada umumiy xabar, sessiya saqlanadi', async () => {
+    fetchMock.mockResolvedValueOnce(
+      errorResponse(429, 'RATE_LIMITED', "So'rovlar juda ko'p, birozdan keyin urinib ko'ring"),
+    );
+    renderWithQuery(<ChangePasswordForm />);
+
+    await fill('wrong-old1', 'Yangi1parol', 'Yangi1parol');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent("So'rovlar juda ko'p");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(replace).not.toHaveBeenCalled();
+    expect(useAuthStore.getState()).toMatchObject({
+      status: 'authenticated',
+      accessToken: 'old-token',
+    });
+  });
 });

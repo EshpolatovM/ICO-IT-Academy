@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react';
 
-import { FullPageSpinner } from '@/features/auth';
+import { FullPageSpinner, SessionUnavailable } from '@/features/auth';
 
 import { useParentBootstrap } from '../hooks/useParentBootstrap';
 
@@ -11,9 +11,12 @@ import { ParentSignIn } from './ParentSignIn';
 import type { ReactNode } from 'react';
 
 function ParentAccessGateInner({ children }: { children: ReactNode }) {
-  const status = useParentBootstrap();
+  const { status, retry } = useParentBootstrap();
   if (status === 'unknown') {
     return <FullPageSpinner />;
+  }
+  if (status === 'unavailable') {
+    return <SessionUnavailable onRetry={retry} />;
   }
   if (status === 'none') {
     return <ParentSignIn />;
@@ -23,7 +26,7 @@ function ParentAccessGateInner({ children }: { children: ReactNode }) {
 
 /**
  * Ota-ona zonasi guard'i: sessiya tekshirilguncha `Spinner`, sessiya bo'lmasa — kod kiritish
- * formasi, bo'lsa — panel. `useSearchParams` uchun `Suspense` chegarasi shu yerda.
+ * formasi, server bilan aloqa bo'lmasa — "Qayta urinish", bo'lsa — panel. `useSearchParams` uchun `Suspense` chegarasi shu yerda.
  */
 export function ParentAccessGate({ children }: { children: ReactNode }) {
   return (

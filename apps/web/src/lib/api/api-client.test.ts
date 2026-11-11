@@ -179,6 +179,19 @@ describe('apiRequest', () => {
     expect(state.lastRole).toBe('MENTOR');
   });
 
+  it("refresh vaqtinchalik xato (5xx) — so'rov SERVICE_UNAVAILABLE bilan tushadi, sessiya saqlanadi", async () => {
+    useAuthStore.getState().setSession('old', USER);
+    fetchMock
+      .mockResolvedValueOnce(errorResponse(401, 'UNAUTHORIZED', 'Avtorizatsiya talab qilinadi'))
+      .mockResolvedValueOnce(new Response('Bad Gateway', { status: 502 }));
+
+    await expect(apiRequest('/data')).rejects.toMatchObject({
+      code: ErrorCode.SERVICE_UNAVAILABLE,
+    });
+
+    expect(useAuthStore.getState()).toMatchObject({ status: 'authenticated', accessToken: 'old' });
+  });
+
   it("token'siz (yoki `auth: false`) so'rovdagi 401 — refresh qilinmaydi", async () => {
     fetchMock.mockResolvedValue(errorResponse(401, 'UNAUTHORIZED', "Login yoki parol noto'g'ri"));
 

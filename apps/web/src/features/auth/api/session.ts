@@ -1,7 +1,7 @@
 import { Role } from '@lms/shared';
 import type { AuthUser, MeResponse } from '@lms/shared';
 
-import { refreshAccessToken } from '@/lib/api';
+import { isSessionRejectedError, refreshAccessToken } from '@/lib/api';
 import { useAuthStore } from '@/stores/auth.store';
 
 import { authApi } from './auth.api';
@@ -23,13 +23,17 @@ export async function loadSessionUser(): Promise<AuthUser | null> {
 }
 
 async function performRestore(): Promise<void> {
-  if ((await refreshAccessToken()) === null) {
-    return;
-  }
   try {
-    await loadSessionUser();
-  } catch (_error) {
-    useAuthStore.getState().clear();
+    if ((await refreshAccessToken()) !== null) {
+      await loadSessionUser();
+    }
+  } catch (error) {
+    const store = useAuthStore.getState();
+    if (isSessionRejectedError(error)) {
+      store.clear();
+    } else {
+      store.markUnavailable();
+    }
   }
 }
 
@@ -38,7 +42,8 @@ let inflightRestore: Promise<void> | null = null;
 /**
  * Sahifa yangilanganda sessiyani tiklash (docs/02 §3): access token faqat xotirada, shuning uchun
  * `rt` cookie bilan `POST /auth/refresh` → `GET /auth/me`. Single-flight: bir vaqtda bir nechta
- * guard (yoki React StrictMode'ning qayta effektlari) bitta tiklashni kutadi.
+ * guard (yoki React StrictMode'ning qayta effektlari) bitta tiklashni kutadi. Sessiya rad etilsa
+ * (401/403) — `anonymous`; vaqtinchalik xato (tarmoq, 5xx) — `unavailable` (M6).
  */
 export function restoreSession(): Promise<void> {
   inflightRestore ??= performRestore().finally(() => {

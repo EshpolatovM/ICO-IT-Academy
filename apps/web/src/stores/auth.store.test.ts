@@ -57,6 +57,18 @@ describe('auth.store', () => {
     });
   });
 
+  it('markUnavailable / retryRestore — faqat tiklash bosqichida (unknown ⇄ unavailable)', () => {
+    const store = useAuthStore.getState();
+    store.markUnavailable();
+    expect(useAuthStore.getState().status).toBe('unavailable');
+    store.retryRestore();
+    expect(useAuthStore.getState().status).toBe('unknown');
+
+    store.setSession('t1', STUDENT);
+    store.markUnavailable();
+    expect(useAuthStore.getState().status).toBe('authenticated');
+  });
+
   it('token brauzer xotirasiga (localStorage/sessionStorage) yozilmaydi', () => {
     useAuthStore.getState().setSession('secret-token', STUDENT);
 

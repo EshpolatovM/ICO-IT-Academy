@@ -21,6 +21,7 @@ export interface AccessContext {
 
 const WAIT: GuardDecision = { type: 'wait' };
 const ALLOW: GuardDecision = { type: 'allow' };
+const UNAVAILABLE: GuardDecision = { type: 'unavailable' };
 
 function redirect(to: string): GuardDecision {
   return { type: 'redirect', to };
@@ -52,6 +53,7 @@ function resolveAuthenticated(area: GuardArea, user: AuthUser): GuardDecision {
 /**
  * Route guard mantig'i (sof funksiya):
  * - sessiya tiklanmoqda → kutish (Spinner);
+ * - tiklashda vaqtinchalik xato → `unavailable` (xato + "Qayta urinish", login sahifasiga emas);
  * - sessiya yo'q → zonaning login sahifasi (student → `/login`, staff → `/login/staff`);
  * - `mustChangePassword` → har qanday himoyalangan sahifadan `/change-password`;
  * - noto'g'ri rol → o'z bosh sahifasi; login sahifasiga kirgan foydalanuvchi → bosh sahifasi.
@@ -59,6 +61,9 @@ function resolveAuthenticated(area: GuardArea, user: AuthUser): GuardDecision {
 export function resolveAccess(area: GuardArea, context: AccessContext): GuardDecision {
   if (context.status === 'unknown') {
     return WAIT;
+  }
+  if (context.status === 'unavailable') {
+    return UNAVAILABLE;
   }
   if (context.status === 'anonymous' || context.user === null) {
     return resolveAnonymous(area, context.lastRole);

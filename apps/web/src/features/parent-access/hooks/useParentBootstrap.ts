@@ -2,7 +2,7 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { PARENT_LINK_TOKEN_PARAM } from '@lms/shared';
 
@@ -10,13 +10,19 @@ import { useParentSessionStore } from '@/stores/parent-session.store';
 import type { ParentSessionStatus } from '@/stores/parent-session.store';
 
 import { parentQueryKeys } from '../api/parent-query-keys';
-import { startParentSession, toParentMe } from '../api/parent-session';
+import { startParentSession } from '../api/parent-session';
+
+export interface ParentBootstrap {
+  status: ParentSessionStatus;
+  /** `unavailable` holatidan: sessiyani tekshirishni qaytadan boshlaydi. */
+  retry: () => void;
+}
 
 /**
  * Ota-ona sahifasi ochilganda: `?t=` token URL'dan DARHOL olib tashlanadi (`router.replace`,
  * docs/02 §4.5), so'ng sessiya boshlanadi. Bir marta ishlaydi (StrictMode'da ham — `ref`).
  */
-export function useParentBootstrap(): ParentSessionStatus {
+export function useParentBootstrap(): ParentBootstrap {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -33,13 +39,24 @@ export function useParentBootstrap(): ParentSessionStatus {
       return;
     }
     startedRef.current = true;
-    void startParentSession(linkToken).then((result) => {
-      if (result !== null) {
-        queryClient.setQueryData(parentQueryKeys.me, toParentMe(result));
-      }
-      useParentSessionStore.getState().setStatus(result === null ? 'none' : 'active');
-    });
+    const store = useParentSessionStore.getState();
+    startParentSession(linkToken).then(
+      (me) => {
+        if (me !== null) {
+          queryClient.setQueryData(parentQueryKeys.me, me);
+        }
+        store.setStatus(me === null ? 'none' : 'active');
+      },
+      () => {
+        store.setStatus('unavailable');
+      },
+    );
   }, [pathname, queryClient, router, searchParams, status]);
 
-  return status;
+  const retry = useCallback(() => {
+    startedRef.current = false;
+    useParentSessionStore.getState().setStatus('unknown');
+  }, []);
+
+  return { status, retry };
 }

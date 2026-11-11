@@ -2,11 +2,12 @@ import { create } from 'zustand';
 
 /**
  * Ota-ona sessiyasi (`ps` cookie, HttpOnly — JS uni ko'rmaydi), shuning uchun faqat client holati:
- * - `unknown` — hali tekshirilmagan (body'siz exchange kutilmoqda);
+ * - `unknown` — hali tekshirilmagan (`GET /auth/me` / body'siz exchange kutilmoqda);
  * - `active` — sessiya bor, farzandlar ko'rsatiladi;
- * - `none` — sessiya yo'q, token kiritish formasi.
+ * - `none` — sessiya yo'q, token kiritish formasi;
+ * - `unavailable` — tekshirib bo'lmadi (tarmoq, 5xx): xato va "Qayta urinish".
  */
-export type ParentSessionStatus = 'unknown' | 'active' | 'none';
+export type ParentSessionStatus = 'unknown' | 'active' | 'none' | 'unavailable';
 
 export interface ParentSessionState {
   status: ParentSessionStatus;

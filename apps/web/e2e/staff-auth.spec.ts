@@ -58,4 +58,25 @@ test.describe('Xodim kirishi', () => {
     );
     await expectPath(page, '/login/staff');
   });
+
+  test('(h) bir nechta tab bir vaqtda sessiyani tiklaydi — hech biri chiqarib yuborilmaydi (H2)', async ({
+    page,
+    context,
+  }) => {
+    const { admin, password } = e2eUsers();
+    await loginAsStaff(page, admin, password);
+    await expectPath(page, '/admin');
+
+    // Har bir yangi tab access token'siz ochiladi va bir vaqtda `POST /auth/refresh` qiladi.
+    const tabs = await Promise.all([context.newPage(), context.newPage(), context.newPage()]);
+    await Promise.all(tabs.map((tab) => tab.goto('/admin')));
+    for (const tab of [...tabs, page]) {
+      await expectPath(tab, '/admin');
+      await expect(tab.getByRole('button', { name: 'Chiqish' })).toBeVisible();
+    }
+
+    await page.reload();
+    await expectPath(page, '/admin');
+    await expect(page.getByRole('button', { name: 'Chiqish' })).toBeVisible();
+  });
 });

@@ -5,9 +5,11 @@ import type { AccountRole, AuthUser } from '@lms/shared';
 /**
  * - `unknown` — sessiya hali tiklanmagan (sahifa yangi ochilgan, `POST /auth/refresh` kutilmoqda);
  * - `authenticated` — access token va foydalanuvchi identifikatsiyasi bor;
- * - `anonymous` — sessiya yo'q yoki tugagan (login sahifasiga).
+ * - `anonymous` — sessiya yo'q yoki tugagan (login sahifasiga);
+ * - `unavailable` — sessiyani tiklab bo'lmadi: vaqtinchalik xato (tarmoq, 5xx). Sessiya rad
+ *   etilmagan, shuning uchun login sahifasiga emas — xato va "Qayta urinish" ko'rsatiladi (M6).
  */
-export type AuthStatus = 'unknown' | 'authenticated' | 'anonymous';
+export type AuthStatus = 'unknown' | 'authenticated' | 'anonymous' | 'unavailable';
 
 export interface AuthState {
   status: AuthStatus;
@@ -23,6 +25,10 @@ export interface AuthState {
   setSession: (accessToken: string, user: AuthUser) => void;
   setAccessToken: (accessToken: string) => void;
   clear: () => void;
+  /** Sessiyani tiklash vaqtinchalik xato bilan tugadi (`unknown` → `unavailable`). */
+  markUnavailable: () => void;
+  /** "Qayta urinish": `unavailable` → `unknown` (guard tiklashni qaytadan boshlaydi). */
+  retryRestore: () => void;
 }
 
 const INITIAL_STATE = { status: 'unknown', accessToken: null, user: null, lastRole: null } as const;
@@ -43,6 +49,12 @@ export const useAuthStore = create<AuthState>()((set) => ({
       user: null,
       lastRole: state.user?.role ?? state.lastRole,
     }));
+  },
+  markUnavailable: () => {
+    set((state) => (state.status === 'unknown' ? { status: 'unavailable' } : {}));
+  },
+  retryRestore: () => {
+    set((state) => (state.status === 'unavailable' ? { status: 'unknown' } : {}));
   },
 }));
 

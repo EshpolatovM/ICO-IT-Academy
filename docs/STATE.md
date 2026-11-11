@@ -7,9 +7,9 @@
 | Maydon | Qiymat |
 |---|---|
 | Joriy modul | 1-bosqich: Poydevor (reja tasdiqlangan 2026-11-10) |
-| Joriy bosqich | 1.11a yakunlandi (api e2e 170/170); 1.11b frontend (`birchka-frontend`) boshlanmoqda |
+| Joriy bosqich | **1-bosqich (Poydevor) yakunlandi** — barcha tekshiruvlar yashil; `main` ga merge uchun egasining ruxsati kutilmoqda |
 | Joriy git branch | `feature/01-poydevor` |
-| Ish rejimi | **2026-11-11 kechasi: avtonom** — egasi uxlayapti, savol so'ralmaydi, Tech Lead o'zi hal qiladi; 1-bosqich oxirigacha (1.8c → 1.8d → 1.9 → 1.10 + tuzatishlar), har vazifadan keyin commit; oxirida bitta hisobot `docs/HISOBOT-2026-11-11.md`. `main` ga merge, 2-bosqich, baza o'chirish — QILINMAYDI. Egasi qaytgach rejim yana "sekin". |
+| Ish rejimi | Sekin: har bir vazifadan keyin hisobot va "Davom etaymi?" (tungi avtonom rejim 2026-11-11 tugadi; hisobot: `docs/HISOBOT-2026-11-11.md`) |
 
 ## Egasining qarorlari (2026-11-10, "ha")
 - MinIO image'i yo'q → dev muhitda S3-compatible **SeaweedFS** ishlatiladi (egasi "ha"; 1.2b da bajarildi).
@@ -29,12 +29,16 @@
 - Agentlarga ism berildi: usta-baza (DB), oga-backend, rassom-dizayner (UI), birchka-frontend, sinchkov-tester (QA), domla-reviewer (review).
 
 ## Oxirgi bajarilgan vazifa
-**1.11a — review tuzatishlari, backend** (`oga-backend`): H1–H5, M1–M5, L1–L3, L5, L7, L8, L10, UUID xato formati, turbo passThroughEnv, `next-env.d.ts` gitignore + `next typegen`. `pnpm check` yashil (api 319, web 94). Tech Lead qayta yurgizganda api e2e: 169/170 — `test/auth-login.e2e-spec.ts` "noto'g'ri parol, noma'lum telefon va INACTIVE — bir xil 401" testida 429 keldi (ehtimol yangi IP umumiy login limiti `auth:login-ip:*` ketma-ket ishga tushirishlarda to'planadi; agent 3 marta yashil ko'rgan). Limit tugagani uchun commit WIP sifatida qilindi.
+**1.11b — review tuzatishlari, frontend** (`birchka-frontend`, Tech Lead tekshirdi): Web Locks bilan tablararo refresh qulfi + `REFRESH_SUPERSEDED` retry, ota-ona bootstrap avval `GET /auth/me`, `next.config.ts` xavfsizlik header'lari (to'liq CSP keyinga), vaqtinchalik xatoda logout yo'q (`unavailable` holati + "Qayta urinish"). Yakuniy tekshiruv (Tech Lead): `pnpm check` (api 319, web 109), `format:check`, `pnpm build`, `pnpm test:e2e` (api 170, Playwright 9) — hammasi yashil.
 
 ## Keyingi aniq vazifa
-1. ✅ e2e 429 tuzatildi (sabab: testda doimiy telefon `+998770000000`, `ip+login` kaliti ishga tushirishlar orasida to'planardi → `randomTestPhone()`).
-2. `docs/tasks/01-1.11b-review-tuzatish-frontend.md` oxiridagi "1.11a natijasi" bo'limini to'ldirib `birchka-frontend`ga berish (REFRESH_SUPERSEDED, logout CSRF, strict sxemalar, UUID VALIDATION_ERROR, next typegen — PROGRESS.md 1.11a yozuvida).
-3. Yakuniy: `pnpm check`, `pnpm format:check`, `pnpm test:e2e` (api + Playwright), `docs/HISOBOT-2026-11-11.md` ni yakunlash.
+1. Egasidan `feature/01-poydevor` → `main` merge ruxsatini olish (ruxsatdan keyin: `git checkout main && git merge --no-ff feature/01-poydevor`).
+2. 2-bosqich (Admin asosi: foydalanuvchilar va guruhlar) rejasini egasiga ko'rsatish — avval S-01/S-02 javoblari kerak.
+
+## Egasi qarori kutilayotgan (1-bosqichdan)
+- L6: ota-ona havolasi `?t=` yoki `#t=` (server loglariga tushmasligi uchun).
+- To'liq CSP (nonce, middleware) — qachon (deploy bosqichida tavsiya).
+- postcss override (`next>postcss` 8.5.32) — ma'lumot uchun.
 
 ## 2-bosqich uchun eslatmalar
 - `RoleBasedStudentScopeResolver` MENTOR tarmog'i → `group_members` asosida (scope tashqarisi 404).

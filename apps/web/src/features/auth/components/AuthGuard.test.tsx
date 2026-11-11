@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AuthUser } from '@lms/shared';
@@ -21,6 +22,14 @@ const MENTOR: AuthUser = {
   mustChangePassword: false,
 };
 
+function renderMentorGuard() {
+  return render(
+    <AuthGuard area="mentor">
+      <p>Mentor kontenti</p>
+    </AuthGuard>,
+  );
+}
+
 describe('AuthGuard', () => {
   let fetchMock: FetchMock;
 
@@ -39,11 +48,7 @@ describe('AuthGuard', () => {
       .mockResolvedValueOnce(jsonResponse(200, { accessToken: 'restored', expiresIn: 900 }))
       .mockResolvedValueOnce(jsonResponse(200, MENTOR));
 
-    render(
-      <AuthGuard area="mentor">
-        <p>Mentor kontenti</p>
-      </AuthGuard>,
-    );
+    renderMentorGuard();
 
     expect(screen.getByTestId('full-page-spinner')).toBeInTheDocument();
     expect(await screen.findByText('Mentor kontenti')).toBeInTheDocument();
@@ -66,6 +71,24 @@ describe('AuthGuard', () => {
       expect(replace).toHaveBeenCalledWith('/login/staff');
     });
     expect(screen.queryByText('Admin kontenti')).not.toBeInTheDocument();
+  });
+
+  it('tiklashda tarmoq xatosi — login\'ga emas, "Qayta urinish"; qayta urinishda kontent', async () => {
+    fetchMock
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      .mockResolvedValueOnce(jsonResponse(200, { accessToken: 'restored', expiresIn: 900 }))
+      .mockResolvedValueOnce(jsonResponse(200, MENTOR));
+
+    renderMentorGuard();
+
+    expect(await screen.findByTestId('session-unavailable')).toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
+    expect(useAuthStore.getState().status).toBe('unavailable');
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Qayta urinish' }));
+
+    expect(await screen.findByText('Mentor kontenti')).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
   it("noto'g'ri rol — o'z bosh sahifasiga", async () => {

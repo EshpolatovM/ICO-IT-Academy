@@ -134,3 +134,9 @@ Yangi yozuvlar pastga qo'shiladi.
 ## 2026-11-11 — 1.11a yakuni: e2e izolyatsiyasi
 - **Nima qilindi:** `auth-login.e2e-spec.ts` da noma'lum foydalanuvchi uchun doimiy telefon o'rniga `randomTestPhone()` (ishga tushirishlar orasida `ip+login` limiti to'planardi). Mahsulot kodida bug yo'q.
 - **Testlar:** api e2e 170/170 (agent 7 marta, Tech Lead 1 marta), `pnpm check` yashil.
+
+## 2026-11-11 — 1.11b va 1-bosqich yakuni
+- **Nima qilindi:** frontend review tuzatishlari (H2 Web Locks + SUPERSEDED retry, H3 parent bootstrap `me` birinchi, H5 header'lar, M6 `unavailable` holati), Playwright 9 ssenariy.
+- **Fayllar:** `apps/web/{next.config.ts,src/lib/api/**,src/stores/**,src/features/{auth,parent-access}/**,e2e/**}`.
+- **Yakuniy testlar (Tech Lead):** `pnpm check` (api 319, web 109), `format:check`, `pnpm build`, `pnpm test:e2e` (api 170, Playwright 9) — yashil.
+- **Holat:** 1-bosqich yakunlandi, `main` ga merge egasining ruxsatini kutmoqda.
