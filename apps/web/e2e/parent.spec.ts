@@ -8,8 +8,10 @@ import { e2eUsers } from './support/e2e-users';
 
 import type { APIRequestContext } from '@playwright/test';
 
-/** Admin API orqali farzandga ota-ona tokeni yaratadi (docs/02 §4.4). */
-async function issueParentToken(request: APIRequestContext): Promise<string> {
+/** Admin API orqali farzandga ota-ona tokeni yaratadi (docs/02 §4.4); havola `#t=` (S-70). */
+async function issueParentToken(
+  request: APIRequestContext,
+): Promise<Pick<ParentTokenCreatedResponse, 'token' | 'link'>> {
   const { admin, child, password } = e2eUsers();
   const login = await request.post(`${E2E_API_URL}/api/v1/auth/staff/login`, {
     data: { phone: admin.login, password },
@@ -22,7 +24,8 @@ async function issueParentToken(request: APIRequestContext): Promise<string> {
     data: { label: 'E2E' },
   });
   expect(created.status()).toBe(201);
-  return ((await created.json()) as ParentTokenCreatedResponse).token;
+  const { token, link } = (await created.json()) as ParentTokenCreatedResponse;
+  return { token, link };
 }
 
 const EXCHANGE_PATH = '/api/v1/auth/parent/exchange';
@@ -33,11 +36,16 @@ test("(e) ota-ona: havola → token URL'dan yo'qoladi → kartochka → qayta yu
   request,
 }) => {
   const { child } = e2eUsers();
-  const token = await issueParentToken(request);
+  const { token, link } = await issueParentToken(request);
+  const linkUrl = new URL(link);
+  expect(linkUrl.pathname).toBe('/parent');
+  expect(linkUrl.search).toBe('');
+  expect(linkUrl.hash).toBe(`#t=${token}`);
 
-  await page.goto(`/parent?t=${token}`);
+  await page.goto(`${linkUrl.pathname}${linkUrl.hash}`);
   await expectPath(page, '/parent');
   await expect.poll(() => page.url()).not.toContain(token);
+  await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('');
 
   const card = page.getByTestId('parent-child-card');
   await expect(card).toContainText(`${child.firstName} ${child.lastName}`);

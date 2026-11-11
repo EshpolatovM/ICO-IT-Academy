@@ -33,6 +33,7 @@ const OTHER_TOKEN = 'Zz9_'.padEnd(43, 'y');
 const CHILD = { studentId: 's1', firstName: 'Ali', lastName: 'Valiyev', groupName: null };
 const EXCHANGE_URL = '/api/v1/auth/parent/exchange';
 const ME_URL = '/api/v1/auth/me';
+const PARENT_PATH = '/parent';
 const NO_SESSION = (): Response =>
   errorResponse(401, 'UNAUTHORIZED', 'Avtorizatsiya talab qilinadi');
 
@@ -55,6 +56,7 @@ describe('ParentAccessGate', () => {
     resetParentSessionStore();
     navigation.replace.mockReset();
     navigation.search = new URLSearchParams();
+    window.history.replaceState(null, '', PARENT_PATH);
     fetchMock = mockFetch();
   });
 
@@ -76,6 +78,35 @@ describe('ParentAccessGate', () => {
     expect(requestJson(init)).toEqual({ tokens: [TOKEN], merge: true });
     expect(requestHeader(init, 'Authorization')).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("#t= token (S-70) URL'dan darhol tozalanadi va {tokens:[t], merge:true} bilan exchange qilinadi", async () => {
+    window.history.replaceState(null, '', `${PARENT_PATH}#t=${TOKEN}`);
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, { children: [CHILD] }));
+
+    renderGate();
+
+    expect(window.location.hash).toBe('');
+    expect(window.location.href).not.toContain(TOKEN);
+    expect(window.location.pathname).toBe(PARENT_PATH);
+    expect(navigation.replace).not.toHaveBeenCalled();
+    expect(await screen.findByText('Ali Valiyev')).toBeInTheDocument();
+    expect(fetchCall(fetchMock, 0).url).toBe(EXCHANGE_URL);
+    expect(requestJson(fetchCall(fetchMock, 0).init)).toEqual({ tokens: [TOKEN], merge: true });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("fragment ham, query ham bo'lsa — fragment ustun, ikkalasi ham URL'dan yo'qoladi", async () => {
+    window.history.replaceState(null, '', `${PARENT_PATH}?t=${OTHER_TOKEN}#t=${TOKEN}`);
+    navigation.search = new URLSearchParams({ t: OTHER_TOKEN });
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, { children: [CHILD] }));
+
+    renderGate();
+
+    expect(window.location.href).not.toContain(TOKEN);
+    expect(window.location.href).not.toContain(OTHER_TOKEN);
+    expect(await screen.findByText('Ali Valiyev')).toBeInTheDocument();
+    expect(requestJson(fetchCall(fetchMock, 0).init)).toEqual({ tokens: [TOKEN], merge: true });
   });
 
   it('`ps` sessiyasi amalda — faqat GET /auth/me, exchange CHAQIRILMAYDI (H3)', async () => {
@@ -139,20 +170,42 @@ describe('ParentAccessGate', () => {
     });
   });
 
-  it("havoladagi token formati buzilgan — so'rov yuborilmaydi, xabar va body'siz exchange", async () => {
-    navigation.search = new URLSearchParams({ t: 'short' });
-    fetchMock
-      .mockResolvedValueOnce(NO_SESSION())
-      .mockResolvedValueOnce(errorResponse(401, 'UNAUTHORIZED', "Kirish kodi noto'g'ri"));
+  it.each([
+    {
+      source: '#t=',
+      openLink: () => {
+        window.history.replaceState(null, '', `${PARENT_PATH}#t=short`);
+      },
+      expectCleaned: () => {
+        expect(window.location.hash).toBe('');
+      },
+    },
+    {
+      source: '?t=',
+      openLink: () => {
+        navigation.search = new URLSearchParams({ t: 'short' });
+      },
+      expectCleaned: () => {
+        expect(navigation.replace).toHaveBeenCalledWith(PARENT_PATH);
+      },
+    },
+  ])(
+    "$source havoladagi token formati buzilgan — so'rov yuborilmaydi, URL tozalanadi, body'siz exchange",
+    async ({ openLink, expectCleaned }) => {
+      openLink();
+      fetchMock
+        .mockResolvedValueOnce(NO_SESSION())
+        .mockResolvedValueOnce(errorResponse(401, 'UNAUTHORIZED', "Kirish kodi noto'g'ri"));
 
-    renderGate();
+      renderGate();
 
-    expect(navigation.replace).toHaveBeenCalledWith('/parent');
-    expect(await screen.findByText(/Havola noto'g'ri/)).toBeInTheDocument();
-    await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledTimes(2);
-    });
-    expect(calledUrls(fetchMock)).toEqual([ME_URL, EXCHANGE_URL]);
-    expect(fetchCall(fetchMock, 1).init.body).toBeUndefined();
-  });
+      expectCleaned();
+      expect(await screen.findByText(/Havola noto'g'ri/)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+      });
+      expect(calledUrls(fetchMock)).toEqual([ME_URL, EXCHANGE_URL]);
+      expect(fetchCall(fetchMock, 1).init.body).toBeUndefined();
+    },
+  );
 });

@@ -140,3 +140,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Fayllar:** `apps/web/{next.config.ts,src/lib/api/**,src/stores/**,src/features/{auth,parent-access}/**,e2e/**}`.
 - **Yakuniy testlar (Tech Lead):** `pnpm check` (api 319, web 109), `format:check`, `pnpm build`, `pnpm test:e2e` (api 170, Playwright 9) — yashil.
 - **Holat:** 1-bosqich yakunlandi, `main` ga merge egasining ruxsatini kutmoqda.
+
+## 2026-11-11 — S-70, 1-bosqich merge, 2-bosqich boshlandi (to'liq avtonom rejim)
+- **Qarorlar (Tech Lead, egasi to'liq vakolat bergan):** S-01 B (bir nechta yo'l, guruh orqali), S-02 A (bitta faol guruh), S-03 A (bitta mentor), S-70 (ota-ona havolasi `#t=`).
+- **Nima qilindi:** S-70 backend + shared helper + frontend; `feature/01-poydevor` → `main` (`--no-ff`); `feature/02-admin-asosi` ochildi; 2-bosqich rejasi `docs/tasks/02-reja.md`.
+- **Testlar:** `pnpm check` (web 117), api e2e 170, Playwright 9 — yashil.

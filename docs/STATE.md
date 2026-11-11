@@ -6,10 +6,10 @@
 
 | Maydon | Qiymat |
 |---|---|
-| Joriy modul | 1-bosqich: Poydevor (reja tasdiqlangan 2026-11-10) |
-| Joriy bosqich | **1-bosqich (Poydevor) yakunlandi** — barcha tekshiruvlar yashil; `main` ga merge uchun egasining ruxsati kutilmoqda |
-| Joriy git branch | `feature/01-poydevor` |
-| Ish rejimi | Sekin: har bir vazifadan keyin hisobot va "Davom etaymi?" (tungi avtonom rejim 2026-11-11 tugadi; hisobot: `docs/HISOBOT-2026-11-11.md`) |
+| Joriy modul | 2-bosqich: Admin asosi — foydalanuvchilar va guruhlar (reja: `docs/tasks/02-reja.md`) |
+| Joriy bosqich | 1-bosqich `main` ga merge qilindi (2026-11-11); 2.1 baza (`usta-baza`) boshlanmoqda |
+| Joriy git branch | `feature/02-admin-asosi` |
+| Ish rejimi | **To'liq avtonom** (egasi 2026-11-11: savol berma, tasdiq kutma, Tech Lead o'zi qaror qiladi; faqat haqiqiy xavfli amallarda to'xtash). Har vazifadan keyin commit + STATE/PROGRESS; hisobot `docs/HISOBOT-*.md` |
 
 ## Egasining qarorlari (2026-11-10, "ha")
 - MinIO image'i yo'q → dev muhitda S3-compatible **SeaweedFS** ishlatiladi (egasi "ha"; 1.2b da bajarildi).
@@ -29,16 +29,10 @@
 - Agentlarga ism berildi: usta-baza (DB), oga-backend, rassom-dizayner (UI), birchka-frontend, sinchkov-tester (QA), domla-reviewer (review).
 
 ## Oxirgi bajarilgan vazifa
-**1.11b — review tuzatishlari, frontend** (`birchka-frontend`, Tech Lead tekshirdi): Web Locks bilan tablararo refresh qulfi + `REFRESH_SUPERSEDED` retry, ota-ona bootstrap avval `GET /auth/me`, `next.config.ts` xavfsizlik header'lari (to'liq CSP keyinga), vaqtinchalik xatoda logout yo'q (`unavailable` holati + "Qayta urinish"). Yakuniy tekshiruv (Tech Lead): `pnpm check` (api 319, web 109), `format:check`, `pnpm build`, `pnpm test:e2e` (api 170, Playwright 9) — hammasi yashil.
+**S-70** — ota-ona havolasi `#t=` (backend `buildParentLink`, shared `parseParentLinkFragment`, frontend fragmentdan o'qib `history.replaceState` bilan tozalaydi, `?t=` orqaga moslik). **1-bosqich `main` ga merge qilindi** (`--no-ff`). S-01 B, S-02 A, S-03 A — Tech Lead qarori.
 
 ## Keyingi aniq vazifa
-1. Egasidan `feature/01-poydevor` → `main` merge ruxsatini olish (ruxsatdan keyin: `git checkout main && git merge --no-ff feature/01-poydevor`).
-2. 2-bosqich (Admin asosi: foydalanuvchilar va guruhlar) rejasini egasiga ko'rsatish — avval S-01/S-02 javoblari kerak.
-
-## Egasi qarori kutilayotgan (1-bosqichdan)
-- L6: ota-ona havolasi `?t=` yoki `#t=` (server loglariga tushmasligi uchun).
-- To'liq CSP (nonce, middleware) — qachon (deploy bosqichida tavsiya).
-- postcss override (`next>postcss` 8.5.32) — ma'lumot uchun.
+**2.1 — baza** (`usta-baza`, `docs/tasks/02-2.1-baza.md`): `learning_paths`, `groups`, `group_members`, dev seed (1 yo'l, 1 guruh, seed mentor, `ST-10001`). Keyin 2.2–2.7 (`docs/tasks/02-reja.md`).
 
 ## 2-bosqich uchun eslatmalar
 - `RoleBasedStudentScopeResolver` MENTOR tarmog'i → `group_members` asosida (scope tashqarisi 404).
