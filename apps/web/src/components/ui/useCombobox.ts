@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { ComboboxOption } from './Combobox.types';
-import type { KeyboardEvent } from 'react';
+import type { FocusEvent, KeyboardEvent, RefObject } from 'react';
 
 const NO_ACTIVE = -1;
 
@@ -14,6 +14,8 @@ interface UseComboboxParams {
   onSelect: (option: ComboboxOption) => void;
   /** Bitta tanlovli rejim: tanlangach ro'yxat yopiladi, yopilganda qidiruv matni tozalanadi. */
   single: boolean;
+  /** Komponentning tashqi konteyneri: undan tashqariga bosish yoki fokus chiqishi ro'yxatni yopadi. */
+  rootRef: RefObject<HTMLElement | null>;
 }
 
 export interface ComboboxState {
@@ -27,6 +29,8 @@ export interface ComboboxState {
   select: (option: ComboboxOption) => void;
   setActiveIndex: (index: number) => void;
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
+  /** Konteynerning `onBlur`i: fokus komponentdan tashqariga chiqsa ro'yxat yopiladi. */
+  onRootBlur: (event: FocusEvent<HTMLElement>) => void;
 }
 
 function step(current: number, delta: number, count: number): number {
@@ -86,12 +90,13 @@ function useActiveIndex(count: number): [number, (index: number) => void] {
 
 interface ListStateParams {
   single: boolean;
+  disabled: boolean;
   onSearchChange: ((query: string) => void) | undefined;
   resetActive: () => void;
 }
 
 /** Ochiq/yopiq holat va qidiruv matni; bitta rejimda yopilganda matn tozalanadi. */
-function useListState({ single, onSearchChange, resetActive }: ListStateParams) {
+function useListState({ single, disabled, onSearchChange, resetActive }: ListStateParams) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
 
@@ -111,7 +116,47 @@ function useListState({ single, onSearchChange, resetActive }: ListStateParams) 
     }
   };
 
-  return { open, setOpen, query, changeQuery, close };
+  const openList = () => {
+    setOpen((current) => current || !disabled);
+  };
+
+  return { open, setOpen, query, changeQuery, close, openList };
+}
+
+function isInside(root: HTMLElement | null, target: EventTarget | null): boolean {
+  return root !== null && target instanceof Node && root.contains(target);
+}
+
+/**
+ * Tashqariga bosish (pointerdown) va fokus chiqishi ro'yxatni yopadi.
+ * Ichkarida bosish yopmaydi — `multiple` rejimda ketma-ket tanlash uchun.
+ */
+function useDismiss(rootRef: RefObject<HTMLElement | null>, open: boolean, close: () => void) {
+  const closeRef = useRef(close);
+  useEffect(() => {
+    closeRef.current = close;
+  });
+
+  useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+    const onPointerDown = (event: PointerEvent) => {
+      if (!isInside(rootRef.current, event.target)) {
+        closeRef.current();
+      }
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+    };
+  }, [open, rootRef]);
+
+  return (event: FocusEvent<HTMLElement>) => {
+    if (open && !isInside(rootRef.current, event.relatedTarget)) {
+      close();
+    }
+  };
 }
 
 /** Combobox holati: ochiq/yopiq, qidiruv matni, faol variant va klaviatura (↑ ↓ Enter Esc). */
@@ -121,15 +166,19 @@ export function useCombobox({
   onSearchChange,
   onSelect,
   single,
+  rootRef,
 }: UseComboboxParams): ComboboxState {
   const [activeIndex, setActiveIndex] = useActiveIndex(options.length);
-  const { open, setOpen, query, changeQuery, close } = useListState({
+  const { open, setOpen, query, changeQuery, close, openList } = useListState({
     single,
+    disabled,
     onSearchChange,
     resetActive: () => {
       setActiveIndex(NO_ACTIVE);
     },
   });
+
+  const onRootBlur = useDismiss(rootRef, open, close);
 
   const select = (option: ComboboxOption) => {
     onSelect(option);
@@ -153,10 +202,6 @@ export function useCombobox({
     close,
   });
 
-  const openList = () => {
-    setOpen((current) => current || !disabled);
-  };
-
   return {
     open,
     query,
@@ -167,5 +212,6 @@ export function useCombobox({
     select,
     setActiveIndex,
     onKeyDown,
+    onRootBlur,
   };
 }

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -39,13 +39,17 @@ function SingleHarness({ onSearch }: { onSearch?: (query: string) => void }) {
 function MultipleHarness() {
   const [value, setValue] = useState<ComboboxOption[]>([MENTORS[0] as ComboboxOption]);
   return (
-    <Combobox
-      multiple
-      aria-label="Studentlar"
-      value={value}
-      onChange={setValue}
-      options={MENTORS}
-    />
+    <div>
+      <Combobox
+        multiple
+        aria-label="Studentlar"
+        value={value}
+        onChange={setValue}
+        options={MENTORS}
+      />
+      <p>Tashqi matn</p>
+      <button type="button">Qo&apos;shish</button>
+    </div>
   );
 }
 
@@ -165,5 +169,61 @@ describe('Combobox — multiple', () => {
     render(<MultipleHarness />);
     await userEvent.click(screen.getByRole('button', { name: 'Aziz Karimov — olib tashlash' }));
     expect(screen.queryByText('Aziz Karimov')).not.toBeInTheDocument();
+  });
+
+  it('ichkarida bosilganda ochiq qoladi, tashqariga bosilganda yopiladi', async () => {
+    render(<MultipleHarness />);
+    const input = screen.getByRole('combobox', { name: 'Studentlar' });
+    await userEvent.click(input);
+    await userEvent.click(screen.getByRole('option', { name: 'Bekzod Aliyev' }));
+    await userEvent.click(screen.getByRole('option', { name: 'Dilnoza Tursunova' }));
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+
+    await userEvent.click(screen.getByText('Tashqi matn'));
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(input).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('fokus input`da qolsa ham tashqaridagi pointerdown ro`yxatni yopadi', async () => {
+    render(<MultipleHarness />);
+    const input = screen.getByRole('combobox', { name: 'Studentlar' });
+    await userEvent.click(input);
+    fireEvent.pointerDown(screen.getByRole('listbox'));
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+    fireEvent.pointerDown(screen.getByText('Tashqi matn'));
+    expect(input).toHaveFocus();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  });
+
+  it('fokus komponentdan chiqsa (Tab) yopiladi, ichkaridagi chip`ga o`tsa ochiq qoladi', async () => {
+    render(<MultipleHarness />);
+    const input = screen.getByRole('combobox', { name: 'Studentlar' });
+    await userEvent.click(input);
+    await userEvent.tab({ shift: true });
+    expect(screen.getByRole('button', { name: 'Aziz Karimov — olib tashlash' })).toHaveFocus();
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+    await userEvent.click(input);
+    await userEvent.tab();
+    expect(screen.getByRole('button', { name: "Qo'shish" })).toHaveFocus();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  });
+});
+
+describe('Combobox — tashqariga bosish (bitta tanlov)', () => {
+  it('tashqariga bosilganda yopiladi va qidiruv matni tozalanadi', async () => {
+    render(
+      <div>
+        <SingleHarness />
+        <p>Tashqarida</p>
+      </div>,
+    );
+    const input = screen.getByRole('combobox');
+    await userEvent.type(input, 'bek');
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+    await userEvent.click(screen.getByText('Tashqarida'));
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(input).toHaveValue('');
   });
 });

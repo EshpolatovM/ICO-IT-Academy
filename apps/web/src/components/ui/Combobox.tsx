@@ -145,7 +145,6 @@ function ComboboxInput({ props, state, ids, inputRef }: InputPartProps) {
       }}
       onClick={state.openList}
       onKeyDown={state.onKeyDown}
-      onBlur={state.close}
       className={inputClasses}
     />
   );
@@ -194,6 +193,7 @@ function useComboboxIds(id: string | undefined): ComboboxIds {
 export function Combobox(props: ComboboxProps) {
   const ids = useComboboxIds(props.id);
   const inputRef = useRef<HTMLInputElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const selection = getComboboxSelection(props);
   const state = useCombobox({
     options: props.options,
@@ -201,10 +201,11 @@ export function Combobox(props: ComboboxProps) {
     onSearchChange: props.onSearchChange,
     onSelect: selection.pick,
     single: props.multiple !== true,
+    rootRef,
   });
 
   return (
-    <div className={cn('relative', props.className)}>
+    <div ref={rootRef} className={cn('relative', props.className)} onBlur={state.onRootBlur}>
       <div className={shellClasses(props)}>
         <MultipleChips props={props} selection={selection} />
         <ComboboxInput props={props} state={state} ids={ids} inputRef={inputRef} />
