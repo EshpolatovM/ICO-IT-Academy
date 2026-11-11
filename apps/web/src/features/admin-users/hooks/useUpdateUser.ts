@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import type { ManagedUserBase } from '@lms/shared';
 
-import { adminUsersKeys } from '../api/admin-users.query-keys';
+import { adminUsersKeys } from '@/lib/query';
 
 import type { ManagedUserKind } from '../types/admin-users.types';
 

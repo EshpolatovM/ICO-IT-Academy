@@ -2,16 +2,32 @@ import type {
   CreateParentTokenRequest,
   ParentTokenCreatedResponse,
   ParentTokensListResponse,
+  PasswordResetResponse,
 } from '@lms/shared';
 
-import { apiRequest, itemPath } from '@/lib/api';
+import { apiRequest } from './api-client';
+import { itemPath } from './request-path';
+
+/** Student ustidagi umumiy amallar (`/students/:id/...`): admin va mentor panellari birga ishlatadi. */
+const STUDENTS_PATH = '/students';
+
+function studentPath(studentId: string): string {
+  return itemPath(STUDENTS_PATH, studentId);
+}
 
 function tokensPath(studentId: string): string {
-  return `${itemPath('/students', studentId)}/parent-tokens`;
+  return `${studentPath(studentId)}/parent-tokens`;
 }
 
 function tokenPath(studentId: string, tokenId: string): string {
   return itemPath(tokensPath(studentId), tokenId);
+}
+
+/** `POST /students/:id/reset-password` (docs/12 §2.1): SA A M (mentor — `@StudentScope`). */
+export function resetStudentPassword(studentId: string): Promise<PasswordResetResponse> {
+  return apiRequest<PasswordResetResponse>(`${studentPath(studentId)}/reset-password`, {
+    method: 'POST',
+  });
 }
 
 /**

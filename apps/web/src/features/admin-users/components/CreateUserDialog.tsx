@@ -17,8 +17,7 @@ import {
 import type { DescriptionItem } from '@/components/ui';
 import type { ServerFieldMap } from '@/lib/forms';
 import { useSecretMutation } from '@/lib/hooks';
-
-import { adminUsersKeys } from '../api/admin-users.query-keys';
+import { adminUsersKeys } from '@/lib/query';
 
 import { UserForm } from './UserForm';
 

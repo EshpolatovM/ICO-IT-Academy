@@ -2,8 +2,8 @@ import type { ManagedUserBase, PaginatedResult, UserSort, UserStatus } from '@lm
 
 import type { ReactNode } from 'react';
 
-/** Boshqariladigan foydalanuvchilar turi (sahifa): `/admin/students`, `/admin/mentors`, `/admin/admins`. */
-export type ManagedUserKind = 'students' | 'mentors' | 'admins';
+/** Turi `@/lib/query` da (query kalitlari bilan birga), bu yerda feature ichi uchun qayta eksport. */
+export type { ManagedUserKind } from '@/lib/query';
 
 /** Jadval holati — URL query'da saqlanadi (docs/12 §2.1 ro'yxat parametrlari). */
 export interface UserListState {

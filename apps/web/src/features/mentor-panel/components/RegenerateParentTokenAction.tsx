@@ -1,9 +1,9 @@
 'use client';
 
 import { ConfirmSecretAction } from '@/components/shared';
+import { parentTokensApi } from '@/lib/api';
 
 import { mentorPanelKeys } from '../api/mentor-panel.query-keys';
-import { parentTokensApi } from '../api/parent-tokens.api';
 import { parentTokenName } from '../lib/parent-token-name';
 
 import { ParentTokenResultDialog } from './ParentTokenResultDialog';

@@ -1,6 +1,7 @@
 import { act, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { adminUsersKeys } from '@/lib/query';
 import { fetchCall, jsonResponse, mockFetch, requestJson } from '@/lib/testing/http';
 import type { FetchMock } from '@/lib/testing/http';
 import { renderHookWithQuery } from '@/lib/testing/render';
@@ -9,7 +10,11 @@ import { adminGroupsKeys } from '../api/admin-groups.query-keys';
 import { DEFAULT_GROUP_LIST_STATE } from '../lib/group-list-state';
 import { GROUP_FIXTURE, IDS, MENTOR_FIXTURE, pageOf } from '../lib/test-fixtures';
 
-import { useAssignGroupMentor, useRemoveGroupMember } from './useGroupMutations';
+import {
+  useAddGroupMembers,
+  useAssignGroupMentor,
+  useRemoveGroupMember,
+} from './useGroupMutations';
 import { useGroup, useGroupList } from './useGroupQueries';
 import {
   useGroupFilterOption,
@@ -63,6 +68,22 @@ describe('admin-groups query hooks', () => {
     expect(init.method).toBe('PUT');
     expect(requestJson(init)).toEqual({ mentorId: null });
     expect(queryClient.getQueryData(adminGroupsKeys.detail(IDS.group))).toEqual(next);
+  });
+
+  it('useAddGroupMembers — POST …/members, studentlar keshi (Guruh ustuni) eskiradi', async () => {
+    fetchMock.mockResolvedValue(jsonResponse(200, GROUP_FIXTURE));
+    const { result, queryClient } = renderHookWithQuery(() => useAddGroupMembers(IDS.group));
+    const studentsListKey = adminUsersKeys.list('students', '');
+    const studentDetailKey = adminUsersKeys.detail('students', IDS.student);
+    queryClient.setQueryData(studentsListKey, pageOf([]));
+    queryClient.setQueryData(studentDetailKey, {});
+
+    await act(() => result.current.mutateAsync({ studentIds: [IDS.student] }));
+    const { url, init } = fetchCall(fetchMock, 0);
+    expect(url).toBe(`${GROUP_URL}/members`);
+    expect(init.method).toBe('POST');
+    expect(queryClient.getQueryState(studentsListKey)?.isInvalidated).toBe(true);
+    expect(queryClient.getQueryState(studentDetailKey)?.isInvalidated).toBe(true);
   });
 
   it('useRemoveGroupMember — DELETE …/members/:studentId (204), tafsilot eskiradi', async () => {

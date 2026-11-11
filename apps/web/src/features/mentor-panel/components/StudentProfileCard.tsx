@@ -10,10 +10,10 @@ import {
   Stack,
   TextLink,
 } from '@/components/ui';
+import { resetStudentPassword } from '@/lib/api';
 import { formatDateTime, personName } from '@/lib/format';
 
 import { mentorPanelKeys } from '../api/mentor-panel.query-keys';
-import { mentorStudentsApi } from '../api/mentor-students.api';
 import { mentorGroupPath } from '../lib/mentor-panel-paths';
 
 function groupLink(student: MentorStudentProfile) {
@@ -44,7 +44,7 @@ export function StudentProfileCard({ student }: { student: MentorStudentProfile 
               userId={student.id}
               userName={personName(student)}
               loginItem={{ term: 'Student ID (login)', value: student.studentCode }}
-              reset={mentorStudentsApi.resetPassword}
+              reset={resetStudentPassword}
               invalidateKey={mentorPanelKeys.student(student.id)}
               size="md"
             />

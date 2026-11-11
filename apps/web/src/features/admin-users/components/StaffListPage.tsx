@@ -5,8 +5,8 @@ import type { StaffAccount } from '@lms/shared';
 import { ResetPasswordAction } from '@/components/shared';
 import { Stack } from '@/components/ui';
 import { personName } from '@/lib/format';
+import { adminUsersKeys } from '@/lib/query';
 
-import { adminUsersKeys } from '../api/admin-users.query-keys';
 import { STAFF_FIELDS } from '../lib/user-fields';
 import { EMPTY_STAFF_FORM, STAFF_SERVER_FIELDS, staffFormSchema } from '../lib/user-forms';
 

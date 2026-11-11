@@ -4,10 +4,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { CreateParentTokenRequest } from '@lms/shared';
 
+import { parentTokensApi } from '@/lib/api';
 import { useSecretMutation } from '@/lib/hooks';
 
 import { mentorPanelKeys } from '../api/mentor-panel.query-keys';
-import { parentTokensApi } from '../api/parent-tokens.api';
 
 /** `GET /students/:id/parent-tokens` — faol tokenlar (faqat `prefix`, xom token yo'q). */
 export function useParentTokens(studentId: string) {

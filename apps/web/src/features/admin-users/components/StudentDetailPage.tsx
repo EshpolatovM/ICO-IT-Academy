@@ -21,10 +21,10 @@ import {
   Stack,
   TextLink,
 } from '@/components/ui';
-import { isApiError } from '@/lib/api';
+import { isApiError, resetStudentPassword } from '@/lib/api';
 import { formatDateTime, personName } from '@/lib/format';
+import { adminUsersKeys } from '@/lib/query';
 
-import { adminUsersKeys } from '../api/admin-users.query-keys';
 import { studentsApi } from '../api/students.api';
 import { useStudent } from '../hooks/useStudent';
 import { AdminUsersPath } from '../lib/admin-users-paths';
@@ -68,7 +68,7 @@ function StudentActionsCard({ student }: { student: StudentDetail }) {
             userId={student.id}
             userName={personName(student)}
             loginItem={{ term: 'Student ID (login)', value: student.studentCode }}
-            reset={studentsApi.resetPassword}
+            reset={resetStudentPassword}
             invalidateKey={adminUsersKeys.kind('students')}
             size="md"
           />

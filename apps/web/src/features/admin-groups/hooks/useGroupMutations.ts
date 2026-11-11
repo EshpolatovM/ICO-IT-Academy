@@ -10,12 +10,21 @@ import type {
   UpdateGroupRequest,
 } from '@lms/shared';
 
+import { adminUsersKeys } from '@/lib/query';
+
 import { adminGroupsKeys } from '../api/admin-groups.query-keys';
 import { groupsApi } from '../api/groups.api';
 
-/** Guruh tafsilotini qaytaradigan mutatsiya: javob keshga, ro'yxatlar qayta yuklanadi. */
+/** Studentlar ro'yxati va tafsilotidagi "Guruh" ma'lumoti (admin-users keshi). */
+const STUDENTS_KEY = adminUsersKeys.kind('students');
+
+/**
+ * Guruh tafsilotini qaytaradigan mutatsiya: javob keshga, ro'yxatlar qayta yuklanadi.
+ * `affectsStudents` — a'zolik, nom yoki holat o'zgarsa studentlar keshi ham eskiradi.
+ */
 function useGroupDetailMutation<TVariables>(
   mutationFn: (variables: TVariables) => Promise<AdminGroupDetail>,
+  affectsStudents = false,
 ) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -23,6 +32,7 @@ function useGroupDetailMutation<TVariables>(
     onSuccess: (group) => {
       queryClient.setQueryData(adminGroupsKeys.detail(group.id), group);
       void queryClient.invalidateQueries({ queryKey: adminGroupsKeys.lists() });
+      if (affectsStudents) void queryClient.invalidateQueries({ queryKey: STUDENTS_KEY });
     },
   });
 }
@@ -32,9 +42,9 @@ export function useCreateGroup() {
   return useGroupDetailMutation((body: CreateGroupRequest) => groupsApi.create(body));
 }
 
-/** `PATCH /admin/groups/:id` (nom, sana, holat). */
+/** `PATCH /admin/groups/:id` (nom, sana, holat — arxivlash/faollashtirish). */
 export function useUpdateGroup(id: string) {
-  return useGroupDetailMutation((body: UpdateGroupRequest) => groupsApi.update(id, body));
+  return useGroupDetailMutation((body: UpdateGroupRequest) => groupsApi.update(id, body), true);
 }
 
 /** `PUT /admin/groups/:id/mentor` (`null` — olib tashlash). */
@@ -46,7 +56,10 @@ export function useAssignGroupMentor(id: string) {
 
 /** `POST /admin/groups/:id/members`. */
 export function useAddGroupMembers(id: string) {
-  return useGroupDetailMutation((body: AddGroupMembersRequest) => groupsApi.addMembers(id, body));
+  return useGroupDetailMutation(
+    (body: AddGroupMembersRequest) => groupsApi.addMembers(id, body),
+    true,
+  );
 }
 
 /** `DELETE /admin/groups/:id/members/:studentId` (204): tafsilot va ro'yxatlar qayta yuklanadi. */
@@ -58,6 +71,7 @@ export function useRemoveGroupMember(id: string) {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: adminGroupsKeys.detail(id) }),
         queryClient.invalidateQueries({ queryKey: adminGroupsKeys.lists() }),
+        queryClient.invalidateQueries({ queryKey: STUDENTS_KEY }),
       ]);
     },
   });

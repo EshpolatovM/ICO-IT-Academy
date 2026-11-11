@@ -10,3 +10,4 @@ export { ApiError, isApiError, isSessionRejectedError } from './api-error';
 export { refreshAccessToken } from './refresh-session';
 export { errorMessage } from './error-message';
 export { itemPath, withQuery } from './request-path';
+export { parentTokensApi, resetStudentPassword } from './student-actions.api';

@@ -15,8 +15,8 @@ import {
   Text,
 } from '@/components/ui';
 import { useSecretMutation } from '@/lib/hooks';
+import { adminUsersKeys } from '@/lib/query';
 
-import { adminUsersKeys } from '../api/admin-users.query-keys';
 import { studentsApi } from '../api/students.api';
 import { AdminUsersPath } from '../lib/admin-users-paths';
 

@@ -3,7 +3,6 @@ import type {
   CreatedStudentResponse,
   CreateStudentRequest,
   PaginatedResult,
-  PasswordResetResponse,
   StudentDetail,
   StudentImportResult,
   StudentListItem,
@@ -33,9 +32,4 @@ export const studentsApi = {
     body.append(STUDENT_IMPORT_FILE_FIELD, file);
     return apiRequest<StudentImportResult>(`${BASE_PATH}/import`, { method: 'POST', body });
   },
-
-  resetPassword: (id: string) =>
-    apiRequest<PasswordResetResponse>(`${itemPath('/students', id)}/reset-password`, {
-      method: 'POST',
-    }),
 };

@@ -4,7 +4,8 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { ManagedUserBase } from '@lms/shared';
 
-import { adminUsersKeys } from '../api/admin-users.query-keys';
+import { adminUsersKeys } from '@/lib/query';
+
 import { toListParams } from '../lib/list-state';
 
 import type { ManagedUserKind, UserListFetcher, UserListState } from '../types/admin-users.types';
