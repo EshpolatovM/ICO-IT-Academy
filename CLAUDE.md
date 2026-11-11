@@ -167,11 +167,13 @@ Limit tugashi yoki sessiya uzilishi istalgan payt bo'lishi mumkin, shuning uchun
 Har bir o'zgarishdan keyin darhol:
 - `docs/STATE.md` yangilanadi: joriy modul va bosqich (baza / backend / frontend / test / review), joriy git branch, oxirgi bajarilgan vazifa, keyingi aniq vazifa (yangi sessiya hech narsa so'ramasdan davom eta oladigan darajada), egasidan kutilayotgan savollar va to'siqlar.
 - `docs/PROGRESS.md` ga sana bilan qisqa yozuv qo'shiladi: nima qilindi, qaysi fayllar o'zgardi.
+- Hamkor sessiya bilan bog'liq har bir o'zgarish (xat, kelishuv, taqsimot) `docs/HAMKORLIK.md` ga yoziladi: xatlar jurnali, joriy taqsimot, ochiq savollar.
+- Egasi bilan chatda qabul qilingan har bir qaror ham darhol `docs/STATE.md` ga yoziladi. Chat uzilsa yoki yangi chat ochilsa, hech narsa yo'qolmasligi kerak: yangi sessiya faqat fayllarga tayanadi.
 - Ishlaydigan holatga kelgan har bir kichik qadam commit qilinadi.
 - Subagent vazifasini tugatgach, Tech Lead STATE.md ni yangilaydi va shundan keyingina keyingi vazifaga o'tadi.
 
 Yangi sessiya boshlanganda, hech narsa qilishdan oldin:
-1. `docs/STATE.md` va `docs/PROGRESS.md` ning oxirgi yozuvlari o'qiladi.
+1. `docs/STATE.md`, `docs/HAMKORLIK.md` va `docs/PROGRESS.md` ning oxirgi yozuvlari o'qiladi. Keyin Drive papkasida hamkordan yangi xat bormi va `git fetch` bilan yangi commit bormi, tekshiriladi (`docs/HAMKORLIK.md` da yo'riqnoma bor).
 2. `.claude/agents/` tekshiriladi. Biror agent yetishmasa, shu fayldagi ta'rif bo'yicha qayta yaratiladi va egasidan Claude Code'ni qayta ishga tushirish so'raladi.
 3. `git status` va `git log` bilan STATE.md dagi holat haqiqiy kodga mosligi tekshiriladi. Commit qilinmagan o'zgarishlar yoki mos kelmaslik bo'lsa, davom etishdan oldin egasiga aytiladi.
 4. Egasiga bir-ikki gap bilan qayerdan davom etilayotgani aytiladi va STATE.md dagi "Keyingi vazifa"dan davom etiladi.

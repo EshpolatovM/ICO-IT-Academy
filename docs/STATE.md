@@ -2,14 +2,16 @@
 
 > Bu fayl har bir o'zgarishdan keyin yangilanadi. Yangi sessiya shu yerdan davom etadi.
 
-**Oxirgi yangilanish:** 2026-11-10
+**Oxirgi yangilanish:** 2026-11-11 19:10
+
+> Hamkorlik (Boltavoy, Drive xatlari, taqsimot, agentlar) — **`docs/HAMKORLIK.md`**. Yangi sessiya ikkala faylni ham o'qiydi.
 
 | Maydon | Qiymat |
 |---|---|
 | Joriy modul | 2-bosqich: Admin asosi — foydalanuvchilar va guruhlar (reja: `docs/tasks/02-reja.md`) |
-| Joriy bosqich | 2.2 tugagan; boshqa Claude sessiyasining kodi olib tashlandi (2026-11-11 15:18); keyingisi 2.3 egasi "davom et" deganda |
+| Joriy bosqich | 2.1, 2.2, 2.4, **2.5a** tayyor; 2.3 — Boltavoyda (IN_PROGRESS); 2.5b/2.5c — 2.3 READY'dan keyin |
 | Joriy git branch | `feature/02-admin-asosi` |
-| Ish rejimi | **To'liq avtonom** (egasi 2026-11-11: savol berma, tasdiq kutma, Tech Lead o'zi qaror qiladi; faqat haqiqiy xavfli amallarda to'xtash). Har vazifadan keyin commit + STATE/PROGRESS; hisobot `docs/HISOBOT-*.md` |
+| Ish rejimi | **To'liq avtonom** (Qo'ziboy; Boltavoy o'z egasi bilan sekin rejimda) (egasi 2026-11-11: savol berma, tasdiq kutma, Tech Lead o'zi qaror qiladi; faqat haqiqiy xavfli amallarda to'xtash). Har vazifadan keyin commit + STATE/PROGRESS; hisobot `docs/HISOBOT-*.md` |
 
 ## Hamkorlik (2026-11-11, egasi "ha")
 - Ikkinchi Claude sessiyasi — **Boltavoy** (bu sessiya — Qo'ziboy). Back/front bo'linmasi yo'q; vazifani egasi + Qo'ziboy taqsimlaydi.
@@ -17,6 +19,11 @@
 - GitHub remote: `origin` = `EshpolatovM/ICO-IT-Academy`. `feature/02-admin-asosi` push qilindi; ikkala sessiya shu bitta branch'da ishlaydi (`git pull --rebase`, force push yo'q, `main` ga merge faqat egasi ruxsati bilan).
 - Taqsimot (egasi "ha", 2026-11-11 17:35): **Boltavoy → 2.3** (guruhlar API + mentor scope, `apps/api/**`); **Qo'ziboy → 2.5a** (admin: Studentlar, Mentorlar, Adminlar sahifalari, `apps/web/**`, vazifa `docs/tasks/02-2.5a-admin-users-ui.md`).
 - Koordinatsiya: har qadamdan oldin/keyin Drive papkasi + `git fetch` tekshiriladi; IN_PROGRESS/READY xatlar; umumiy fayllar (shared, STATE, PROGRESS, root config, lockfile) oldidan ogohlantirish. Boltavoy o'z holatini `docs/boltavoy/HOLAT.md` da yuritadi.
+
+## Tech Lead qarorlari (2026-11-11, egasi "o'zing tanla")
+- Sidebar'dagi "Foydalanuvchilar" bandi `/admin/students`, `/admin/mentors`, `/admin/admins` da faol ko'rinadi (`NavEntry` ga active prefix). 2.5b bilan birga qilinadi.
+- `/admin/mentors/[id]` alohida sahifa hozircha QILINMAYDI: tahrirlash Dialog orqali. Mentorning guruhlari va studentlari kerak bo'lsa, 2.5b da qayta ko'riladi.
+- CSV import limitlari: Boltavoydan `@lms/shared` ga konstanta so'raldi. Kelguncha klientda bloklanmaydi, faqat hint ko'rsatiladi.
 
 ## Egasining qarorlari (2026-11-10, "ha")
 - MinIO image'i yo'q → dev muhitda S3-compatible **SeaweedFS** ishlatiladi (egasi "ha"; 1.2b da bajarildi).
@@ -44,7 +51,7 @@
 
 ## Keyingi aniq vazifa
 **2.5a — TAYYOR** (2026-11-11, birchka-frontend; Tech Lead tekshirdi: `pnpm check` yashil, web 40 fayl / 189 test, api 380). `/admin/students` (+`[id]`, `import`), `/admin/mentors`, `/admin/admins` (SA). Guruh filtri disabled placeholder.
-**Keyingi:** Boltavoy 2.3 READY yozishini kutish → 2.5b (Guruhlar sahifalari) + 2.5c (Mentor paneli) birchka-frontend'ga; student guruh filtri/tanlovini ulash. Ochiq UX savollari: Sidebar 'Foydalanuvchilar' bandi `/admin/mentors` da faol ko'rinishi; `/admin/mentors/[id]` sahifasi kerakmi; `STUDENT_IMPORT_MAX_*` ni shared'ga chiqarish (Boltavoy bilan).
+**Keyingi:** Boltavoy 2.3 READY yozishini kutish → 2.5b (Guruhlar sahifalari) + 2.5c (Mentor paneli) birchka-frontend'ga; student guruh filtri/tanlovini ulash. UX savollari hal qilindi (yuqoridagi "Tech Lead qarorlari").
 
 Eski yozuv:
 **2.3 — backend: guruhlar, mentor scope** (`oga-backend`, `docs/tasks/02-2.3-groups-scope.md` tayyor) — egasi ruxsat berganda. Keyin 2.3, 2.5, 2.6, 2.7 (`docs/tasks/02-reja.md`).

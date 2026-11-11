@@ -179,3 +179,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - Fayllar: `apps/web/src/features/admin-users/**`, `apps/web/src/app/(admin)/admin/{students,mentors,admins}/**`, `features/shell/components/SuperAdminOnly.tsx`, `lib/api/api-client.ts` (FormData), `lib/testing/*`.
 - Testlar: `pnpm check` yashil — web 189/189 (40 fayl, 52 yangi), api 380/380; `format:check`, web build yashil.
 - Qarorlar: vaqtinchalik parol faqat komponent state'ida (mutatsiya `gcTime: 0` + reset); yaratishda parol maydoni yo'q (tizim yaratadi); mentor/admin tahrirlash Dialog orqali; CSV hajmi klientda bloklanmaydi.
+
+## 2026-11-11 — Sessiyalararo xotira: `docs/HAMKORLIK.md`
+- Yangi `docs/HAMKORLIK.md`: kim kim, Drive kanali, git qoidalari, agentlar, joriy taqsimot, xatlar jurnali.
+- `docs/STATE.md`: holat jadvali yangilandi, Tech Lead qarorlari (Sidebar active prefix, mentor tafsilot sahifasi yo'q, CSV limitlari).
+- `CLAUDE.md`: yangi sessiya HAMKORLIK.md ni o'qiydi va Drive/git'ni tekshiradi; chatdagi har qaror darhol faylga yoziladi.
