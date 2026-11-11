@@ -8,7 +8,7 @@
 
 ## ⚠️ SESSIYA TO'XTADI (2026-11-11 ~18:35, Claude limiti tugadi) — YANGI SESSIYA SHU YERDAN BOSHLAYDI
 Limit tugashi oldidan ikki agent ishlab turgan edi. Ularning ishi diskda qolgan bo'lishi mumkin, lekin **commit qilinmagan**:
-- **2.6b** (sinchkov-tester, `docs/tasks/02-2.6b-playwright-groups-mentor.md`): 18:45 da diskda commitsiz turgan fayllar: yangi `apps/web/e2e/{admin-groups,mentor-panel}.spec.ts`, `support/groups-api.ts`; o'zgargan `admin-student-import.spec.ts` (3d qaytarilgan), `support/{admin-api,admin-fixtures}.ts`. Natija noma'lum: agentni qayta ishga tushirib, "diskdagi chala ishni davom ettir, keyin to'liq Playwright yurgiz" deb ber.
+- **2.6b** (sinchkov-tester, `docs/tasks/02-2.6b-playwright-groups-mentor.md`): 18:45 da diskda commitsiz turgan fayllar: yangi `apps/web/e2e/{admin-groups,mentor-panel}.spec.ts`, `support/groups-api.ts`; o'zgargan `admin-student-import.spec.ts` (3d qaytarilgan), `support/{admin-api,admin-fixtures}.ts`. 18:50 da Tech Lead to'liq Playwright'ni yurgizdi: **11 ta test yiqildi**, ular orasida avval yashil bo'lgan admin-staff, admin-students va student-auth ham bor (`locator.fill` timeout). Ehtimoliy sabablar: login rate-limit (bir kunda ko'p yurgizish natijasi), agentning `support/admin-fixtures.ts`/`admin-api.ts` dagi o'zgarishi yoki muhit. Avval `git stash` qilmasdan, `git diff apps/web/e2e/support` ni ko'rib chiq. sinchkov-tester'ga "eski testlar ham yiqilyapti, sababini top" deb ber. **Bu fayllar commit qilinmasin, toki hammasi yashil bo'lmaguncha.**
 - **2.5b-2: TAYYOR va commit qilingan** (18:40; web 280 test, Playwright admin 13/13). Eslatma: Playwright'ni ikki agent parallel yurgizmasin (port, DB, test-results umumiy).
 
 **Yangi sessiya qiladigan ishlar:**
