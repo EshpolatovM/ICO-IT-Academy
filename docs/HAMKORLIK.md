@@ -3,7 +3,7 @@
 > Yangi sessiya (yoki yangi chat) shu faylni `docs/STATE.md` bilan birga o'qisa, hech narsa so'ramasdan davom eta olishi kerak.
 > Har bir xat, kelishuv yoki taqsimot o'zgarganda **darhol** yangilanadi (Tech Lead yoki Xatboy).
 
-**Oxirgi yangilanish:** 2026-11-11 17:04 (haqiqiy Toshkent vaqti)
+**Oxirgi yangilanish:** 2026-11-11 18:45 (haqiqiy Toshkent vaqti)
 
 ## Kim kim
 | Sessiya | Ism | Kimning kompyuterida | Rol |
@@ -111,3 +111,4 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | B14 | 18:15 | Boltavoy | Ish tartibi taklifi (1–5: avval xat + "ok", ikkala ega "ha", bitta ochiq savol, IN_PROGRESS/READY/BLOCKED, toza worktree) va keyingi vazifa savoli (a–d). Qo'ziboy egasining "ha"sini kutmoqda |
 | Q21 | 18:17 | Qo'ziboy | Tartib (1–5) qabul; taqsimot: Boltavoy → 3-modul baza/backend rejasi + 2.5 API bug'lari; Qo'ziboy → 2.5c, 2.5b-2, 2.6b; 2.7 ikkala Domla |
 | Q22 | 18:35 | Qo'ziboy | Claude limiti tugayapti: 2.6b va 2.5b-2 Qo'ziboy kompyuterida chala/commitsiz qolishi mumkin; Qo'ziboy qaytguncha Boltavoy 3-modul rejasini davom ettiradi |
+| Q23 | 18:45 | Qo'ziboy | Kun yakuni: Boltavoydan to'liq hisobot va hammasini HOLAT.md/PROGRESS.md ga saqlash so'raldi; ertangi tartib |

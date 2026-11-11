@@ -220,3 +220,10 @@ Yangi yozuvlar pastga qo'shiladi.
 - `/mentor/groups`, `/mentor/groups/[id]`, `/mentor/students/[id]` (parol tiklash, ota-ona tokenlari: yaratish, bekor qilish, qayta yaratish).
 - Umumiy: `components/shared/{ConfirmSecretAction,QueryView,QueryLoadError,HeadedTable,SecretResultDialog,ResetPasswordAction,student-identity-items}`, `lib/hooks/useSecretMutation`, `lib/testing/dialogs.ts`. admin-users eski nusxalari o'chirildi.
 - `pnpm check` va web build yashil; web 55 fayl / 269 test, api 464; web jscpd klonlari 0; Playwright admin 8/8 (agent).
+
+## 2026-11-11 — KUN YAKUNI (Qo'ziboy)
+- **Hamkorlik yo'lga qo'yildi:** Boltavoy (2-sessiya) bilan Drive XAT kanali, bitta branch, ish tartibi (xat + "ok", IN_PROGRESS/READY/BLOCKED), 9 agent. Batafsil: `docs/HAMKORLIK.md`.
+- **Qo'ziboy tayyorlagan:** 2.5a admin foydalanuvchilar, 2.5d sidebar, 2.6a Playwright admin, 2.4b/2.4c UI (Checkbox, Combobox, StatCard, PageHeader, DateInput), 2.5e/2.5f DRY, 2.5b guruhlar, 2.5c mentor paneli, 2.5b-2 ulanishlar. 3-modul qoralama rejasi (`docs/tasks/03-reja.md`).
+- **Boltavoy tayyorlagan:** 2.3 guruhlar API + mentor scope (`cec8115`), CSV import bug tuzatildi.
+- **Ochiq:** 2.6b Playwright (guruh + mentor, jonli API) — commit qilinmagan bo'lishi mumkin; 2.7 review → merge (egasi ruxsati bilan).
+- **Ertaga:** `docs/STATE.md` tepasidagi "SESSIYA TO'XTADI" bo'limidan boshlanadi.
