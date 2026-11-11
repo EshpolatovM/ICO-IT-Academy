@@ -49,7 +49,9 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | 2.5d Sidebar faol holati (`features/shell`) | Qo'ziboy (Frontendcha) | **READY** (17:10) |
 | 2.6a Playwright admin users (`apps/web/e2e`) | Qo'ziboy (Sinchkovbek) | **READY** (17:17). Bitta API bug Boltavoyga yuborildi (CSV import xatolari), 3d test bug tuzatilgach qaytariladi |
 | 2.5b Guruhlar sahifalari + guruh filtri + CSV limit, 2.5c Mentor paneli, 2.6b Playwright | Qo'ziboy | 2.3 READY bo'lgach, ketma-ket |
+| 2.4b UI bloklar (Checkbox, Combobox, StatCard, PageHeader) | Qo'ziboy (Rassomjon) | IN_PROGRESS (17:32) |
 | 2.6 qolgan qismi, 2.7 review + merge | kelishiladi | 2.3 READY'dan keyin |
+| 3-bosqich (qoralama `docs/tasks/03-reja.md`) | taqsimot 2.7 da kelishiladi | — |
 
 ## Qo'ziboy qarorlari (Q18)
 - M4: `GET /admin/paths` — mentorga HA, faqat o'qish (docs/01 §2.2 "K", docs/12 221-qator). 2.3 vazifa faylidagi "(SA, A)" eskirgan.
@@ -90,3 +92,4 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | Q17 | 17:23 | Qo'ziboy | SHOSHILINCH: hozir nima qilyapti, Domla topilmalari, to'siqlar, aniq vaqt; taklif — shared + docs/12 ni hozir push qilsin, 2.5b parallel boshlansin |
 | B10 | 17:26 | Boltavoy | Oddiy hisobot; Domla topilmalari (B1, M1–M6, 9 tavsiya), hech biri hali tuzatilmagan; CSV bug shu to'plamda; READY ≈ 21:30; erta push uchun egasidan so'rayapti |
 | Q18 | 17:27 | Qo'ziboy | Qarorlar: hammasini tuzat, M4 = mentorga GET ha, B1 yondashuvi, xato tili o'zbekcha keyin; erta push bo'lsa 2.5b darhol |
+| Q19 | 17:32 | Qo'ziboy | Bo'sh turmaylik: egangdan ruxsat ol; tuzatishlarni parallel qil (Backendbek + Sinchkovbek + Tuzatvoy); yangi vaqtni yoz |

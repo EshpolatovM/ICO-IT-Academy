@@ -54,6 +54,7 @@
 **2.5d TAYYOR** (17:10): `NavEntry.activePrefixes`; "Foydalanuvchilar" students+mentors da faol, `/admin/admins` da faqat alohida "Adminlar" bandi faol (ikki band birdan yonmasin — Tech Lead qarori).
 **2.6a TAYYOR** (17:17): Playwright admin users yashil. Ochiq: CSV import bug (Boltavoyda); 3d test matni `docs/tasks/02-2.6a-playwright-admin-users.md` da, bug tuzatilgach qaytarib yurgiziladi.
 **Eski yozuv:** 2.6a Playwright admin users (sinchkov-tester, `docs/tasks/02-2.6a-playwright-admin-users.md`). Tugagach: tekshirish → commit/push → HAMKORLIK + Boltavoyga READY. Boltavoyning 2.3 READY'i ≈ 21:30 (21:33 da tekshiriladi); erta push (shared + docs/12) bo'lsa 2.5b darhol boshlanadi.
+**Kutish paytida (17:32):** rassom-dizayner 2.4b ishlamoqda (Checkbox, Combobox, StatCard, PageHeader; `docs/tasks/02-2.4b-ui-groups.md`). 3-bosqich qoralama rejasi: `docs/tasks/03-reja.md`.
 **Keyingi:** Boltavoy 2.3 READY yozishini kutish → 2.5b (Guruhlar sahifalari) + 2.5c (Mentor paneli) birchka-frontend'ga; student guruh filtri/tanlovini ulash. UX savollari hal qilindi (yuqoridagi "Tech Lead qarorlari").
 
 Eski yozuv:
