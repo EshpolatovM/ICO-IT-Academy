@@ -51,6 +51,7 @@
 
 ## Keyingi aniq vazifa
 **2.5a — TAYYOR** (2026-11-11, birchka-frontend; Tech Lead tekshirdi: `pnpm check` yashil, web 40 fayl / 189 test, api 380). `/admin/students` (+`[id]`, `import`), `/admin/mentors`, `/admin/admins` (SA). Guruh filtri disabled placeholder.
+**Hozir parallel (17:05):** 2.5d sidebar faol holati (birchka-frontend, `docs/tasks/02-2.5d-sidebar-active.md`) va 2.6a Playwright admin users (sinchkov-tester, `docs/tasks/02-2.6a-playwright-admin-users.md`). Tugagach: tekshirish → commit/push → HAMKORLIK + Boltavoyga READY. 20:03 da Boltavoyning 2.3 READY xati tekshiriladi.
 **Keyingi:** Boltavoy 2.3 READY yozishini kutish → 2.5b (Guruhlar sahifalari) + 2.5c (Mentor paneli) birchka-frontend'ga; student guruh filtri/tanlovini ulash. UX savollari hal qilindi (yuqoridagi "Tech Lead qarorlari").
 
 Eski yozuv:
