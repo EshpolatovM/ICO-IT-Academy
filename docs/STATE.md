@@ -52,7 +52,8 @@
 ## Keyingi aniq vazifa
 **2.5a — TAYYOR** (2026-11-11, birchka-frontend; Tech Lead tekshirdi: `pnpm check` yashil, web 40 fayl / 189 test, api 380). `/admin/students` (+`[id]`, `import`), `/admin/mentors`, `/admin/admins` (SA). Guruh filtri disabled placeholder.
 **2.5d TAYYOR** (17:10): `NavEntry.activePrefixes`; "Foydalanuvchilar" students+mentors da faol, `/admin/admins` da faqat alohida "Adminlar" bandi faol (ikki band birdan yonmasin — Tech Lead qarori).
-**Hozir:** 2.6a Playwright admin users (sinchkov-tester, `docs/tasks/02-2.6a-playwright-admin-users.md`). Tugagach: tekshirish → commit/push → HAMKORLIK + Boltavoyga READY. 20:03 da Boltavoyning 2.3 READY xati tekshiriladi.
+**2.6a TAYYOR** (17:30): Playwright admin users yashil. Ochiq: CSV import bug (Boltavoyda); 3d test matni `docs/tasks/02-2.6a-playwright-admin-users.md` da, bug tuzatilgach qaytarib yurgiziladi.
+**Eski yozuv:** 2.6a Playwright admin users (sinchkov-tester, `docs/tasks/02-2.6a-playwright-admin-users.md`). Tugagach: tekshirish → commit/push → HAMKORLIK + Boltavoyga READY. 20:03 da Boltavoyning 2.3 READY xati tekshiriladi.
 **Keyingi:** Boltavoy 2.3 READY yozishini kutish → 2.5b (Guruhlar sahifalari) + 2.5c (Mentor paneli) birchka-frontend'ga; student guruh filtri/tanlovini ulash. UX savollari hal qilindi (yuqoridagi "Tech Lead qarorlari").
 
 Eski yozuv:

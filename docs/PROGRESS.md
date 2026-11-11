@@ -189,3 +189,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - `NavEntry.activePrefixes` (umumiy imkoniyat); "Foydalanuvchilar" `/admin/students/**`, `/admin/mentors/**` da faol; `/admin/admins` da faqat "Adminlar" bandi.
 - Fayllar: `apps/web/src/features/shell/{types/nav.types.ts,config/nav.config.ts,lib/nav-sections.ts,lib/nav-sections.test.ts}`.
 - Testlar: shell 11/11, web lint + typecheck yashil (agent `pnpm check` yashil, 191 test).
+
+## 2026-11-11 — 2.6a Playwright: admin foydalanuvchilar (sinchkov-tester)
+- Yangi: `apps/web/e2e/admin-students.spec.ts`, `admin-student-import.spec.ts`, `admin-staff.spec.ts`, `support/{admin-fixtures,admin-api,users-script}.ts`; o'zgargan: `support/global-setup.ts`, `parent.spec.ts` (DRY).
+- Natija: admin Playwright 8/8 yashil (Tech Lead qayta yurgizdi), eski testlar yashil, `pnpm check` yashil. Test yozuvlari o'zi yaratiladi va o'chiriladi.
+- Bug (API, Boltavoyga): CSV import qator xatosida guruh xatolarini qaytarmaydi (docs/12 §2.1 ga zid). 3d test vaqtincha olingan, matni vazifa faylida.

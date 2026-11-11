@@ -47,7 +47,7 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | 2.3 guruhlar API + mentor scope | Boltavoy | IN_PROGRESS: Backendbek tugatdi (unit 421, e2e 388, hali commit yo'q), endi Domla review → tuzatishlar. **Taxminiy READY: 20:00 (+05)**, 20:03 da tekshiriladi. `packages/shared/**`, `.env.example`, `docs/12-api.md` §2.2/§12, `PROGRESS.md` ga tegadi |
 | 2.5a admin: Studentlar, Mentorlar, Adminlar | Qo'ziboy | **READY** `184be06` |
 | 2.5d Sidebar faol holati (`features/shell`) | Qo'ziboy (Frontendcha) | **READY** (17:10) |
-| 2.6a Playwright admin users (`apps/web/e2e`) | Qo'ziboy (Sinchkovbek) | IN_PROGRESS (17:05) |
+| 2.6a Playwright admin users (`apps/web/e2e`) | Qo'ziboy (Sinchkovbek) | **READY** (17:30). Bitta API bug Boltavoyga yuborildi (CSV import xatolari), 3d test bug tuzatilgach qaytariladi |
 | 2.5b Guruhlar sahifalari + guruh filtri + CSV limit, 2.5c Mentor paneli, 2.6b Playwright | Qo'ziboy | 2.3 READY bo'lgach, ketma-ket |
 | 2.6 qolgan qismi, 2.7 review + merge | kelishiladi | 2.3 READY'dan keyin |
 

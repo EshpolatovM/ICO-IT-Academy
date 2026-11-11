@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-import type { LoginResponse, ParentTokenCreatedResponse } from '@lms/shared';
+import type { ParentTokenCreatedResponse } from '@lms/shared';
 
+import { staffAccessToken } from './support/admin-api';
 import { expectPath, requiredField } from './support/auth';
 import { E2E_API_URL } from './support/e2e-env';
 import { e2eUsers } from './support/e2e-users';
@@ -13,11 +14,7 @@ async function issueParentToken(
   request: APIRequestContext,
 ): Promise<Pick<ParentTokenCreatedResponse, 'token' | 'link'>> {
   const { admin, child, password } = e2eUsers();
-  const login = await request.post(`${E2E_API_URL}/api/v1/auth/staff/login`, {
-    data: { phone: admin.login, password },
-  });
-  expect(login.status()).toBe(200);
-  const { accessToken } = (await login.json()) as LoginResponse;
+  const accessToken = await staffAccessToken(request, admin, password);
 
   const created = await request.post(`${E2E_API_URL}/api/v1/students/${child.id}/parent-tokens`, {
     headers: { Authorization: `Bearer ${accessToken}` },
