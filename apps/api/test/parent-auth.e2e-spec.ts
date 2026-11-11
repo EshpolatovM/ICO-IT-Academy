@@ -82,7 +82,7 @@ describe('Ota-ona kirishi va tokenlari (e2e)', () => {
     const student = await fixtures.createUser({ role: Role.STUDENT });
     const created = await issueParentToken(app, adminToken, student.id);
     expect(created.token).toMatch(/^[A-Za-z0-9_-]{43}$/);
-    expect(created.link).toBe(`http://localhost:3000/parent?t=${created.token}`);
+    expect(created.link).toBe(`http://localhost:3000/parent#t=${created.token}`);
     expect(created.prefix).toBe(created.token.slice(0, 6));
 
     const exchanged = await exchange(app, { tokens: [created.token] }).expect(200);

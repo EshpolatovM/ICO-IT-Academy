@@ -41,8 +41,10 @@ export { Role } from './enums/role.js';
 export { UserStatus } from './enums/user-status.js';
 export { ErrorCode } from './errors/error-code.js';
 export type { ApiErrorBody, FieldErrorDetail } from './errors/error-code.js';
+export { buildParentLink, parseParentLinkFragment } from './parent/parent-link.js';
 export {
   PARENT_EXCHANGE_MAX_TOKENS,
+  PARENT_LINK_FRAGMENT_PREFIX,
   PARENT_LINK_PATH,
   PARENT_LINK_TOKEN_PARAM,
   PARENT_TOKEN_LABEL_MAX_LENGTH,

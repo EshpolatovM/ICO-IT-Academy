@@ -29,7 +29,7 @@ export const envSchema = z
     DATABASE_URL: z.url({ protocol: POSTGRES_PROTOCOL }),
     REDIS_URL: z.url({ protocol: REDIS_PROTOCOL }),
     LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
-    /** Frontend bazaviy manzili (ota-ona havolasi uchun: `${WEB_BASE_URL}/parent?t=...`). */
+    /** Frontend bazaviy manzili (ota-ona havolasi uchun: `${WEB_BASE_URL}/parent#t=...`, S-70). */
     WEB_BASE_URL: z
       .url({ protocol: HTTP_PROTOCOL })
       .transform((url) => url.replace(TRAILING_SLASHES, '')),

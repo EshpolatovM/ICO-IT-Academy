@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { PARENT_LINK_PATH, PARENT_LINK_TOKEN_PARAM } from '@lms/shared';
+import { buildParentLink } from '@lms/shared';
 import type { ParentTokenCreatedResponse } from '@lms/shared';
 
 import { AppConfigService } from '../../../common/config/app-config.service.js';
@@ -11,7 +11,9 @@ import type { GeneratedParentToken, ParentTokenRecord } from '../parent-access.t
 
 /**
  * Token berish qoidalari: yangi xom token, faol tokenlar limiti (S-17) va bir martalik javob
- * (`${WEB_BASE_URL}/parent?t=<token>` havolasi bilan, docs/02 §4.4, docs/12 §2).
+ * (`${WEB_BASE_URL}/parent#t=<token>` havolasi bilan, docs/02 §4.4, docs/12 §2). Token fragmentda —
+ * serverga yuborilmaydi va access loglarga tushmaydi (S-70); havola `@lms/shared` dagi umumiy
+ * `buildParentLink` bilan yasaladi (front `parseParentLinkFragment` bilan o'qiydi).
  */
 @Injectable()
 export class ParentTokenIssuer {
@@ -30,11 +32,10 @@ export class ParentTokenIssuer {
   }
 
   toCreatedResponse(record: ParentTokenRecord, token: string): ParentTokenCreatedResponse {
-    const query = new URLSearchParams({ [PARENT_LINK_TOKEN_PARAM]: token });
     return {
       id: record.id,
       token,
-      link: `${this.config.get('WEB_BASE_URL')}${PARENT_LINK_PATH}?${query.toString()}`,
+      link: buildParentLink(this.config.get('WEB_BASE_URL'), token),
       prefix: record.tokenPrefix,
       label: record.label,
       createdAt: record.createdAt.toISOString(),

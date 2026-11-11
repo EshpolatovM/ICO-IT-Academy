@@ -127,7 +127,7 @@ POST /students/0190.../parent-tokens
 { "label": "Onasi" }
 
 201
-{ "id": "0191...", "token": "k2Jd8...", "link": "https://app.example.uz/parent?t=k2Jd8...",
+{ "id": "0191...", "token": "k2Jd8...", "link": "https://app.example.uz/parent#t=k2Jd8...",
   "prefix": "k2Jd8x", "createdAt": "2026-11-10T08:00:00Z" }
 ```
 

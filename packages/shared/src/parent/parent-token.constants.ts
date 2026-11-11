@@ -5,9 +5,15 @@
 export const PARENT_TOKEN_LENGTH = 43;
 export const PARENT_TOKEN_PATTERN = /^[A-Za-z0-9_-]+$/;
 
-/** Havoladagi token query parametri: `/parent?t=...` (docs/02 §4.4). */
+/**
+ * Ota-ona havolasi: `${WEB_BASE_URL}/parent#t=<token>` (docs/02 §4.4, S-70). Token URL fragmentida —
+ * fragment serverga yuborilmaydi, shuning uchun proxy/access loglariga tushmaydi (docs/02 §5).
+ * Eski `?t=` havolalari ham bir muddat qabul qilinadi (orqaga moslik, S-70).
+ */
 export const PARENT_LINK_PATH = '/parent';
 export const PARENT_LINK_TOKEN_PARAM = 't';
+/** `#t=` — havoladagi token oldidagi fragment qismi. */
+export const PARENT_LINK_FRAGMENT_PREFIX = `#${PARENT_LINK_TOKEN_PARAM}=`;
 
 /**
  * Bitta exchange so'rovidagi va `parent_tokens` cookie'sidagi tokenlar soni chegarasi.

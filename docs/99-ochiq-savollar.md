@@ -12,7 +12,7 @@ Savol hal qilinganda: javobni shu yerga yozing, tegishli hujjatdagi "Taxmin:" be
 |---|---|---|
 | 1 | **S-15** Ota-ona tokeni modeli | ✔️ Hal qilindi (2026-11-10) |
 | 2 | **S-30** "Yangi dars takrorlashdan keyin ochiladi" qoidasi | ✔️ Hal qilindi (2026-11-10) |
-| 3 | **S-01 / S-02** Yo'llar va guruhlar tuzilmasi | ⏳ Egasining javobi kutilmoqda (2-bosqichgacha kerak) |
+| 3 | **S-01 / S-02** Yo'llar va guruhlar tuzilmasi | ✔️ Tech Lead qarori (2026-11-11, egasi to'liq vakolat bergan): S-01 B, S-02 A, S-03 A |
 | 4 | **S-61** Hosting va ma'lumotlar lokalizatsiyasi | ✔️ Hal qilindi: hosting'ga bog'lanmagan arxitektura |
 | 5 | **S-45** Meeting provayderi | ✔️ LiveKit (10-bosqichda yakuniy tasdiq) |
 | 6 | **S-65** Jamoa, muddat, MVP tarkibi | ⏳ Egasining javobi kutilmoqda |
@@ -22,15 +22,15 @@ Savol hal qilinganda: javobni shu yerga yozing, tegishli hujjatdagi "Taxmin:" be
 
 ## 1. Umumiy (00)
 
-**S-01** 🔴 Bitta umumiy ilm yo'li bormi yoki bir nechta yo'nalish bo'yicha yo'llarmi?
+**S-01** ✔️ **Tech Lead qarori (2026-11-11): B — bir nechta yo'l, student guruh orqali bitta yo'lga biriktiriladi.** Bitta umumiy ilm yo'li bormi yoki bir nechta yo'nalish bo'yicha yo'llarmi?
 - A) Bitta yo'l. ✅ B) Bir nechta yo'l, student guruh orqali bitta yo'lga biriktiriladi. C) Student bir nechta yo'lni parallel o'qiydi.
 - Ta'sir: `groups.path_id`, `student_path_enrollments`, xarita. Bo'lim (section) darajasi ham taxmin sifatida qo'shilgan.
 
-**S-02** 🔴 Student bir vaqtda bir nechta guruhda bo'la oladimi?
+**S-02** ✔️ **Tech Lead qarori (2026-11-11): A — faqat bitta faol guruh.** Student bir vaqtda bir nechta guruhda bo'la oladimi?
 - ✅ A) Faqat bitta faol guruh. B) Bir nechta guruh (masalan asosiy + qo'shimcha kurs).
 - Ta'sir: partial unique index, mentor scope, chat (qaysi mentor).
 
-**S-03** 🟡 Guruhda bir nechta mentor bo'la oladimi?
+**S-03** ✔️ **Tech Lead qarori (2026-11-11): A — bitta mentor.** Guruhda bir nechta mentor bo'la oladimi?
 - ✅ A) Bitta mentor. B) Asosiy + yordamchi mentorlar (`group_mentors` jadvali).
 
 **S-04** 🟢 Interfeys tillari?
@@ -253,3 +253,5 @@ Savol hal qilinganda: javobni shu yerga yozing, tegishli hujjatdagi "Taxmin:" be
 
 **S-69** ✔️ **HAL QILINDI (2026-11-11): A — mentor paneli `/mentor/*`, student sahifasi `/my-mentor`.** Student "Mentor sahifasi" va mentor paneli bir xil yo'lda (`/mentor`, docs/03 §2.11 va §3). Qaysi biri o'zgaradi?
 - A) Mentor paneli `/mentor/*` qoladi, student sahifasi `/my-mentor` bo'ladi (tavsiya). B) Student sahifasi `/mentor` qoladi, mentor paneli `/m/*` yoki `/mentor-panel/*`.
+
+**S-70** ✔️ **Tech Lead qarori (2026-11-11): ota-ona havolasi `#t=` (fragment).** Review L6: `?t=` query server/proxy access loglariga tushadi (docs/02 §5 "token loglarga yozilmaydi" talabiga zid). Fragment serverga yuborilmaydi. Havola: `${WEB_BASE_URL}/parent#t=<token>`; frontend fragmentni o'qib, darhol `history.replaceState` bilan tozalaydi. Eski `?t=` havolalari ham bir muddat qabul qilinadi (orqaga moslik).

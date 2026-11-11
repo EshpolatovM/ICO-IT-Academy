@@ -129,7 +129,7 @@ sequenceDiagram
     API->>API: hash = HMAC-SHA256(PEPPER, raw)
     API->>DB: parent_access_tokens INSERT {student_id, token_hash, prefix=raw[0..6], label}
     API->>DB: audit_logs INSERT
-    API-->>M: 201 {token: raw, link: https://.../parent?t=raw} (FAQAT bir marta)
+    API-->>M: 201 {token: raw, link: https://.../parent#t=raw} (FAQAT bir marta)
 ```
 
 ### 4.5 Ota-ona: kirish (token exchange)
@@ -142,7 +142,7 @@ sequenceDiagram
     participant R as Redis
     participant DB as PostgreSQL
 
-    P->>FE: /parent?t=RAW havola yoki tokenni qo'lda kiritish
+    P->>FE: /parent#t=RAW havola yoki tokenni qo'lda kiritish
     FE->>FE: tokenni URL'dan darhol olib tashlash (history.replaceState)
     FE->>API: POST /auth/parent/exchange {tokens:[RAW1, RAW2?]}
     API->>R: rate limit (ip)
@@ -175,7 +175,7 @@ sequenceDiagram
 Tavsifda: "Bir ota-onaning bir nechta farzandi bo'lishi mumkin" va "token student profilidan beriladi". Bu ikki talab birga quyidagicha amalga oshiriladi:
 
 **Qaror (S-15, egasi tasdiqlagan):** token **har bir farzand uchun alohida** yaratiladi (student profilidan) va ota-ona panelida birlashtiriladi. Kirishning ikki yo'li bor:
-1. **Mentor yuborgan havola** (`/parent?t=...`): havola ochilganda token brauzerda saqlanadi va keyingi tashriflarda qayta kiritish talab qilinmaydi.
+1. **Mentor yuborgan havola** (`/parent#t=...`, S-70: fragment serverga yuborilmaydi va loglarga tushmaydi; eski `?t=` ham qabul qilinadi): havola ochilganda token brauzerda saqlanadi va keyingi tashriflarda qayta kiritish talab qilinmaydi.
 2. **Saytda kod kiritish**: ota-ona panelidagi "Farzand qo'shish" orqali boshqa farzandning kodi kiritiladi va u mavjud sessiyaga qo'shiladi.
 
 Tokenni brauzerda saqlash usuli:
