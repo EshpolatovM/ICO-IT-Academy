@@ -93,7 +93,9 @@ describe('Auth: kirish, me, rollar (e2e)', () => {
 
   it("noto'g'ri parol, noma'lum telefon va INACTIVE — bir xil 401", async () => {
     const inactive = await fixtures.createUser({ role: Role.MENTOR, status: UserStatus.INACTIVE });
-    const unknown: TestUser = { ...mentor, phone: '+998770000000' };
+    // Har ishga tushirishda yangi telefon: doimiy raqamning `ip + login` hisoblagichi (15 daqiqalik
+    // oyna) ketma-ket ishga tushirishlarda yig'ilib, 6-marta 429 qaytarardi.
+    const unknown: TestUser = { ...mentor, phone: randomTestPhone() };
 
     const responses = await Promise.all([
       loginRequest(app, mentor, 'NotoGri123'),

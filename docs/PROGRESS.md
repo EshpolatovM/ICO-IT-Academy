@@ -130,3 +130,7 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Nima qilindi:** atomar login/exchange limitlari + IP umumiy limit; refresh grace oynasi (`REFRESH_SUPERSEDED`); cookie bilan exchange limitga sanalmaydi; RolesGuard deny-by-default + `@AnyAuthenticated` + barcha route'lar testi; helmet; Redis Lua skriptlar; token_version CAS; change-password limiti; parent token tombstone + audit bitta tranzaksiyada (`UnitOfWork`); prod'da namuna sirlar rad etiladi; logout CSRF; access JWT `aud`; strict sxemalar; UUID → VALIDATION_ERROR; CI `pnpm audit`; turbo passThroughEnv; `next-env.d.ts` gitignore. postcss override (`next>postcss` 8.5.32).
 - **Frontend uchun:** REFRESH_SUPERSEDED da logout qilmaslik; logout CSRF (api client qo'yadi); strict sxemalar; UUID xato formati; web lint/typecheck `next typegen` bilan.
 - **Testlar:** `pnpm check` yashil (api 319, web 94); api e2e 169/170 — `auth-login.e2e-spec.ts` da 429 (yuqoridagi STATE ga qarang). Limit tugagani uchun WIP commit.
+
+## 2026-11-11 — 1.11a yakuni: e2e izolyatsiyasi
+- **Nima qilindi:** `auth-login.e2e-spec.ts` da noma'lum foydalanuvchi uchun doimiy telefon o'rniga `randomTestPhone()` (ishga tushirishlar orasida `ip+login` limiti to'planardi). Mahsulot kodida bug yo'q.
+- **Testlar:** api e2e 170/170 (agent 7 marta, Tech Lead 1 marta), `pnpm check` yashil.
