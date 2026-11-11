@@ -155,3 +155,10 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Nima qilindi:** 12 ta komponent (Table, Pagination, Select, SearchInput, Textarea, FileInput, Badge, DescriptionList, Dialog, ConfirmDialog, Tabs, SecretReveal), `/design-preview` bo'limlari, testlar. Radix dialog/tabs qo'shildi.
 - **Fayllar:** `apps/web/src/components/ui/**`, `apps/web/src/app/design-preview/**`, `apps/web/package.json`, `pnpm-lock.yaml`.
 - **Testlar:** `pnpm check` (web 144), `format:check` — yashil.
+
+## 2026-11-11 — 2.2: backend foydalanuvchilar boshqaruvi
+- **Nima qilindi:** adminlar (SA), mentorlar va studentlar (SA A) CRUD, qidiruv/filtr/saralash/pagination, vaqtinchalik parol, deaktivatsiya/aktivatsiya, CSV import, audit; shared sxema/tiplar; docs/12 §2.1.
+- **Fayllar:** `apps/api/src/modules/{admin-users,groups}/**`, `apps/api/src/common/{csv,config}/**`, `apps/api/src/modules/{audit,parent-access,users}/**`, `apps/api/test/**`, `packages/shared/src/{users,groups,errors,audit}/**`, `.env.example`, `.github/workflows/ci.yml`, `docs/12-api.md`.
+- **Testlar:** api unit 380, api e2e 283, web 144 — Tech Lead qayta yurgizdi, yashil.
+- **Qarorlar:** CSV `groupName` (UUID emas), o'z CSV parser (bog'liqliksiz), o'z akkauntini PATCH qilish 403, guruh xatosi 400; `GET /super/admins/:id` yo'q (docs'da yo'q).
+- **Holat:** egasi so'rovi bilan shu yerda to'xtatildi.

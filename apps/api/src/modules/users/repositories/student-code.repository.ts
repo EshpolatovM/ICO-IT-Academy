@@ -23,4 +23,23 @@ export class StudentCodeRepository {
     }
     return formatStudentCode(row.value);
   }
+
+  /**
+   * Bir nechta kod bitta so'rovda (CSV import): qiymatlar o'sish tartibida qaytadi.
+   * Tranzaksiya bekor bo'lsa sequence qiymatlari qaytmaydi (raqamlarda bo'shliq — normal holat).
+   */
+  async nextMany(client: RawQueryClient, count: number): Promise<string[]> {
+    if (count <= 0) {
+      return [];
+    }
+    const rows = await client.$queryRaw<{ value: bigint }[]>`
+      SELECT nextval('student_code_seq') AS value FROM generate_series(1, ${count}::int)`;
+    if (rows.length !== count) {
+      throw new Error('student_code_seq dan yetarli qiymat olinmadi.');
+    }
+    return rows
+      .map((row) => row.value)
+      .sort((left, right) => (left < right ? -1 : 1))
+      .map((value) => formatStudentCode(value));
+  }
 }

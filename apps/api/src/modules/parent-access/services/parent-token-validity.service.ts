@@ -81,4 +81,19 @@ export class ParentTokenValidityCache {
       );
     }
   }
+
+  /**
+   * Tombstone'ni olib tashlaydi — token bazada hali faol bo'lsa (masalan student qayta
+   * aktivlashtirilganda), keyingi so'rov bazadan tekshiradi va keshni qayta yozadi.
+   * Xato — log, yuqoriga uzatilmaydi (tombstone TTL tugagach baribir o'chadi).
+   */
+  async clearRevoked(tokenId: string): Promise<void> {
+    try {
+      await this.redis.del(revokedKey(tokenId));
+    } catch (error) {
+      this.logger.warn(
+        `Ota-ona tokeni ${tokenId} tombstone'ini o'chirib bo'lmadi: ${String(error)}`,
+      );
+    }
+  }
 }

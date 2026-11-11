@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { AuditLogsRepository } from '../repositories/audit-logs.repository.js';
 
-import type { AuditEntry, AuditSnapshot } from '../audit.types.js';
+import type { AuditEntry, AuditLogData, AuditSnapshot } from '../audit.types.js';
 
 /**
  * Maxfiy maydonlar — `before`/`after` ga HECH QACHON yozilmaydi (har qanday chuqurlikda).
@@ -44,6 +44,19 @@ function sanitizeSnapshot(snapshot: AuditSnapshot): AuditSnapshot {
   );
 }
 
+function toLogData(entry: AuditEntry): AuditLogData {
+  return {
+    actorId: entry.actor?.id ?? null,
+    actorRole: entry.actor?.role ?? null,
+    action: entry.action,
+    entityType: entry.entityType,
+    entityId: entry.entityId,
+    before: entry.before ? sanitizeSnapshot(entry.before) : null,
+    after: entry.after ? sanitizeSnapshot(entry.after) : null,
+    ip: entry.ip,
+  };
+}
+
 /**
  * Muhim amallar jurnali (docs/01 §4, docs/11 §1 `audit_logs`): kim (`actor`, `actorRole`),
  * nima (`action`), qaysi obyekt, oldin/keyin holati va IP. Maxfiy qiymatlar avtomatik olib tashlanadi.
@@ -53,15 +66,14 @@ export class AuditService {
   constructor(private readonly logs: AuditLogsRepository) {}
 
   async record(entry: AuditEntry): Promise<void> {
-    await this.logs.insert({
-      actorId: entry.actor?.id ?? null,
-      actorRole: entry.actor?.role ?? null,
-      action: entry.action,
-      entityType: entry.entityType,
-      entityId: entry.entityId,
-      before: entry.before ? sanitizeSnapshot(entry.before) : null,
-      after: entry.after ? sanitizeSnapshot(entry.after) : null,
-      ip: entry.ip,
-    });
+    await this.logs.insert(toLogData(entry));
+  }
+
+  /** Bir nechta yozuv bitta so'rovda (masalan CSV importda har bir yaratilgan student). */
+  async recordMany(entries: readonly AuditEntry[]): Promise<void> {
+    if (entries.length === 0) {
+      return;
+    }
+    await this.logs.insertMany(entries.map(toLogData));
   }
 }

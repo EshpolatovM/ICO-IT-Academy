@@ -18,6 +18,8 @@ export const ErrorCode = {
   FORBIDDEN: 'FORBIDDEN',
   NOT_FOUND: 'NOT_FOUND',
   CONFLICT: 'CONFLICT',
+  /** Yuklangan fayl (masalan CSV import) ruxsat etilgan hajmdan katta — 413. */
+  PAYLOAD_TOO_LARGE: 'PAYLOAD_TOO_LARGE',
   RATE_LIMITED: 'RATE_LIMITED',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
@@ -27,6 +29,8 @@ export const ErrorCode = {
   INSUFFICIENT_COINS: 'INSUFFICIENT_COINS',
   OUT_OF_STOCK: 'OUT_OF_STOCK',
   ALREADY_DONE: 'ALREADY_DONE',
+  /** Studentning boshqa faol guruhi bor (S-02: bitta faol guruh) — 409. */
+  STUDENT_ALREADY_IN_GROUP: 'STUDENT_ALREADY_IN_GROUP',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

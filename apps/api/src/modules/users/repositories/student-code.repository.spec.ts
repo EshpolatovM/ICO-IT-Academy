@@ -16,4 +16,18 @@ describe('StudentCodeRepository', () => {
   it('sequence qiymat qaytarmasa xato', async () => {
     await expect(repository.next(clientReturning([]))).rejects.toThrow(/student_code_seq/);
   });
+
+  it("nextMany: bir nechta kod o'sish tartibida", async () => {
+    const client = clientReturning([{ value: 10_003n }, { value: 10_002n }]);
+
+    await expect(repository.nextMany(client, 2)).resolves.toEqual(['ST-10002', 'ST-10003']);
+  });
+
+  it("nextMany: 0 ta — bazaga so'rovsiz, yetishmasa — xato", async () => {
+    const client = clientReturning([]);
+
+    await expect(repository.nextMany(client, 0)).resolves.toEqual([]);
+    expect(client.$queryRaw).not.toHaveBeenCalled();
+    await expect(repository.nextMany(client, 2)).rejects.toThrow(/student_code_seq/);
+  });
 });

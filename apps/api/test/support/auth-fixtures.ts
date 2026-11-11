@@ -1,3 +1,5 @@
+import { randomBytes } from 'node:crypto';
+
 import request from 'supertest';
 
 import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE, Role, UserStatus } from '@lms/shared';
@@ -7,6 +9,7 @@ import { PASSWORD_HASHER } from '../../src/common/security/password-hasher.inter
 import { PrismaService } from '../../src/infra/prisma/prisma.service.js';
 
 import {
+  deleteTestGroups,
   deleteTestUsers,
   randomTestPhone,
   randomTestStudentCode,
@@ -20,6 +23,18 @@ import type { App } from 'supertest/types.js';
 export const API = '/api/v1';
 export { TEST_PASSWORD };
 const HTTP_OK = 200;
+
+const GROUP_SUFFIX_BYTES = 4;
+
+export interface TestGroup {
+  id: string;
+  name: string;
+}
+
+interface CreateGroupOptions {
+  name?: string;
+  status?: 'ACTIVE' | 'ARCHIVED';
+}
 
 export interface TestUser {
   id: string;
@@ -40,6 +55,8 @@ interface CreateUserOptions {
  */
 export class AuthFixtures {
   private readonly createdIds: string[] = [];
+  private readonly groupIds: string[] = [];
+  private readonly pathIds: string[] = [];
 
   constructor(private readonly app: INestApplication<App>) {}
 
@@ -63,9 +80,37 @@ export class AuthFixtures {
     return user;
   }
 
-  /** Faqat shu fixture yaratgan foydalanuvchilar va ularga bog'langan yozuvlar o'chiriladi. */
+  /** API orqali yaratilgan foydalanuvchini tozalash ro'yxatiga qo'shadi. */
+  track(userId: string): void {
+    this.createdIds.push(userId);
+  }
+
+  /** Test guruhi (o'z yo'li bilan): `E2E-` prefiksli nom, holat — standart ACTIVE. */
+  async createGroup(options: CreateGroupOptions = {}): Promise<TestGroup> {
+    const suffix = randomBytes(GROUP_SUFFIX_BYTES).toString('hex');
+    const db = this.prisma().dbIncludingDeleted;
+    const path = await db.learningPath.create({
+      data: { title: `E2E ${suffix}`, slug: `e2e-${suffix}`, status: 'PUBLISHED' },
+      select: { id: true },
+    });
+    this.pathIds.push(path.id);
+    const group = await db.group.create({
+      data: {
+        name: options.name ?? `E2E-${suffix}`,
+        pathId: path.id,
+        status: options.status ?? 'ACTIVE',
+      },
+      select: { id: true, name: true },
+    });
+    this.groupIds.push(group.id);
+    return group;
+  }
+
+  /** Faqat shu fixture yaratgan foydalanuvchilar, guruhlar va ularga bog'langan yozuvlar o'chiriladi. */
   async cleanup(): Promise<void> {
-    await deleteTestUsers(this.prisma().dbIncludingDeleted, this.createdIds);
+    const db = this.prisma().dbIncludingDeleted;
+    await deleteTestUsers(db, this.createdIds);
+    await deleteTestGroups(db, this.groupIds, this.pathIds);
   }
 
   private prisma(): PrismaService {
@@ -121,4 +166,13 @@ export function statusCounts(responses: readonly request.Response[]): Record<num
     counts[status] = (counts[status] ?? 0) + 1;
   }
   return counts;
+}
+
+/** Berilgan roldagi yangi test foydalanuvchisi nomidan access token (suite `beforeAll` i uchun). */
+export async function accessTokenFor(
+  app: INestApplication<App>,
+  fixtures: AuthFixtures,
+  role: AccountRole,
+): Promise<string> {
+  return (await login(app, await fixtures.createUser({ role }))).accessToken;
 }

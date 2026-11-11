@@ -7,7 +7,7 @@
 | Maydon | Qiymat |
 |---|---|
 | Joriy modul | 2-bosqich: Admin asosi — foydalanuvchilar va guruhlar (reja: `docs/tasks/02-reja.md`) |
-| Joriy bosqich | 2.1 va 2.4 commit qilindi; 2.2 backend foydalanuvchilar (`oga-backend`, `docs/tasks/02-2.2-users.md`) bajarilmoqda |
+| Joriy bosqich | 2.2 commit qilindi; **egasi so'rovi bilan to'xtatildi** (2026-11-11) — keyingisi 2.3, egasi "davom et" deganda |
 | Joriy git branch | `feature/02-admin-asosi` |
 | Ish rejimi | **To'liq avtonom** (egasi 2026-11-11: savol berma, tasdiq kutma, Tech Lead o'zi qaror qiladi; faqat haqiqiy xavfli amallarda to'xtash). Har vazifadan keyin commit + STATE/PROGRESS; hisobot `docs/HISOBOT-*.md` |
 
@@ -33,8 +33,10 @@
 
 **2.4 — UI** (`rassom-dizayner`, Tech Lead tekshirdi): Table/TableHead (saralash, `aria-sort`), Pagination (`getPageCount`), Select, SearchInput (debounce feature'da), Textarea, FileInput, Badge, DescriptionList, Dialog + ConfirmDialog (Radix dialog 1.3.1; `onConfirm` oynani o'zi yopmaydi), Tabs (Radix 1.2.1), SecretReveal (+`useCopyToClipboard`), `toneClasses`. Web 144 test.
 
+**2.2 — backend: foydalanuvchilar** (`oga-backend`, Tech Lead tekshirdi): `modules/admin-users` — `/super/admins` (SA), `/admin/mentors`, `/admin/students` (SA A): CRUD, qidiruv (pg_trgm), filtr, saralash, pagination, vaqtinchalik parol bir marta, deaktivatsiya/aktivatsiya (token_version, refresh, parent tombstone), CSV import (`firstName,lastName[,groupName]`, hammasi yoki hech narsa, o'z RFC 4180 parser), audit. `modules/groups` boshlandi (repository'lar, `GroupEnrollmentService`). Yangi kodlar: `STUDENT_ALREADY_IN_GROUP` (409), `PAYLOAD_TOO_LARGE` (413). api unit 380, e2e 283.
+
 ## Keyingi aniq vazifa
-**2.2 — backend: foydalanuvchilar** (`oga-backend`, `docs/tasks/02-2.2-users.md`) — bajarilmoqda. Keyin 2.3, 2.5, 2.6, 2.7 (`docs/tasks/02-reja.md`).
+**2.3 — backend: guruhlar, mentor scope** (`oga-backend`, `docs/tasks/02-2.3-groups-scope.md` tayyor) — egasi ruxsat berganda. Keyin 2.3, 2.5, 2.6, 2.7 (`docs/tasks/02-reja.md`).
 
 ## 2-bosqich uchun eslatmalar
 - `RoleBasedStudentScopeResolver` MENTOR tarmog'i → `group_members` asosida (scope tashqarisi 404).

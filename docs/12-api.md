@@ -29,7 +29,8 @@
 | 401 | Token yo'q yoki eskirgan |
 | 403 | Rol/scope ruxsati yo'q, `PASSWORD_CHANGE_REQUIRED`, `LOCKED` |
 | 404 | Topilmadi (scope'dan tashqari resurs uchun ham 404 qaytariladi, mavjudligini oshkor qilmaslik uchun) |
-| 409 | `REVIEW_REQUIRED`, `INSUFFICIENT_COINS`, `OUT_OF_STOCK`, `ALREADY_DONE` |
+| 409 | `REVIEW_REQUIRED`, `INSUFFICIENT_COINS`, `OUT_OF_STOCK`, `ALREADY_DONE`, `STUDENT_ALREADY_IN_GROUP`, `CONFLICT` (masalan telefon band) |
+| 413 | `PAYLOAD_TOO_LARGE` — yuklangan fayl hajmi limitdan katta (CSV import) |
 | 429 | Rate limit |
 
 **Rol qisqartmalari:** `SA` super admin, `A` admin, `M` mentor (scope: o'z guruhi), `S` student (scope: o'zi), `P` ota-ona (scope: farzand), `PUB` public, `ANY` har qanday autentifikatsiyalangan foydalanuvchi.
@@ -120,6 +121,80 @@ POST /admin/students
 
 201
 { "id": "0190...", "studentCode": "ST-10245", "temporaryPassword": "q7Lm2xPa9z", "mustChangePassword": true }
+```
+
+### 2.1 Foydalanuvchilarni boshqarish (2.2)
+
+**Ruxsat matritsasi** (docs/01 §2.1, S-07 A, S-11 A): adminlar — faqat SA; mentor va studentlar — SA va A. SUPER_ADMIN API orqali yaratilmaydi va o'zgartirilmaydi (faqat CLI, S-13): har bir endpoint faqat o'z rolidagi akkauntni ko'radi, boshqa rol (SUPER_ADMIN ham) — 404. Boshqaruv endpointi orqali **o'z akkauntini** o'zgartirish/deaktivatsiya qilish — 403 `FORBIDDEN` (o'z profili — `PATCH /me/profile`). O'chirish endpointi yo'q — faqat deaktivatsiya (S-08 A). Barcha so'rov sxemalari `@lms/shared` da (`z.strictObject`: noma'lum maydon — 400).
+
+**Ro'yxatlar** (`GET /super/admins`, `GET /admin/mentors`, `GET /admin/students`) — offset pagination:
+
+| Parametr | Qiymat |
+|---|---|
+| `page`, `pageSize` | standart 1 / 20, `pageSize` ≤ 100 |
+| `q` | ≤ 64 belgi. Ism-familiya bo'yicha qism moslik (`lower(first_name ‖ ' ' ‖ last_name) LIKE`, pg_trgm GIN indeksi). Studentlarda qo'shimcha: student kodi aniq mosligi (`ST-10245` yoki `10245`). Xodimlarda: telefon raqamlari bo'yicha qism moslik |
+| `status` | `ACTIVE` \| `INACTIVE` |
+| `groupId` | faqat `/admin/students`: shu guruhning faol a'zolari |
+| `sort` | `-createdAt` (standart), `createdAt`, `lastName`, `-lastName` |
+
+```http
+GET /admin/students?q=ali&groupId=0190...&status=ACTIVE&page=1&pageSize=20&sort=lastName
+200
+{ "items": [ { "id": "0190...", "studentCode": "ST-10245", "firstName": "Ali", "lastName": "Valiyev",
+               "status": "ACTIVE", "mustChangePassword": true, "lastLoginAt": null,
+               "createdAt": "2026-11-11T08:00:00.000Z", "group": { "id": "0190...", "name": "FE-12" } } ],
+  "total": 1, "page": 1, "pageSize": 20 }
+```
+`GET /admin/students/:id` — xuddi shu element. `GET /admin/mentors` elementi: `{ id, phone, firstName, lastName, status, mustChangePassword, lastLoginAt, createdAt, bio, groups: [{ id, name }] }` (faqat ACTIVE guruhlar); `GET /admin/mentors/:id` — xuddi shu. `GET /super/admins` elementi: `{ id, phone, firstName, lastName, status, mustChangePassword, lastLoginAt, createdAt }`.
+
+**Yaratish** — 201, `Cache-Control: no-store`. `password` berilmasa (`null`/yo'q) tizim 10 belgili vaqtinchalik parol yaratadi va u FAQAT shu javobda qaytadi; berilsa (parol siyosati, docs/02 §6) — `temporaryPassword: null`. Har ikki holatda `mustChangePassword: true`. Audit `USER_CREATED` (parolsiz).
+
+```http
+POST /super/admins            (SA)       POST /admin/mentors   (SA A)
+{ "phone": "+998 90 123-45-67", "firstName": "Vali", "lastName": "Aliyev", "password": null }
+
+201
+{ "id": "0190...", "phone": "+998901234567", "temporaryPassword": "q7Lm2xPa9z", "mustChangePassword": true }
+409 { "error": { "code": "CONFLICT", "message": "Bu telefon raqam boshqa akkauntda band", "details": { "field": "phone" } } }
+```
+Student (`POST /admin/students`, namuna yuqorida): `groupId` berilsa guruh ACTIVE bo'lishi shart (aks holda 400 `VALIDATION_ERROR`, `details: [{ field: "groupId" }]`), student shu tranzaksiyada faol a'zo bo'ladi; boshqa faol guruhi bo'lsa — 409 `STUDENT_ALREADY_IN_GROUP` (S-02).
+
+**O'zgartirish / deaktivatsiya** — `PATCH /super/admins/:id`, `PATCH /admin/mentors/:id`: `{ firstName?, lastName?, phone?, status? }`; `PATCH /admin/students/:id`: `{ firstName?, lastName?, status? }` (guruh — `/admin/groups/:id/members`). Kamida bitta maydon (bo'sh body — 400). Javob — yangilangan element (GET bilan bir xil). O'zgarmagan qiymat — no-op (audit yo'q).
+
+```http
+PATCH /admin/students/0190...
+{ "status": "INACTIVE" }
+200 { "id": "0190...", "status": "INACTIVE", ... }
+```
+- `INACTIVE`: shu tranzaksiyada `token_version++` va barcha refresh tokenlar bekor → eski access va refresh darhol 401, login 401. Student bo'lsa ota-ona sessiyalari darhol 401 (tokenlar bekor qilinmaydi — `parent_token:*:valid` keshiga to'xtatish belgisi qo'yiladi). Audit `USER_DEACTIVATED`.
+- `ACTIVE`: `token_version` o'zgarmaydi (yangi login kerak), ota-ona tokenlari qayta ishlaydi. Audit `USER_ACTIVATED`.
+- Ism/familiya/telefon: audit `USER_UPDATED` (`before`/`after` faqat o'zgargan maydonlar). Telefon band — 409.
+
+**CSV import** — `POST /admin/students/import` (SA A, S-21), `multipart/form-data`, fayl maydoni `file`. Hajm ≤ `STUDENT_IMPORT_MAX_FILE_BYTES` (standart 1 MiB, oshsa — 413 `PAYLOAD_TOO_LARGE`), ma'lumot qatorlari ≤ `STUDENT_IMPORT_MAX_ROWS` (standart 500).
+
+Fayl formati: UTF-8 (Excel BOM qabul qilinadi), RFC 4180 (`"..."` ichida vergul, `""`, qator o'tishi mumkin), ajratgich `,` yoki `;` (sarlavhadan aniqlanadi). Birinchi qator — sarlavha, ustunlar nomi bo'yicha (tartib va katta-kichik harf ixtiyoriy): `firstName` (majburiy), `lastName` (majburiy), `groupName` (ixtiyoriy — faol guruh nomi, katta-kichik harf farqisiz; bo'sh — guruhsiz). Boshqa ustun — xato. Parol har doim tizim tomonidan yaratiladi.
+
+```csv
+firstName,lastName,groupName
+Ali,Valiyev,FE-12
+Laylo,"Karimova, Sh.",
+```
+
+**Hammasi yoki hech narsa:** avval butun fayl tekshiriladi (sarlavha, har bir qator, guruh nomlari — aniq bitta faol guruh mos kelishi shart). Birorta xato bo'lsa hech kim yaratilmaydi va barcha xatolar bitta javobda (`row` — fayldagi qator raqami, 1 = sarlavha, 0 = butun fayl):
+```http
+400
+{ "error": { "code": "VALIDATION_ERROR", "message": "CSV faylda xatolar bor — hech bir student yaratilmadi",
+  "details": [ { "row": 3, "field": "lastName", "message": "..." },
+               { "row": 5, "field": "groupName", "message": "Bunday nomli faol guruh topilmadi" } ] } }
+```
+Muvaffaqiyatda hammasi bitta tranzaksiyada yaratiladi (`Cache-Control: no-store`, parollar FAQAT shu javobda); audit: har biriga `USER_CREATED` + partiyaga `STUDENTS_IMPORTED` (`entity_type = STUDENT_IMPORT`).
+```http
+201
+{ "count": 2, "students": [
+  { "id": "0190...", "studentCode": "ST-10246", "firstName": "Ali", "lastName": "Valiyev",
+    "groupName": "FE-12", "temporaryPassword": "q7Lm2xPa9z" },
+  { "id": "0190...", "studentCode": "ST-10247", "firstName": "Laylo", "lastName": "Karimova, Sh.",
+    "groupName": null, "temporaryPassword": "R4tkm8Hs2w" } ] }
 ```
 
 ```http

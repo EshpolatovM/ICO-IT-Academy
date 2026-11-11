@@ -9,6 +9,19 @@ function toJson(snapshot: AuditSnapshot | null): Prisma.InputJsonValue | undefin
   return snapshot === null ? undefined : (snapshot as Prisma.InputJsonObject);
 }
 
+function toCreateInput(data: AuditLogData): Prisma.AuditLogUncheckedCreateInput {
+  return {
+    actorId: data.actorId,
+    actorRole: data.actorRole,
+    action: data.action,
+    entityType: data.entityType,
+    entityId: data.entityId,
+    before: toJson(data.before),
+    after: toJson(data.after),
+    ip: data.ip,
+  };
+}
+
 /**
  * `audit_logs` jadvali — faqat qo'shish (o'qish `GET /super/audit-logs` bilan keyinroq).
  * `BaseRepository` dan meros olmaydi: jurnal o'zgarmas (update/softDelete/umumiy CRUD bo'lmasligi
@@ -20,18 +33,10 @@ export class AuditLogsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async insert(data: AuditLogData): Promise<void> {
-    await this.prisma.client.auditLog.create({
-      data: {
-        actorId: data.actorId,
-        actorRole: data.actorRole,
-        action: data.action,
-        entityType: data.entityType,
-        entityId: data.entityId,
-        before: toJson(data.before),
-        after: toJson(data.after),
-        ip: data.ip,
-      },
-      select: { id: true },
-    });
+    await this.prisma.client.auditLog.create({ data: toCreateInput(data), select: { id: true } });
+  }
+
+  async insertMany(data: readonly AuditLogData[]): Promise<void> {
+    await this.prisma.client.auditLog.createMany({ data: data.map(toCreateInput) });
   }
 }

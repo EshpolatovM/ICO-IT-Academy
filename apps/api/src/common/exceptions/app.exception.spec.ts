@@ -37,7 +37,8 @@ describe('AppException', () => {
     [HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND],
     [HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED],
     [HttpStatus.TOO_MANY_REQUESTS, ErrorCode.RATE_LIMITED],
-    [HttpStatus.PAYLOAD_TOO_LARGE, ErrorCode.BAD_REQUEST],
+    [HttpStatus.PAYLOAD_TOO_LARGE, ErrorCode.PAYLOAD_TOO_LARGE],
+    [HttpStatus.UNPROCESSABLE_ENTITY, ErrorCode.BAD_REQUEST],
     [HttpStatus.BAD_GATEWAY, ErrorCode.INTERNAL_ERROR],
   ])('fromHttpStatus(%i) → %s, holat saqlanadi', (status, code) => {
     const exception = AppException.fromHttpStatus(status);

@@ -1,69 +1,39 @@
 import { randomUUID } from 'node:crypto';
 
-import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE, ErrorCode, Role } from '@lms/shared';
+import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE, Role } from '@lms/shared';
 import type { AccountRole } from '@lms/shared';
 
 import { API, http, TEST_PASSWORD } from './support/auth-fixtures.js';
 import { useE2eContext } from './support/e2e-context.js';
 import { ALL_ACTORS, RbacActors } from './support/rbac-actors.js';
+import {
+  accountOnly,
+  FORBIDDEN,
+  MCP_BLOCKED,
+  NOT_FOUND,
+  ok,
+  resolved,
+  row,
+  staffStudentAccess,
+  targetStudent,
+  UNAUTHORIZED,
+} from './support/rbac-matrix.js';
+import { USER_MANAGEMENT_CASES } from './support/rbac-user-cases.js';
 
-import type { Actor, ActorKind } from './support/rbac-actors.js';
+import type { AuthFixtures } from './support/auth-fixtures.js';
+import type { Actor } from './support/rbac-actors.js';
+import type { EndpointCase, RequestSpec } from './support/rbac-matrix.js';
 import type request from 'supertest';
 
 /**
- * 1-bosqich RBAC matritsasi (docs/01 §2.1, docs/02 §7, docs/12 §1, §16): har bir endpoint × har bir
+ * RBAC matritsasi — 1-bosqich va 2.2 (docs/01 §2.1, docs/02 §7, docs/12 §1, §2, §16): har bir endpoint × har bir
  * aktyor → kutilgan status (va xato kodi). Global guard tartibi: autentifikatsiya (401) →
  * `PASSWORD_CHANGE_REQUIRED` (403) → `@Roles` (403) → ota-ona faqat o'qish (403) → `@StudentScope`.
  * Mentor uchun student endpointlari hozir 403 (guruhlar 2-bosqichda — 1.6 qarori).
  * Har bir katak o'z aktyori va nishon yozuvlari bilan ishlaydi (natijalar bir-biriga ta'sir qilmaydi).
  */
 
-interface Expectation {
-  status: number;
-  code?: ErrorCode;
-}
-
-interface RequestSpec {
-  method: 'get' | 'post' | 'delete';
-  path: string;
-  body?: object;
-  csrf?: boolean;
-}
-
-interface EndpointCase {
-  endpoint: string;
-  build: (actor: Actor, actors: RbacActors) => Promise<RequestSpec>;
-  expected: Record<ActorKind, Expectation>;
-}
-
 const NEW_PASSWORD = 'Yangi$Parol9';
-
-const UNAUTHORIZED: Expectation = { status: 401, code: ErrorCode.UNAUTHORIZED };
-const FORBIDDEN: Expectation = { status: 403, code: ErrorCode.FORBIDDEN };
-const MCP_BLOCKED: Expectation = { status: 403, code: ErrorCode.PASSWORD_CHANGE_REQUIRED };
-const NOT_FOUND: Expectation = { status: 404, code: ErrorCode.NOT_FOUND };
-const ok = (status: number): Expectation => ({ status });
-
-/** Ustunlar tartibi: anonim, SA, A, M, S, S(mcp), P. */
-function row(...cells: [Expectation, ...Expectation[]]): Record<ActorKind, Expectation> {
-  return Object.fromEntries(ALL_ACTORS.map((kind, index) => [kind, cells[index]])) as Record<
-    ActorKind,
-    Expectation
-  >;
-}
-
-/** SA A M S — akkauntli rollar (ota-ona — 403, mcp=true — 403 PASSWORD_CHANGE_REQUIRED). */
-const accountOnly = (success: Expectation) =>
-  row(UNAUTHORIZED, success, success, success, success, MCP_BLOCKED, FORBIDDEN);
-
-/** SA A (+ M guruh bilan, 2-bosqichgacha 403) — xodimning studentga oid amallari. */
-const staffStudentAccess = (success: Expectation) =>
-  row(UNAUTHORIZED, success, success, FORBIDDEN, FORBIDDEN, MCP_BLOCKED, FORBIDDEN);
-
-/** Studentga oid endpoint nishoni: student — o'zi, ota-ona — farzandi, qolganlar — yangi student. */
-async function targetStudent(actor: Actor, actors: RbacActors): Promise<string> {
-  return actor.ownStudentId ?? (await actors.newUser(Role.STUDENT)).id;
-}
 
 async function tokenPath(actor: Actor, actors: RbacActors): Promise<string> {
   const studentId = await targetStudent(actor, actors);
@@ -77,9 +47,7 @@ function staffResetOf(role: AccountRole) {
   });
 }
 
-const resolved = (spec: RequestSpec) => () => Promise.resolve(spec);
-
-const CASES: EndpointCase[] = [
+const FOUNDATION_CASES: EndpointCase[] = [
   {
     endpoint: 'GET /health',
     build: resolved({ method: 'get', path: '/health' }),
@@ -191,6 +159,19 @@ const CASES: EndpointCase[] = [
   },
 ];
 
+const CASES: EndpointCase[] = [...FOUNDATION_CASES, ...USER_MANAGEMENT_CASES];
+
+/** Muvaffaqiyatli yaratish javobidagi foydalanuvchilar (`id`, `students[].id`) tozalanadi. */
+function trackCreatedUsers(fixtures: AuthFixtures, response: request.Response): void {
+  const body = response.body as { id?: string; students?: { id: string }[] };
+  const ids = [body.id, ...(body.students ?? []).map((student) => student.id)];
+  ids.forEach((id) => {
+    if (id) {
+      fixtures.track(id);
+    }
+  });
+}
+
 const CELLS = CASES.flatMap((testCase) =>
   ALL_ACTORS.map((actor) => ({
     ...testCase,
@@ -199,7 +180,7 @@ const CELLS = CASES.flatMap((testCase) =>
   })),
 );
 
-describe('RBAC matritsasi — 1-bosqich endpointlari (e2e)', () => {
+describe('RBAC matritsasi — 1-bosqich va 2.2 endpointlari (e2e)', () => {
   const context = useE2eContext();
   let actors: RbacActors;
 
@@ -211,13 +192,20 @@ describe('RBAC matritsasi — 1-bosqich endpointlari (e2e)', () => {
     const agent = http(context.app);
     const base = actor.authorize(agent[spec.method](`${API}${spec.path}`));
     const withCsrf = spec.csrf ? base.set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE) : base;
+    if (spec.attach) {
+      return withCsrf.attach(spec.attach.field, spec.attach.content, spec.attach.filename);
+    }
     return spec.body ? withCsrf.send(spec.body) : withCsrf;
   }
 
-  it.each(CELLS)('$endpoint — $actor → $status', async ({ build, expected, actor: kind }) => {
+  it.each(CELLS)('$endpoint — $actor → $status', async (cell) => {
+    const { build, expected, actor: kind } = cell;
     const actor = await actors.create(kind);
     const spec = await build(actor, actors);
     const response = await send(spec, actor);
+    if (cell.createsUsers) {
+      trackCreatedUsers(context.fixtures, response);
+    }
 
     const want = expected[kind];
     const body = response.body as { error?: { code?: string } } | undefined;

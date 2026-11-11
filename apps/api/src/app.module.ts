@@ -14,6 +14,7 @@ import { AppLoggerModule } from './infra/logger/app-logger.module.js';
 import { PrismaExceptionMapper } from './infra/prisma/prisma-exception.mapper.js';
 import { PrismaModule } from './infra/prisma/prisma.module.js';
 import { RedisModule } from './infra/redis/redis.module.js';
+import { AdminUsersModule } from './modules/admin-users/admin-users.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard.js';
 import { HealthModule } from './modules/health/health.module.js';
@@ -35,6 +36,7 @@ import type { ExceptionMapper } from './common/filters/exception-mapper.interfac
     AuthModule,
     ParentAccessModule,
     PasswordResetModule,
+    AdminUsersModule,
     HealthModule,
   ],
   providers: [

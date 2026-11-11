@@ -10,7 +10,7 @@ import type { RepositoryTypes } from '../../../common/repository/repository.type
 import type { Prisma, User } from '../../../infra/prisma/generated/client.js';
 import type { PasswordChangeResult, StudentProfileRecord, UserAuthRecord } from '../users.types.js';
 
-interface UserRepositoryTypes extends RepositoryTypes {
+export interface UserRepositoryTypes extends RepositoryTypes {
   model: User;
   where: Prisma.UserWhereInput;
   create: Prisma.UserCreateInput;

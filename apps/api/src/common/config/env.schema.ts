@@ -6,6 +6,7 @@ import { assertSecureCookieInProduction, authEnvShape } from './auth-env.schema.
 import { parentEnvShape } from './parent-env.schema.js';
 import { assertNoPlaceholderSecretsInProduction } from './production-secrets.schema.js';
 import { trustProxySchema } from './trust-proxy.schema.js';
+import { userImportEnvShape } from './user-import-env.schema.js';
 
 /**
  * Ilova env o'zgaruvchilari sxemasi — yagona joy (docs/13 §4: barcha tashqi manzillar env orqali).
@@ -37,6 +38,7 @@ export const envSchema = z
     TRUST_PROXY: trustProxySchema,
     ...authEnvShape,
     ...parentEnvShape,
+    ...userImportEnvShape,
   })
   .superRefine((env, ctx) => {
     assertSecureCookieInProduction(env, ctx);

@@ -21,11 +21,12 @@ export function randomTestStudentCode(): string {
 }
 
 /**
- * Berilgan test foydalanuvchilari va ularga bog'langan yozuvlarni o'chiradi (audit, ota-ona
- * tokenlari va loglari, refresh tokenlar). Boshqa yozuvlarga tegilmaydi.
+ * Berilgan test foydalanuvchilari va ularga bog'langan yozuvlarni o'chiradi (guruh a'zoliklari,
+ * audit, ota-ona tokenlari va loglari, refresh tokenlar). Boshqa yozuvlarga tegilmaydi.
  */
 export async function deleteTestUsers(db: PrismaClient, userIds: readonly string[]): Promise<void> {
   const ids = { in: [...userIds] };
+  await db.groupMember.deleteMany({ where: { studentId: ids } });
   await db.auditLog.deleteMany({ where: { OR: [{ actorId: ids }, { entityId: ids }] } });
   await db.parentAccessLog.deleteMany({ where: { studentId: ids } });
   const tokens = await db.parentAccessToken.findMany({
@@ -37,4 +38,15 @@ export async function deleteTestUsers(db: PrismaClient, userIds: readonly string
   await db.refreshToken.updateMany({ where: { userId: ids }, data: { replacedById: null } });
   await db.refreshToken.deleteMany({ where: { userId: ids } });
   await db.user.deleteMany({ where: { id: ids } });
+}
+
+/** Test guruhlari va ularning yo'llari (a'zoliklar bilan) — faqat berilgan id'lar. */
+export async function deleteTestGroups(
+  db: PrismaClient,
+  groupIds: readonly string[],
+  pathIds: readonly string[],
+): Promise<void> {
+  await db.groupMember.deleteMany({ where: { groupId: { in: [...groupIds] } } });
+  await db.group.deleteMany({ where: { id: { in: [...groupIds] } } });
+  await db.learningPath.deleteMany({ where: { id: { in: [...pathIds] } } });
 }

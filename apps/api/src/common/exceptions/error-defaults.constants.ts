@@ -16,6 +16,7 @@ export const ERROR_HTTP_STATUS: Readonly<Record<ErrorCode, HttpStatus>> = {
   [ErrorCode.FORBIDDEN]: HttpStatus.FORBIDDEN,
   [ErrorCode.NOT_FOUND]: HttpStatus.NOT_FOUND,
   [ErrorCode.CONFLICT]: HttpStatus.CONFLICT,
+  [ErrorCode.PAYLOAD_TOO_LARGE]: HttpStatus.PAYLOAD_TOO_LARGE,
   [ErrorCode.RATE_LIMITED]: HttpStatus.TOO_MANY_REQUESTS,
   [ErrorCode.INTERNAL_ERROR]: HttpStatus.INTERNAL_SERVER_ERROR,
   [ErrorCode.SERVICE_UNAVAILABLE]: HttpStatus.SERVICE_UNAVAILABLE,
@@ -25,6 +26,7 @@ export const ERROR_HTTP_STATUS: Readonly<Record<ErrorCode, HttpStatus>> = {
   [ErrorCode.INSUFFICIENT_COINS]: HttpStatus.CONFLICT,
   [ErrorCode.OUT_OF_STOCK]: HttpStatus.CONFLICT,
   [ErrorCode.ALREADY_DONE]: HttpStatus.CONFLICT,
+  [ErrorCode.STUDENT_ALREADY_IN_GROUP]: HttpStatus.CONFLICT,
 };
 
 /** Xabar berilmaganda ishlatiladigan standart matnlar. */
@@ -36,6 +38,7 @@ export const DEFAULT_ERROR_MESSAGES: Readonly<Record<ErrorCode, string>> = {
   [ErrorCode.FORBIDDEN]: "Ruxsat yo'q",
   [ErrorCode.NOT_FOUND]: 'Topilmadi',
   [ErrorCode.CONFLICT]: 'Ziddiyat: resurs allaqachon mavjud yoki holati mos emas',
+  [ErrorCode.PAYLOAD_TOO_LARGE]: 'Fayl hajmi ruxsat etilganidan katta',
   [ErrorCode.RATE_LIMITED]: "So'rovlar juda ko'p, birozdan keyin urinib ko'ring",
   [ErrorCode.INTERNAL_ERROR]: 'Ichki server xatosi',
   [ErrorCode.SERVICE_UNAVAILABLE]: 'Servis vaqtincha ishlamayapti',
@@ -45,6 +48,7 @@ export const DEFAULT_ERROR_MESSAGES: Readonly<Record<ErrorCode, string>> = {
   [ErrorCode.INSUFFICIENT_COINS]: 'Coin yetarli emas',
   [ErrorCode.OUT_OF_STOCK]: 'Mahsulot qolmagan',
   [ErrorCode.ALREADY_DONE]: 'Allaqachon bajarilgan',
+  [ErrorCode.STUDENT_ALREADY_IN_GROUP]: 'Student allaqachon boshqa faol guruhda',
 };
 
 /** `HttpException` holatidan xato kodini aniqlash (Nest'ning o'z xatolari, masalan route topilmasa). */
@@ -54,6 +58,7 @@ export const HTTP_STATUS_ERROR_CODE: Readonly<Partial<Record<number, ErrorCode>>
   [HttpStatus.FORBIDDEN]: ErrorCode.FORBIDDEN,
   [HttpStatus.NOT_FOUND]: ErrorCode.NOT_FOUND,
   [HttpStatus.CONFLICT]: ErrorCode.CONFLICT,
+  [HttpStatus.PAYLOAD_TOO_LARGE]: ErrorCode.PAYLOAD_TOO_LARGE,
   [HttpStatus.TOO_MANY_REQUESTS]: ErrorCode.RATE_LIMITED,
   [HttpStatus.SERVICE_UNAVAILABLE]: ErrorCode.SERVICE_UNAVAILABLE,
 };

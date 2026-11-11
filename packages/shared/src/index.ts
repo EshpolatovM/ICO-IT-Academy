@@ -72,3 +72,50 @@ export {
   PAGINATION_DEFAULTS,
 } from './pagination/offset-pagination.js';
 export type { OffsetPaginationQuery, PaginatedResult } from './pagination/offset-pagination.js';
+export { GROUP_NAME_MAX_LENGTH } from './groups/group.constants.js';
+export type { GroupRef } from './groups/group.types.js';
+export {
+  PERSON_NAME_MAX_LENGTH,
+  STUDENT_IMPORT_FILE_FIELD,
+  STUDENT_IMPORT_REQUIRED_COLUMNS,
+  StudentImportColumn,
+  USER_SEARCH_MAX_LENGTH,
+  USER_SORT_DEFAULT,
+  UserSort,
+} from './users/users.constants.js';
+export {
+  AT_LEAST_ONE_FIELD_MESSAGE,
+  createStaffSchema,
+  createStudentSchema,
+  personNameSchema,
+  staffListQuerySchema,
+  studentImportRowSchema,
+  studentListQuerySchema,
+  updateStaffSchema,
+  updateStudentSchema,
+  userStatusSchema,
+} from './users/users.schemas.js';
+export type {
+  CreateStaffRequest,
+  CreateStudentRequest,
+  StaffListQuery,
+  StudentImportRow,
+  StudentListQuery,
+  UpdateStaffRequest,
+  UpdateStudentRequest,
+} from './users/users.schemas.js';
+export type {
+  AdminUserListItem,
+  CreatedStaffResponse,
+  CreatedStudentResponse,
+  CreatedUserResponse,
+  ImportedStudent,
+  ImportRowError,
+  ManagedUserBase,
+  MentorDetail,
+  MentorListItem,
+  StaffAccount,
+  StudentDetail,
+  StudentImportResult,
+  StudentListItem,
+} from './users/users.types.js';

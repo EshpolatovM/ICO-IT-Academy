@@ -85,6 +85,15 @@ export class ParentAccessTokensRepository {
     });
   }
 
+  /** Studentning faol (bekor qilinmagan, muddati o'tmagan) token id'lari — student holatidan qat'i nazar. */
+  async listActiveIds(studentId: string, now: Date): Promise<string[]> {
+    const rows = await this.prisma.db.parentAccessToken.findMany({
+      where: { studentId, ...activeWhere(now) },
+      select: { id: true },
+    });
+    return rows.map((row) => row.id);
+  }
+
   /**
    * Limit ichida yaratish — poygasiz: student qatori `FOR UPDATE` bilan qulflanadi, so'ng faol
    * tokenlar sanaladi. Limit to'lgan bo'lsa — `null`.
