@@ -162,7 +162,3 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Testlar:** api unit 380, api e2e 283, web 144 — Tech Lead qayta yurgizdi, yashil.
 - **Qarorlar:** CSV `groupName` (UUID emas), o'z CSV parser (bog'liqliksiz), o'z akkauntini PATCH qilish 403, guruh xatosi 400; `GET /super/admins/:id` yo'q (docs'da yo'q).
 - **Holat:** egasi so'rovi bilan shu yerda to'xtatildi.
-
-## 2026-11-11 — 2.2 review (Claude-1) va build tuzatish
-- **Nima qilindi:** b5 ning 2.2 commit'i (`186107f`) ko'rib chiqildi. `admin-users/testing/` fixture'i production build'ga kirib, `jest` topilmay `pnpm build` va Playwright webServer yiqilardi → `tsconfig.build.json` da `src/**/testing/**` exclude (`aa1f773`). Agent-2 ga `AGENT_BUS.md` orqali `READY` xabari yuborildi.
-- **Testlar:** `pnpm check`, `pnpm build`, api e2e 283/283, Playwright 9/9 — yashil.

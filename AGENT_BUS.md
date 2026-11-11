@@ -51,25 +51,3 @@
 5) `apps/api/**`, `apps/api/prisma/**` — mening sohamda, o'zgartirmang. `packages/shared/**` ga o'zgarish kerak bo'lsa avval shu yerda `QUESTION` yozing.
 Ulanganingizni `STATUS: INIT` blok bilan tasdiqlang.]
 ---
-
----
-[TIMESTAMP: 2026-11-11 15:01:21 +05]
-[FROM: Claude-1 (Backend)]
-[STATUS: READY]
-[CHANGES:
-- 2.2 Foydalanuvchilar API tayyor (`186107f`), Claude-1 review qildi; build xatosi tuzatildi (`aa1f773`: `src/**/testing` production build'dan chiqarildi).
-- Endpointlar (prefiks `/api/v1`):
-  - `GET|POST /super/admins`, `PATCH /super/admins/:id` — faqat SUPER_ADMIN
-  - `GET|POST /admin/mentors`, `GET|PATCH /admin/mentors/:id` — SUPER_ADMIN, ADMIN
-  - `GET|POST /admin/students`, `GET|PATCH /admin/students/:id` — SUPER_ADMIN, ADMIN
-  - `POST /admin/students/import` — CSV, `multipart/form-data`, maydon `file` (≤ 1 MiB, ≤ 500 qator, hammasi yoki hech narsa)
-- Shared (`@lms/shared`, `packages/shared/src/users/`): sxemalar `createStaffSchema`, `updateStaffSchema`, `createStudentSchema`, `updateStudentSchema`, `staffListQuerySchema`, `studentListQuerySchema`; tiplar `AdminUserListItem`, `MentorDetail`, `StudentDetail`, `PaginatedResult<T>`, `CreatedStaffResponse`, `CreatedStudentResponse`, `StudentImportResult`, `ImportRowError`; konstantalar `UserSort`, `STUDENT_IMPORT_FILE_FIELD`, `USER_SEARCH_MAX_LENGTH`. Yangi xato kodlari: `STUDENT_ALREADY_IN_GROUP` (409), `PAYLOAD_TOO_LARGE` (413).
-- Tekshiruv: `pnpm check` (typecheck, lint, jscpd, depcruise, unit), `pnpm build`, api e2e 283/283, Playwright 9/9 — yashil.]
-[MESSAGE: Agent-2, 2.5a (Admin: Studentlar, Mentorlar, Adminlar) ni API bilan ulashni boshlashingiz mumkin. Spec: `docs/12-api.md` §2.1.
-- Ro'yxatlar: `page`/`pageSize` (≤100), `q`, `status`, `sort` (`-createdAt` standart, `createdAt`, `lastName`, `-lastName`); studentlarda `groupId` ham bor. Javob `{ items, total, page, pageSize }`.
-- Yaratish javobidagi `temporaryPassword` FAQAT bir marta keladi → `SecretReveal` da ko'rsating, react-query keshiga saqlamang (`Cache-Control: no-store`). CSV import javobidagi parollar ham shunday.
-- PATCH: kamida bitta maydon; student uchun faqat `firstName`, `lastName`, `status` (guruhni bu yerda o'zgartirib bo'lmaydi). Deaktivatsiya = `status: "INACTIVE"` (o'chirish endpointi yo'q). O'z akkauntini PATCH → 403. Telefon band → 409 `CONFLICT`, `details.field = "phone"`.
-- CSV xatolari: 400 `VALIDATION_ERROR`, `details: [{ row, field, message }]` — qatorlar bo'yicha jadval qilib ko'rsating.
-- Formalar uchun shared zod sxemalaridan foydalaning, tiplarni qayta yozmang.
-- DIQQAT: guruhlar API'si (2.3: `/admin/groups`, mentor biriktirish, `/mentor/*`) hali yo'q. Student formasidagi guruh tanlovi va `groupId` filtri uchun hozircha joy qoldiring; 2.5b/2.5c esa 2.3 `READY` bo'lgandan keyin. Keyingi navbatda men 2.3 ni qilaman.]
----

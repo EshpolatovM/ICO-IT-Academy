@@ -2,7 +2,7 @@
 
 > Ikki agent uchun umumiy holat jadvali. Batafsil Tech Lead holati: [`docs/STATE.md`](docs/STATE.md), tarix: [`docs/PROGRESS.md`](docs/PROGRESS.md), aloqa: [`AGENT_BUS.md`](AGENT_BUS.md).
 
-**Oxirgi yangilanish:** 2026-11-11 15:01 +05 — Claude-1 (Backend)
+**Oxirgi yangilanish:** 2026-11-11 14:31 +05 — Claude-1 (Backend)
 
 ## Agentlar
 
@@ -26,7 +26,7 @@ Branch: `feature/02-admin-asosi` · Reja: [`docs/tasks/02-reja.md`](docs/tasks/0
 | #    | Vazifa                                                                                                                                                                    | Spec                                | Status      |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ----------- |
 | 2.1  | Baza: `learning_paths`, `groups`, `group_members`, dev seed                                                                                                               | `docs/tasks/02-2.1-baza.md`         | DONE        |
-| 2.2  | Foydalanuvchilar API: `/super/admins`, `/admin/mentors`, `/admin/students` CRUD, deaktivatsiya, vaqtinchalik parol, CSV import, audit                                     | `docs/tasks/02-2.2-users.md`        | DONE (`186107f`, build fix `aa1f773`) |
+| 2.2  | Foydalanuvchilar API: `/super/admins`, `/admin/mentors`, `/admin/students` CRUD, deaktivatsiya, vaqtinchalik parol, CSV import, audit                                     | `docs/tasks/02-2.2-users.md`        | IN_PROGRESS |
 | 2.3  | Guruhlar API: `/admin/groups` CRUD, mentor biriktirish, a'zolar; `StudentScopeResolver`; `/mentor/groups*`, `/mentor/students/:id`; mentor reset-password va parent-token | `docs/tasks/02-2.3-groups-scope.md` | TODO        |
 | 2.6a | API e2e + RBAC matritsasi (2-bosqich endpointlari)                                                                                                                        | `docs/tasks/02-reja.md`             | TODO        |
 
@@ -35,7 +35,7 @@ Branch: `feature/02-admin-asosi` · Reja: [`docs/tasks/02-reja.md`](docs/tasks/0
 | #    | Vazifa                                                                                                          | Bog'liqlik  | Status                        |
 | ---- | --------------------------------------------------------------------------------------------------------------- | ----------- | ----------------------------- |
 | 2.4  | UI komponentlar: Table, Pagination, Select, SearchInput, Dialog, Badge, Tabs, Textarea, FileInput, SecretReveal | —           | DONE                          |
-| 2.5a | Admin: Studentlar, Mentorlar, Adminlar (SA) — ro'yxat, forma, CSV import                                        | 2.2 `DONE`  | TODO — API ulanishini boshlash mumkin |
+| 2.5a | Admin: Studentlar, Mentorlar, Adminlar (SA) — ro'yxat, forma, CSV import                                        | 2.2 `READY` | TODO (skelet boshlash mumkin) |
 | 2.5b | Admin: Guruhlar (ro'yxat, tafsilot, mentor biriktirish, a'zolar)                                                | 2.3 `READY` | TODO                          |
 | 2.5c | Mentor: Guruhlar, Guruh tafsiloti, Student profili (parol tiklash, ota-ona tokenlari)                           | 2.3 `READY` | TODO                          |
 | 2.6b | Playwright: admin student/mentor/guruh yaratadi, mentor o'z studentini ko'radi va token beradi                  | 2.5         | TODO                          |
