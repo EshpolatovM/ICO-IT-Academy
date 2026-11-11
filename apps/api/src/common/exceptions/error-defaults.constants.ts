@@ -27,6 +27,7 @@ export const ERROR_HTTP_STATUS: Readonly<Record<ErrorCode, HttpStatus>> = {
   [ErrorCode.OUT_OF_STOCK]: HttpStatus.CONFLICT,
   [ErrorCode.ALREADY_DONE]: HttpStatus.CONFLICT,
   [ErrorCode.STUDENT_ALREADY_IN_GROUP]: HttpStatus.CONFLICT,
+  [ErrorCode.GROUP_ARCHIVED]: HttpStatus.CONFLICT,
 };
 
 /** Xabar berilmaganda ishlatiladigan standart matnlar. */
@@ -49,6 +50,7 @@ export const DEFAULT_ERROR_MESSAGES: Readonly<Record<ErrorCode, string>> = {
   [ErrorCode.OUT_OF_STOCK]: 'Mahsulot qolmagan',
   [ErrorCode.ALREADY_DONE]: 'Allaqachon bajarilgan',
   [ErrorCode.STUDENT_ALREADY_IN_GROUP]: 'Student allaqachon boshqa faol guruhda',
+  [ErrorCode.GROUP_ARCHIVED]: "Guruh arxivlangan — unga a'zo qo'shib bo'lmaydi",
 };
 
 /** `HttpException` holatidan xato kodini aniqlash (Nest'ning o'z xatolari, masalan route topilmasa). */
