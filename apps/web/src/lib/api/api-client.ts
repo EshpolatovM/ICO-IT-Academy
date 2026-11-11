@@ -10,7 +10,7 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export interface ApiRequestOptions {
   method?: HttpMethod;
-  /** JSON ga aylantiriladi. */
+  /** JSON ga aylantiriladi; `FormData` (fayl yuklash) — o'zgarishsiz `multipart/form-data` bo'lib ketadi. */
   body?: unknown;
   /**
    * `false` — `Authorization` yuborilmaydi va 401 da refresh qilinmaydi: public endpointlar
@@ -20,12 +20,12 @@ export interface ApiRequestOptions {
   signal?: AbortSignal;
 }
 
-function buildHeaders(hasBody: boolean, accessToken: string | null): Headers {
+function buildHeaders(isJsonBody: boolean, accessToken: string | null): Headers {
   const headers = new Headers({
     Accept: 'application/json',
     [CSRF_HEADER_NAME]: CSRF_HEADER_VALUE,
   });
-  if (hasBody) {
+  if (isJsonBody) {
     headers.set('Content-Type', 'application/json');
   }
   if (accessToken !== null) {
@@ -34,18 +34,27 @@ function buildHeaders(hasBody: boolean, accessToken: string | null): Headers {
   return headers;
 }
 
+/** So'rov body'si: `FormData` — o'zgarishsiz, boshqasi — JSON. */
+function serializeBody(body: unknown): BodyInit | undefined {
+  if (body === undefined || body instanceof FormData) {
+    return body;
+  }
+  return JSON.stringify(body);
+}
+
 async function send(
   path: string,
   options: ApiRequestOptions,
   accessToken: string | null,
 ): Promise<Response> {
-  const hasBody = options.body !== undefined;
+  // `FormData` uchun `Content-Type` ni brauzer o'zi (boundary bilan) qo'yadi.
+  const isJsonBody = options.body !== undefined && !(options.body instanceof FormData);
   try {
     return await fetch(`${API_BASE_PATH}${path}`, {
       method: options.method ?? 'GET',
       credentials: 'include',
-      headers: buildHeaders(hasBody, accessToken),
-      body: hasBody ? JSON.stringify(options.body) : undefined,
+      headers: buildHeaders(isJsonBody, accessToken),
+      body: serializeBody(options.body),
       signal: options.signal,
     });
   } catch (error) {

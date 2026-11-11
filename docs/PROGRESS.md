@@ -173,3 +173,9 @@ Yangi yozuvlar pastga qo'shiladi.
 - GitHub remote mavjudligi aniqlandi; `feature/02-admin-asosi` origin'ga push qilindi.
 - Kelishuv: bitta branch, Drive XAT kanali, sekin rejim, back/front bo'linmasi yo'q.
 - O'zgargan fayllar: `docs/STATE.md`, `docs/PROGRESS.md`.
+
+## 2026-11-11 — 2.5a admin foydalanuvchilar sahifalari (birchka-frontend)
+- `/admin/students` (ro'yxat, qidiruv, status filtri, saralash, pagination, yaratish + SecretReveal), `/admin/students/[id]` (tahrirlash, deaktivatsiya, parol tiklash), `/admin/students/import` (CSV, xatolar jadvali), `/admin/mentors`, `/admin/admins` (faqat SA, `SuperAdminOnly`).
+- Fayllar: `apps/web/src/features/admin-users/**`, `apps/web/src/app/(admin)/admin/{students,mentors,admins}/**`, `features/shell/components/SuperAdminOnly.tsx`, `lib/api/api-client.ts` (FormData), `lib/testing/*`.
+- Testlar: `pnpm check` yashil — web 189/189 (40 fayl, 52 yangi), api 380/380; `format:check`, web build yashil.
+- Qarorlar: vaqtinchalik parol faqat komponent state'ida (mutatsiya `gcTime: 0` + reset); yaratishda parol maydoni yo'q (tizim yaratadi); mentor/admin tahrirlash Dialog orqali; CSV hajmi klientda bloklanmaydi.

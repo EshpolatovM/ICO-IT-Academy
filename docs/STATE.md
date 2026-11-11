@@ -43,7 +43,8 @@
 **2.2 — backend: foydalanuvchilar** (`oga-backend`, Tech Lead tekshirdi): `modules/admin-users` — `/super/admins` (SA), `/admin/mentors`, `/admin/students` (SA A): CRUD, qidiruv (pg_trgm), filtr, saralash, pagination, vaqtinchalik parol bir marta, deaktivatsiya/aktivatsiya (token_version, refresh, parent tombstone), CSV import (`firstName,lastName[,groupName]`, hammasi yoki hech narsa, o'z RFC 4180 parser), audit. `modules/groups` boshlandi (repository'lar, `GroupEnrollmentService`). Yangi kodlar: `STUDENT_ALREADY_IN_GROUP` (409), `PAYLOAD_TOO_LARGE` (413). api unit 380, e2e 283.
 
 ## Keyingi aniq vazifa
-**2.5a — birchka-frontend ishlamoqda** (2026-11-11). Tugagach: Tech Lead tekshiradi → commit + push → Boltavoyga READY xat. Guruh tanlovi/filtri 2.3 READY bo'lgach ulanadi (2.5b/2.5c).
+**2.5a — TAYYOR** (2026-11-11, birchka-frontend; Tech Lead tekshirdi: `pnpm check` yashil, web 40 fayl / 189 test, api 380). `/admin/students` (+`[id]`, `import`), `/admin/mentors`, `/admin/admins` (SA). Guruh filtri disabled placeholder.
+**Keyingi:** Boltavoy 2.3 READY yozishini kutish → 2.5b (Guruhlar sahifalari) + 2.5c (Mentor paneli) birchka-frontend'ga; student guruh filtri/tanlovini ulash. Ochiq UX savollari: Sidebar 'Foydalanuvchilar' bandi `/admin/mentors` da faol ko'rinishi; `/admin/mentors/[id]` sahifasi kerakmi; `STUDENT_IMPORT_MAX_*` ni shared'ga chiqarish (Boltavoy bilan).
 
 Eski yozuv:
 **2.3 — backend: guruhlar, mentor scope** (`oga-backend`, `docs/tasks/02-2.3-groups-scope.md` tayyor) — egasi ruxsat berganda. Keyin 2.3, 2.5, 2.6, 2.7 (`docs/tasks/02-reja.md`).

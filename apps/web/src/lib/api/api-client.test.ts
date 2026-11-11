@@ -60,6 +60,19 @@ describe('apiRequest', () => {
     expect(requestHeader(init, CSRF_HEADER_NAME)).toBe(CSRF_HEADER_VALUE);
   });
 
+  it("FormData body o'zgarishsiz yuboriladi, JSON Content-Type qo'yilmaydi", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(201, {}));
+    const form = new FormData();
+    form.append('file', new Blob(['a,b']), 'a.csv');
+
+    await apiRequest('/upload', { method: 'POST', body: form });
+
+    const { init } = fetchCall(fetchMock, 0);
+    expect(init.body).toBe(form);
+    expect(requestHeader(init, 'Content-Type')).toBeNull();
+    expect(requestHeader(init, CSRF_HEADER_NAME)).toBe(CSRF_HEADER_VALUE);
+  });
+
   it('`auth: false` — Bearer yuborilmaydi', async () => {
     useAuthStore.getState().setSession('token-1', USER);
     fetchMock.mockResolvedValueOnce(jsonResponse(200, {}));

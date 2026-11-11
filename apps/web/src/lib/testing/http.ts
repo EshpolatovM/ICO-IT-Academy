@@ -56,3 +56,24 @@ export function fetchCall(fetchMock: FetchMock, index: number): { url: string; i
 export function requestHeader(init: RequestInit, name: string): string | null {
   return new Headers(init.headers).get(name);
 }
+
+const NOT_FOUND_STATUS = 404;
+
+/** `"METHOD /api/v1/yo'l"` (query'siz) → javob yaratuvchi. */
+export type FetchRoutes = Record<string, (init: RequestInit) => Response>;
+
+/**
+ * `fetch` mock'ini method + yo'l bo'yicha javob beradigan qiladi; noma'lum so'rov — 404.
+ * Yo'l query satrisiz solishtiriladi.
+ */
+export function routeFetch(fetchMock: FetchMock, routes: FetchRoutes): void {
+  fetchMock.mockImplementation((input, init = {}) => {
+    const path = requestUrl(input).split('?')[0] ?? '';
+    const handler = routes[`${init.method ?? 'GET'} ${path}`];
+    return Promise.resolve(
+      handler === undefined
+        ? errorResponse(NOT_FOUND_STATUS, 'NOT_FOUND', `Mock yo'q: ${path}`)
+        : handler(init),
+    );
+  });
+}

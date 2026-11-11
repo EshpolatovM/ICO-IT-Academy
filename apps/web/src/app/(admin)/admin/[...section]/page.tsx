@@ -4,13 +4,16 @@ import { ADMIN_NAV, findSectionEntry, SectionPage, sectionEntries } from '@/feat
 
 const BASE_PATH = '/admin';
 
+/** O'z route'i bor (qilingan) bo'limlar — catch-all ularni yaratmaydi. */
+const IMPLEMENTED_SECTIONS: ReadonlySet<string> = new Set(['students', 'admins']);
+
 /** Faqat menyudagi bo'limlar (`/admin/settings/rewards` kabi ko'p segmentli ham); boshqalari — 404. */
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return sectionEntries(ADMIN_NAV, BASE_PATH, BASE_PATH).map(({ segments }) => ({
-    section: segments,
-  }));
+  return sectionEntries(ADMIN_NAV, BASE_PATH, BASE_PATH)
+    .filter(({ segments }) => !IMPLEMENTED_SECTIONS.has(segments.join('/')))
+    .map(({ segments }) => ({ section: segments }));
 }
 
 /** Admin menyusidagi hali qilinmagan bo'limlar ("Tez orada"; super admin bandlari — 403 holati). */
