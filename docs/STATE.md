@@ -7,7 +7,7 @@
 | Maydon | Qiymat |
 |---|---|
 | Joriy modul | 2-bosqich: Admin asosi — foydalanuvchilar va guruhlar (reja: `docs/tasks/02-reja.md`) |
-| Joriy bosqich | 2.2 commit qilindi; **egasi so'rovi bilan to'xtatildi** (2026-11-11) — keyingisi 2.3, egasi "davom et" deganda |
+| Joriy bosqich | 2.2 tugagan; boshqa Claude sessiyasining kodi olib tashlandi (2026-11-11 15:18); keyingisi 2.3 egasi "davom et" deganda |
 | Joriy git branch | `feature/02-admin-asosi` |
 | Ish rejimi | **To'liq avtonom** (egasi 2026-11-11: savol berma, tasdiq kutma, Tech Lead o'zi qaror qiladi; faqat haqiqiy xavfli amallarda to'xtash). Har vazifadan keyin commit + STATE/PROGRESS; hisobot `docs/HISOBOT-*.md` |
 

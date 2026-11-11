@@ -162,3 +162,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Testlar:** api unit 380, api e2e 283, web 144 — Tech Lead qayta yurgizdi, yashil.
 - **Qarorlar:** CSV `groupName` (UUID emas), o'z CSV parser (bog'liqliksiz), o'z akkauntini PATCH qilish 403, guruh xatosi 400; `GET /super/admins/:id` yo'q (docs'da yo'q).
 - **Holat:** egasi so'rovi bilan shu yerda to'xtatildi.
+
+## 2026-11-11 — Boshqa Claude sessiyasining kodi olib tashlandi
+- **Egasi so'rovi:** boshqa agent kodi o'chirilsin, o'zimizniki qolsin.
+- **Nima qilindi:** commit qilinmagan 2.3 qismi (groups controller/servis/scope, shared groups/enums) zaxiraga olinib o'chirildi; AGENT_BUS/PROJECT_STATE commit'lari revert qilindi; `aa1f773` (build tuzatishi) qoldirildi; `feature/02-admin-asosi` branch'i qayta yaratildi.
+- **Testlar:** `pnpm check`, `format:check` — yashil.
