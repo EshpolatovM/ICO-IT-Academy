@@ -15,7 +15,8 @@
 - Ikkinchi Claude sessiyasi — **Boltavoy** (bu sessiya — Qo'ziboy). Back/front bo'linmasi yo'q; vazifani egasi + Qo'ziboy taqsimlaydi.
 - Aloqa: Google Drive papkasidagi `XAT — ...md` fayllari (git'dagi AGENT_BUS ishlatilmaydi).
 - GitHub remote: `origin` = `EshpolatovM/ICO-IT-Academy`. `feature/02-admin-asosi` push qilindi; ikkala sessiya shu bitta branch'da ishlaydi (`git pull --rebase`, force push yo'q, `main` ga merge faqat egasi ruxsati bilan).
-- Boltavoyga berilgan vazifa: branch'ga o'tish, `docs/boltavoy/` ni commit+push, `pnpm check` natijasini yuborish. 2.3 kimga berilishi uning natijasidan keyin hal qilinadi.
+- Taqsimot (egasi "ha", 2026-11-11 17:35): **Boltavoy → 2.3** (guruhlar API + mentor scope, `apps/api/**`); **Qo'ziboy → 2.5a** (admin: Studentlar, Mentorlar, Adminlar sahifalari, `apps/web/**`, vazifa `docs/tasks/02-2.5a-admin-users-ui.md`).
+- Koordinatsiya: har qadamdan oldin/keyin Drive papkasi + `git fetch` tekshiriladi; IN_PROGRESS/READY xatlar; umumiy fayllar (shared, STATE, PROGRESS, root config, lockfile) oldidan ogohlantirish. Boltavoy o'z holatini `docs/boltavoy/HOLAT.md` da yuritadi.
 
 ## Egasining qarorlari (2026-11-10, "ha")
 - MinIO image'i yo'q → dev muhitda S3-compatible **SeaweedFS** ishlatiladi (egasi "ha"; 1.2b da bajarildi).
@@ -42,6 +43,9 @@
 **2.2 — backend: foydalanuvchilar** (`oga-backend`, Tech Lead tekshirdi): `modules/admin-users` — `/super/admins` (SA), `/admin/mentors`, `/admin/students` (SA A): CRUD, qidiruv (pg_trgm), filtr, saralash, pagination, vaqtinchalik parol bir marta, deaktivatsiya/aktivatsiya (token_version, refresh, parent tombstone), CSV import (`firstName,lastName[,groupName]`, hammasi yoki hech narsa, o'z RFC 4180 parser), audit. `modules/groups` boshlandi (repository'lar, `GroupEnrollmentService`). Yangi kodlar: `STUDENT_ALREADY_IN_GROUP` (409), `PAYLOAD_TOO_LARGE` (413). api unit 380, e2e 283.
 
 ## Keyingi aniq vazifa
+**2.5a — birchka-frontend ishlamoqda** (2026-11-11). Tugagach: Tech Lead tekshiradi → commit + push → Boltavoyga READY xat. Guruh tanlovi/filtri 2.3 READY bo'lgach ulanadi (2.5b/2.5c).
+
+Eski yozuv:
 **2.3 — backend: guruhlar, mentor scope** (`oga-backend`, `docs/tasks/02-2.3-groups-scope.md` tayyor) — egasi ruxsat berganda. Keyin 2.3, 2.5, 2.6, 2.7 (`docs/tasks/02-reja.md`).
 
 ## 2-bosqich uchun eslatmalar
