@@ -107,4 +107,18 @@ test.describe('Admin: studentlarni CSV import', () => {
     await expect(groupError).toContainText('Bunday nomli faol guruh topilmadi');
     expect(await countStudents(request, adminApi.token, family)).toBe(0);
   });
+
+  // docs/12 §2.1: "Birorta xato bo'lsa ... barcha xatolar bitta javobda" — qator va guruh xatolari birga.
+  test("(3d) qator va guruh xatolari bitta javobda birga ko'rsatiladi", async ({ page }) => {
+    const family = uniqueName('Aralash');
+    await uploadCsv(page, 'broken-mixed.csv', [
+      'firstName,lastName,groupName',
+      'Vali,,',
+      `Sardor,${family},${uniqueName('YoqGuruh')}`,
+    ]);
+
+    await expectImportFailed(page);
+    await expect(errorRow(page, 'lastName').getByRole('cell').first()).toHaveText('2');
+    await expect(errorRow(page, 'groupName').getByRole('cell').first()).toHaveText('3');
+  });
 });

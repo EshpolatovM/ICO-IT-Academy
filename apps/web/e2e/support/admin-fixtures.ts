@@ -5,6 +5,7 @@ import { expect, test as base } from '@playwright/test';
 import { staffAccessToken } from './admin-api';
 import { expectPath, loginAsStaff } from './auth';
 import { e2eUsers } from './e2e-users';
+import { retireGroupViaApi } from './groups-api';
 import { deleteUsers } from './users-script';
 
 import type { E2eUser } from './e2e-users';
@@ -18,28 +19,47 @@ const TEST_PHONE_PREFIX = '+99877';
 const TEST_PHONE_SUFFIX_MAX = 10_000_000;
 const TEST_PHONE_SUFFIX_DIGITS = String(TEST_PHONE_SUFFIX_MAX - 1).length;
 
-/** Admin API sessiyasi va test yaratgan foydalanuvchilar (test oxirida o'chiriladi). */
+/** Admin API sessiyasi va test yaratgan yozuvlar (test oxirida tozalanadi). */
 export interface AdminApi {
   token: string;
   /** Test yaratgan foydalanuvchi id'larini teardown ro'yxatiga qo'shadi. */
   track: (...ids: string[]) => void;
+  /** Test yaratgan guruh id'larini teardown ro'yxatiga qo'shadi. */
+  trackGroups: (...ids: string[]) => void;
 }
 
 /**
- * `adminApi` fixture: oddiy admin access token'i; test davomida `track` qilingan foydalanuvchilar
- * test tugagach (yiqilsa ham) bazadan o'chiriladi — dev ma'lumotlari ifloslanmaydi.
+ * `adminApi` fixture: oddiy admin access token'i. Test tugagach (yiqilsa ham): `trackGroups`
+ * qilingan guruhlar mentorsiz, a'zosiz va arxivlangan holga keltiriladi (o'chirish API'si yo'q),
+ * so'ng `track` qilingan foydalanuvchilar bazadan o'chiriladi — dev ma'lumotlari ifloslanmaydi.
  */
 export const test = base.extend<{ adminApi: AdminApi }>({
   adminApi: async ({ request }, use) => {
     const { admin, password } = e2eUsers();
     const ids: string[] = [];
+    const groupIds: string[] = [];
     const token = await staffAccessToken(request, admin, password);
-    await use({ token, track: (...created) => ids.push(...created) });
-    deleteUsers(ids);
+    await use({
+      token,
+      track: (...created) => ids.push(...created),
+      trackGroups: (...created) => groupIds.push(...created),
+    });
+    try {
+      for (const groupId of groupIds) {
+        await retireGroupViaApi(request, token, groupId);
+      }
+    } finally {
+      deleteUsers(ids);
+    }
   },
 });
 
 export { expect };
+
+/** Test guruhi nomi: `e2e-` prefiksi + unikal qism. */
+export function uniqueGroupName(prefix: string): string {
+  return `e2e-${uniqueName(prefix)}`;
+}
 
 /** Unikal ism/familiya (faqat harflar) — mavjud yozuvlarga tayanmaslik uchun. */
 export function uniqueName(prefix: string): string {
@@ -89,4 +109,11 @@ export function tableRow(page: Page, text: string): Locator {
 /** `SecretReveal` dagi maxfiy qiymat (masalan "Vaqtinchalik parol"). */
 export function secretValue(scope: Page | Locator, label: string): Locator {
   return scope.getByRole('group', { name: label }).locator('code');
+}
+
+/** `ConfirmDialog` (alertdialog) dagi tasdiqlash tugmasini bosadi va oyna yopilguncha kutadi. */
+export async function confirmInDialog(page: Page, button: string): Promise<void> {
+  const confirm = page.getByRole('alertdialog');
+  await confirm.getByRole('button', { name: button }).click();
+  await expect(confirm).toBeHidden();
 }

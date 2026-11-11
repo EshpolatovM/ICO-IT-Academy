@@ -8,10 +8,15 @@
 
 ## ⚠️ SESSIYA TO'XTADI (2026-11-11 ~18:35, Claude limiti tugadi) — YANGI SESSIYA SHU YERDAN BOSHLAYDI
 Limit tugashi oldidan ikki agent ishlab turgan edi. Ularning ishi diskda qolgan bo'lishi mumkin, lekin **commit qilinmagan**:
-- **2.6b** (sinchkov-tester, `docs/tasks/02-2.6b-playwright-groups-mentor.md`): 18:45 da diskda commitsiz turgan fayllar: yangi `apps/web/e2e/{admin-groups,mentor-panel}.spec.ts`, `support/groups-api.ts`; o'zgargan `admin-student-import.spec.ts` (3d qaytarilgan), `support/{admin-api,admin-fixtures}.ts`. 18:50 da Tech Lead to'liq Playwright'ni yurgizdi: **11 ta test yiqildi**, ular orasida avval yashil bo'lgan admin-staff, admin-students va student-auth ham bor (`locator.fill` timeout). Ehtimoliy sabablar: login rate-limit (bir kunda ko'p yurgizish natijasi), agentning `support/admin-fixtures.ts`/`admin-api.ts` dagi o'zgarishi yoki muhit. Avval `git stash` qilmasdan, `git diff apps/web/e2e/support` ni ko'rib chiq. sinchkov-tester'ga "eski testlar ham yiqilyapti, sababini top" deb ber. **Bu fayllar commit qilinmasin, toki hammasi yashil bo'lmaguncha.**
+- **2.6b TAYYOR** (22:55): Playwright 23/23 yashil (eski 17 + 3d + guruhlar g1–g4 + mentor m1), `pnpm check` yashil. 18:50 dagi 11 ta yiqilish kod sababli emas edi: Tech Lead va agent bir vaqtda Playwright yurgizdi (port 3200, `test-results` umumiy). **Qoida: Playwright faqat bitta jarayonda yuriladi.** Parent exchange rate-limit 10/15 daqiqa/IP: to'liq suite 15 daqiqada ko'pi bilan 2 marta.
 - **2.5b-2: TAYYOR va commit qilingan** (18:40; web 280 test, Playwright admin 13/13). Eslatma: Playwright'ni ikki agent parallel yurgizmasin (port, DB, test-results umumiy).
 
 **12-noyabr: Boltavoy ishlamaydi (B17).** Uning ruxsati bilan Qo'ziboy `apps/api` va `packages/shared` dagi bug'larni (2.6b) hamda 2.7 review topilmalarini o'zi tuzatadi. **Har bir shunday o'zgarish `docs/boltavoy/QOZIBOY-OZGARISHLARI.md` ga yoziladi:** vaqt, hash, fayllar, sabab, oldin→keyin, testlar, API kontrakti (o'zgarsa `docs/12-api.md` ham). Kun oxirida Boltavoyga "sening sohangda shular o'zgardi" xati yoziladi. `main` ga merge faqat Boltavoy qaytgach, ikkala ega bilan.
+
+**Ochiq kichik ishlar (2.7 dan oldin yoki uning ichida):**
+- UI: `components/ui/ComboboxListbox` multiple rejimda tanlovdan keyin ochiq qoladi va pastdagi "Qo'shish" tugmasini yopib qo'yadi → rassom-dizayner (tashqariga bosilganda yopilsin yoki tugmani yopmasin).
+- Test tozalash: dev bazada `e2e-` prefiksli arxivlangan guruhlar yig'ilyapti (API'da guruhni o'chirish yo'q). Taklif: `apps/api/test/support/web-e2e-users.ts` ga `delete-groups` buyrug'i (`deleteTestGroups` tayyor) + `apps/web/e2e/support/users-script.ts` da `deleteGroups`. Bu Boltavoy sohasi: qilinsa `docs/boltavoy/QOZIBOY-OZGARISHLARI.md` ga yoziladi.
+- **GitHub push ishlamayapti** (Authentication failed, eski token o'chirilgan). Ega `gh auth login` qilishi kerak; local commitlar push kutmoqda.
 
 **Yangi sessiya qiladigan ishlar:**
 1. `git status` va `git diff --stat`: qaysi fayllar bor, ko'rib chiq.

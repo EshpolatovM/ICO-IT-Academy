@@ -241,3 +241,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Qarorlar:** 3-modulda backfill yo'q, lazy enrollment; mukofotlar 5-modulga, "takrorlashdan keyin ochilish" 6-modulga; S-C1..C3, S-D1..D3 (batafsil `docs/boltavoy/HOLAT.md` §6).
 - **Muammolar va savollar:** reja Domla review'idan o'tmagan, egaga ko'rsatilmagan; 3.1 enrollment qismi (§2.8, §2.11 p.3, §5.2 #13) tuzatilishi kerak. Egaga: S-B1, S-B2, S-B5, Z-3, T-4.
 - **Keyingi qadam:** Domla rejani ko'radi → egadan "ha" → Qo'ziboyga READY xati; 2.6b READY bo'lgach 2.7 review → `main` ga merge (ikkala ega ruxsati), keyin `feature/03-ilm-yoli`.
+
+## 2026-11-11 (kech) — 2.6b Playwright: guruhlar va mentor paneli (sinchkov-tester)
+- Yangi: `apps/web/e2e/{admin-groups,mentor-panel}.spec.ts`, `support/groups-api.ts`; o'zgargan: `support/{admin-fixtures,admin-api}.ts`, `admin-student-import.spec.ts` (3d qaytarildi).
+- Natija: Playwright 23/23, `pnpm check` yashil. Jonli 2.3 API docs/12 ga mos, bug yo'q.
+- Saboq: Playwright'ni ikki jarayon parallel yurgizmasin (port/test-results to'qnashadi).

@@ -14,9 +14,9 @@ import type { E2eUser } from './e2e-users';
 import type { APIRequestContext } from '@playwright/test';
 
 /** E2E API (alohida port) — UI'dan tashqari tayyorlash va tekshirish uchun to'g'ridan-to'g'ri so'rovlar. */
-const API = `${E2E_API_URL}/api/v1`;
-const HTTP_OK = 200;
-const HTTP_CREATED = 201;
+export const API = `${E2E_API_URL}/api/v1`;
+export const HTTP_OK = 200;
+export const HTTP_CREATED = 201;
 
 /** Xodim sifatida kirib, access token qaytaradi. */
 export async function staffAccessToken(
@@ -31,7 +31,7 @@ export async function staffAccessToken(
   return ((await login.json()) as LoginResponse).accessToken;
 }
 
-function bearer(token: string): Record<string, string> {
+export function bearer(token: string): Record<string, string> {
   return { Authorization: `Bearer ${token}` };
 }
 

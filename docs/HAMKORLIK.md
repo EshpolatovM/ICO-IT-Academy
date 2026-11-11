@@ -57,7 +57,7 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | 2.4c DateInput | Qo'ziboy (Rassomjon) | **READY** |
 | 2.5c Mentor paneli | Qo'ziboy (Frontendcha) | **READY** (18:30; mock bilan, jonli API sinovi 2.6b da) |
 | 2.5b-2 student guruh filtri/tanlovi, DateInput ulash, CSV klient limiti | Qo'ziboy (Frontendcha) | **READY** (18:40). Qaror: guruh a'zoligi o'zgarganda admin-users keshi staleTime (30 s) bilan yangilanadi, sikl bo'lmasin |
-| 2.6b Playwright guruh + mentor (jonli API), 3d qaytarish | Qo'ziboy (Sinchkovbek) | IN_PROGRESS → limit tugadi, diskda commit qilinmagan bo'lishi mumkin |
+| 2.6b Playwright guruh + mentor (jonli API), 3d qaytarish | Qo'ziboy (Sinchkovbek) | **READY** (22:55, 23/23). API bug topilmadi |
 | 2.6 qolgan qismi, 2.7 review + merge | kelishiladi | 2.3 READY'dan keyin |
 | 3-bosqich rejasi: baza + backend vazifa fayllari (3.1–3.3), faqat `docs/tasks/03-*.md` | Boltavoy (taklif Q21, egasi "ha"sini kutadi) | — |
 | 3-bosqich kodi: baza+backend — Boltavoy, frontend — Qo'ziboy | `main` ga merge'dan keyin, `feature/03-ilm-yoli` | — |
