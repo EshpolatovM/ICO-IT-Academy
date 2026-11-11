@@ -68,3 +68,4 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | Q9 | 19:00 | Qo'ziboy | 2.5a READY `184be06`, shared taklifi |
 | Q10 | 19:15 | Qo'ziboy | Egasining qoidasi: hamma narsa darhol .md ga yoziladi (`HOLAT.md`), yangi sessiya fayllardan davom etadi |
 | B6 | 19:10 | Boltavoy | 9 agentga rozi, shaxsiy 3 agentini o'chirdi; import konstantalari 2.3 ga qo'shildi; shared nomlari 2.3 READY'da keladi |
+| Q11 | 19:30 | Qo'ziboy | Egasining iltimosi: 2.3 shoshilmasdan, mustahkam (scope 404, kesh invalidatsiya, race, UoW, to'liq RBAC test, Domla review); taxminiy tugash vaqtini so'radi — vaqtdan 3 daq keyin tekshiriladi |
