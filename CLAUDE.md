@@ -83,18 +83,17 @@ Loyiha birdaniga emas, modulma-modul qilinadi: avval baza, keyin backend, keyin 
 | `oga-backend` | Backendbek | NestJS modullar, servislar, repository'lar, API, WebSocket |
 | `rassom-dizayner` | Rassomjon | Design token'lar, `components/ui`, `/design-preview` |
 | `birchka-frontend` | Frontendcha | Next.js sahifalari, feature'lar, API ulanishi (faqat tasdiqlangan UI komponentlar va token'lar bilan) |
-| `sinchkov-tester` | Sinchkovbek | Unit va e2e testlar yozadi va ishga tushiradi |
+| `sinchkov-tester` | Sinchkovbek | Unit va e2e testlar yozadi va ishga tushiradi; muhit sozlash (install, compose, migrate/seed) va to'liq tekshiruv (`check`, `build`, e2e) |
 | `domla-reviewer` | Domla | Faqat o'qiydi va tekshiradi: OOP, DRY, xavfsizlik, RBAC, takroriy kod |
 | `pushbek-git` | Pushbek | Tech Lead aytgan fayllarni commit, `pull --rebase`, push; konflikt hisoboti (force push va main'ga merge yo'q) |
-| `hisobotchi-xatboy` | Xatboy | STATE.md / PROGRESS.md, hamkor sessiyaga Drive XAT, egaga hisobot matni |
-| `qorovul-kuzatuvchi` | Qorovulboy | Drive'dagi yangi xatlar va GitHub'dagi yangi commitlarni kuzatadi, to'qnashuv xavfini aytadi (faqat o'qiydi) |
+| `hisobotchi-xatboy` | Xatboy | Hamkordan yangi xat/commitlarni kuzatadi (to'qnashuv xavfi), STATE.md / PROGRESS.md, hamkorga Drive XAT, egaga hisobot matni |
 | `chaqqon-tuzatkich` | Tuzatvoy | Lint/typecheck/test va review'dagi mayda topilmalarni tuzatadi (yangi feature yozmaydi) |
 
 ### Parallel ishlash (egasi, 2026-11-11)
-- Kerak bo'lsa bir vaqtda **2–3 ta** subagent ishlatiladi. Shart: ular **turli fayllarga** tegadi va bir-birining natijasini kutmaydi. Masalan: backend + frontend skeleti; frontend + qorovul; tester + hisobotchi.
+- Kerak bo'lsa bir vaqtda **2–3 ta** subagent ishlatiladi. Shart: ular **turli fayllarga** tegadi va bir-birining natijasini kutmaydi. Masalan: backend + frontend skeleti; frontend + hisobotchi; backend + tuzatkich.
 - Bitta faylga yoki bir-biriga bog'liq ishlarga (baza → backend → frontend zanjiri) parallel agent qo'yilmaydi.
 - Kerak bo'lmasa agent chaqirilmaydi. Mayda ishni (bitta qator, bitta xat) Tech Lead o'zi qiladi.
-- Hamkor sessiya (Boltavoy) ham xuddi shu agentlar to'plami va qoidalar bilan ishlaydi.
+- Hamkor sessiya (Boltavoy) ham xuddi shu agentlar to'plami va qoidalar bilan ishlaydi. Yagona manba — repo'dagi `.claude/agents/` (shaxsiy `~/.claude/agents/` dagi nusxalar ishlatilmaydi).
 
 Subagentga vazifa berilganda har safar to'liq kontekst beriladi: qaysi modul, qaysi docs fayllarini o'qish kerak, aniq vazifa va tayyorlik mezoni.
 
