@@ -32,6 +32,7 @@
 - **Umumiy fayllar**: `packages/shared/**`, `docs/STATE.md`, `docs/PROGRESS.md`, root config'lar, `pnpm-lock.yaml`. Ularga tegishdan oldin xat bilan ogohlantiriladi. `STATE.md` ni faqat Qo'ziboy yuritadi, `PROGRESS.md` ga ikkalasi ham faqat oxiriga yozadi.
 - Bir vaqtda ikkala sessiya bitta faylga tegmaydi. Hech kimning kodi o'chirilmaydi.
 - **Test ma'lumotlari qoidasi (B8/Q14):** har test o'z ma'lumotini unikal nom bilan yaratadi va o'zi tozalaydi. Umumiy seed'ga tegilmaydi. Playwright'da `e2e-…` prefiksi ishlatiladi. Bazalar alohida, shuning uchun to'qnashuv faqat kodda bo'lishi mumkin: `apps/web/e2e/support/**`, `apps/api/test/**`, `prisma/seed`. Bu fayllarga tegishdan oldin xat yoziladi.
+- **Ish tartibi (B14 → Q21, kelishilgan):** (1) vazifadan oldin xat "X ni olaman, shu fayllar" + ikkinchi tomonning "ok"i (10 daqiqada javob kelmasa boshlanadi); (2) taqsimotga ikkala ega "ha" deydi — Qo'ziboy egasi qarorni Qo'ziboyga topshirgan (2026-11-11 18:17); (3) bir mavzuda bitta ochiq savol (BLOCKED mustasno); (4) IN_PROGRESS / READY (+hash) / BLOCKED; (5) toza worktree'da tekshirib push.
 - **To'qnashuv qoidasi (Q13, Boltavoy rozi — B8):** ishlar to'qnashsa (bitta fayl yoki endpoint, test ma'lumoti, seed, migratsiya, umumiy config), hech kim o'zicha hal qilmaydi. QUESTION xat yoziladi, kelishiladi, keyin bittasi qiladi. API bug'ini Qo'ziboy tuzatmaydi, Boltavoyga xat bilan yuboradi.
 - Boltavoyda lokal `main` da `b8c747f` commiti bor (eski AGENT_BUS INIT bloki). U push qilinmaydi va kerak emas.
 
@@ -44,7 +45,7 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 ## Joriy taqsimot (2-bosqich)
 | Vazifa | Kim | Holat |
 |---|---|---|
-| 2.3 guruhlar API + mentor scope | Boltavoy | IN_PROGRESS: kod yozilgan (800+ test yashil, hali commit yo'q). Domla topilmalari: 🔴 B1 (Redis uzilsa 500, parollar yo'qoladi), 🟡 M1–M6 (qulfsiz o'qish, kesh poygasi, negativ testlar, M4, unit testlar, BaseRepository). CSV bug ham shu to'plamda tuzatiladi. **Taxminiy READY: 21:30**, 21:33 da tekshiriladi. Erta push qilindi: `85345ba` (shared + docs/12). Tuzatishlar parallel boshlandi. **Yangi READY ≈ 20:45.** ⚠️ `85345ba` api typecheck'ni sindirdi (`error-defaults.constants.ts`: `GROUP_ARCHIVED`), Q20 da tuzatish so'raldi. `packages/shared/**`, `.env.example`, `docs/12-api.md` §2.2/§12, `PROGRESS.md` ga tegadi |
+| 2.3 guruhlar API + mentor scope | Boltavoy | **READY** 18:14 (`cec8115`, `31bfb93`). `/admin/groups` da `sort` YO'Q (yuborilsa 400). CSV bug tuzatildi. Eski holat: IN_PROGRESS: kod yozilgan (800+ test yashil, hali commit yo'q). Domla topilmalari: 🔴 B1 (Redis uzilsa 500, parollar yo'qoladi), 🟡 M1–M6 (qulfsiz o'qish, kesh poygasi, negativ testlar, M4, unit testlar, BaseRepository). CSV bug ham shu to'plamda tuzatiladi. **Taxminiy READY: 21:30**, 21:33 da tekshiriladi. Erta push qilindi: `85345ba` (shared + docs/12). Tuzatishlar parallel boshlandi. **Yangi READY ≈ 20:45.** ⚠️ `85345ba` api typecheck'ni sindirdi (`error-defaults.constants.ts`: `GROUP_ARCHIVED`), Q20 da tuzatish so'raldi. `packages/shared/**`, `.env.example`, `docs/12-api.md` §2.2/§12, `PROGRESS.md` ga tegadi |
 | 2.5a admin: Studentlar, Mentorlar, Adminlar | Qo'ziboy | **READY** `184be06` |
 | 2.5d Sidebar faol holati (`features/shell`) | Qo'ziboy (Frontendcha) | **READY** (17:10) |
 | 2.6a Playwright admin users (`apps/web/e2e`) | Qo'ziboy (Sinchkovbek) | **READY** (17:17). Bitta API bug Boltavoyga yuborildi (CSV import xatolari), 3d test bug tuzatilgach qaytariladi |
@@ -57,7 +58,9 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | 2.5c Mentor paneli | Qo'ziboy (Frontendcha) | IN_PROGRESS (`docs/tasks/02-2.5c-mentor-panel.md`) |
 | 2.5b-2 student guruh filtri/tanlovi, DateInput ulash, CSV klient limiti | Qo'ziboy | 2.5c dan keyin |
 | 2.6 qolgan qismi, 2.7 review + merge | kelishiladi | 2.3 READY'dan keyin |
-| 3-bosqich (qoralama `docs/tasks/03-reja.md`) | taqsimot 2.7 da kelishiladi | — |
+| 3-bosqich rejasi: baza + backend vazifa fayllari (3.1–3.3), faqat `docs/tasks/03-*.md` | Boltavoy (taklif Q21, egasi "ha"sini kutadi) | — |
+| 3-bosqich kodi: baza+backend — Boltavoy, frontend — Qo'ziboy | `main` ga merge'dan keyin, `feature/03-ilm-yoli` | — |
+| 2.7 review: api+shared — Boltavoy Domlasi, web — Qo'ziboy Domlasi; keyin egalardan merge ruxsati | ikkalasi | 2.6b dan keyin |
 
 ## Qo'ziboy qarorlari (Q18)
 - M4: `GET /admin/paths` — mentorga HA, faqat o'qish (docs/01 §2.2 "K", docs/12 221-qator). 2.3 vazifa faylidagi "(SA, A)" eskirgan.
@@ -102,3 +105,7 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | B11 | 17:39 | Boltavoy | Erta push `85345ba`; egasi hammasiga "ha"; tuzatishlar parallel; READY ≈ 20:45 |
 | Q20 | 17:44 | Qo'ziboy | BLOCKED: `85345ba` api typecheck'ni sindirdi (`GROUP_ARCHIVED` xaritada yo'q); (a) o'zi 2 qatorni push qilsin yoki (b) menga ruxsat bersin; kelajakda enum + xaritalar birga push qilinsin |
 | B12 | 17:53 | Boltavoy | `af3a56b`: GROUP_ARCHIVED xaritasi tuzatildi, branch yana yashil |
+| (git) | 18:13 | Boltavoy | `cec8115` 2.3 kodi push qilindi (103 fayl): review tuzatishlari tugagan, api unit 464, e2e 416 (uning hisobicha). Qo'ziboy tekshirdi: api typecheck yashil, unit 464/464. READY xati kutilmoqda |
+| B13 | 18:14 | Boltavoy | 2.3 READY: shared nomlari o'zgarmagan, endpointlar jadvali, `/admin/groups` sort yo'q, mentor ro'yxatlari pagination'siz, CSV bug tuzatildi, 2.6 backend qismi bajarilgan |
+| B14 | 18:15 | Boltavoy | Ish tartibi taklifi (1–5: avval xat + "ok", ikkala ega "ha", bitta ochiq savol, IN_PROGRESS/READY/BLOCKED, toza worktree) va keyingi vazifa savoli (a–d). Qo'ziboy egasining "ha"sini kutmoqda |
+| Q21 | 18:17 | Qo'ziboy | Tartib (1–5) qabul; taqsimot: Boltavoy → 3-modul baza/backend rejasi + 2.5 API bug'lari; Qo'ziboy → 2.5c, 2.5b-2, 2.6b; 2.7 ikkala Domla |
