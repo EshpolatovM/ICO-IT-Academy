@@ -194,3 +194,8 @@ Yangi yozuvlar pastga qo'shiladi.
 - Yangi: `apps/web/e2e/admin-students.spec.ts`, `admin-student-import.spec.ts`, `admin-staff.spec.ts`, `support/{admin-fixtures,admin-api,users-script}.ts`; o'zgargan: `support/global-setup.ts`, `parent.spec.ts` (DRY).
 - Natija: admin Playwright 8/8 yashil (Tech Lead qayta yurgizdi), eski testlar yashil, `pnpm check` yashil. Test yozuvlari o'zi yaratiladi va o'chiriladi.
 - Bug (API, Boltavoyga): CSV import qator xatosida guruh xatolarini qaytarmaydi (docs/12 §2.1 ga zid). 3d test vaqtincha olingan, matni vazifa faylida.
+
+## 2026-11-11 — 2.4b UI: Checkbox, Combobox, StatCard, PageHeader (rassom-dizayner)
+- Yangi: `components/ui/{Checkbox,Combobox,ComboboxListbox,ComboboxChips,useCombobox,comboboxSelection,Combobox.types,StatCard,PageHeader,joinIds,assignRef,isPresentNode}`, design-preview bo'limlari. `FormField`/`FileInput` umumiy `joinIds` ga o'tdi.
+- Testlar: 17 yangi; `pnpm check` yashil (web 43 fayl, api 380). Yangi paket va token yo'q.
+- Qaror: Combobox `value` — option obyekti (`{value,label}`), tanlangan element qidiruv natijasida bo'lmasa ham nomi ko'rinadi.

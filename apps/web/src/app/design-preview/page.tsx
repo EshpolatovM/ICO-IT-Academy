@@ -9,7 +9,9 @@ import { FieldsExtraSection } from './_components/FieldsExtraSection';
 import { FormsSection } from './_components/FormsSection';
 import { LayoutSection } from './_components/LayoutSection';
 import { OverlaySection } from './_components/OverlaySection';
+import { PageSection } from './_components/PageSection';
 import { ScalesSection } from './_components/ScalesSection';
+import { SelectionSection } from './_components/SelectionSection';
 
 import type { Metadata } from 'next';
 
@@ -47,8 +49,10 @@ export default function DesignPreviewPage() {
           <ComponentsSection />
           <FormsSection />
           <FieldsExtraSection />
+          <SelectionSection />
           <DataSection />
           <OverlaySection />
+          <PageSection />
           <LayoutSection />
         </Stack>
       </Container>

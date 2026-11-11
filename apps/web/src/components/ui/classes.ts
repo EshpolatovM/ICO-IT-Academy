@@ -8,6 +8,10 @@ export const focusRing =
 export const peerFocusRing =
   'peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus-ring';
 
+/** Ichidagi element (masalan Combobox input'i) fokuslanganda butun "maydon" atrofida halqa. */
+export const focusWithinRing =
+  'focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus-ring';
+
 /** Kiritish maydonlari (Input, Select, Textarea) uchun umumiy ko'rinish. */
 export const fieldBase =
   'block w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text placeholder:text-text-disabled disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-disabled';

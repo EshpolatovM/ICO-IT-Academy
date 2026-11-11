@@ -7,6 +7,15 @@ export type { BadgeProps, BadgeVariant } from './Badge';
 export { Button } from './Button';
 export type { ButtonProps, ButtonSize, ButtonVariant } from './Button';
 export { Card, CardContent, CardFooter, CardHeader, CardTitle } from './Card';
+export { Checkbox } from './Checkbox';
+export type { CheckboxProps } from './Checkbox';
+export { Combobox } from './Combobox';
+export type {
+  ComboboxMultipleProps,
+  ComboboxOption,
+  ComboboxProps,
+  ComboboxSingleProps,
+} from './Combobox.types';
 export { ConfirmDialog } from './ConfirmDialog';
 export type { ConfirmDialogProps, ConfirmDialogVariant } from './ConfirmDialog';
 export { Container } from './Container';
@@ -38,6 +47,8 @@ export { Label } from './Label';
 export type { LabelProps } from './Label';
 export { NavItem } from './NavItem';
 export type { NavItemProps } from './NavItem';
+export { PageHeader } from './PageHeader';
+export type { PageHeaderBackLink, PageHeaderProps } from './PageHeader';
 export { getPageCount, Pagination } from './Pagination';
 export type { PaginationProps } from './Pagination';
 export { PasswordInput } from './PasswordInput';
@@ -54,6 +65,8 @@ export { Spinner } from './Spinner';
 export type { SpinnerProps, SpinnerSize } from './Spinner';
 export { Stack } from './Stack';
 export type { StackAlign, StackDirection, StackGap, StackJustify, StackProps } from './Stack';
+export { StatCard } from './StatCard';
+export type { StatCardProps } from './StatCard';
 export { Table, TableBody, TableCell, TableEmpty, TableHeader, TableRow } from './Table';
 export type { TableEmptyProps, TableProps } from './Table';
 export { TableHead } from './TableHead';

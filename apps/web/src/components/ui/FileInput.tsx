@@ -5,6 +5,7 @@ import { useId, useState } from 'react';
 import { cn } from '@/lib/cn';
 
 import { peerFocusRing } from './classes';
+import { joinIds } from './joinIds';
 
 import type { InputHTMLAttributes, Ref } from 'react';
 
@@ -19,10 +20,6 @@ export interface FileInputProps extends Omit<
   /** Xato holati: qizil chegara va `aria-invalid`. */
   invalid?: boolean;
   ref?: Ref<HTMLInputElement>;
-}
-
-function joinIds(...ids: (string | undefined)[]): string {
-  return ids.filter((id) => id !== undefined && id !== '').join(' ');
 }
 
 interface FileButtonProps {

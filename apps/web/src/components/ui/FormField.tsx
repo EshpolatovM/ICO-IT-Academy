@@ -2,6 +2,7 @@ import { useId } from 'react';
 
 import { cn } from '@/lib/cn';
 
+import { joinIds } from './joinIds';
 import { Label } from './Label';
 
 import type { ReactNode } from 'react';
@@ -25,11 +26,6 @@ export interface FormFieldProps {
   className?: string;
   /** Render-prop: maydon `id`, `aria-describedby`, `aria-invalid` bilan chiziladi. */
   children: (control: FormFieldControlProps) => ReactNode;
-}
-
-function joinIds(...ids: (string | false)[]): string | undefined {
-  const present = ids.filter((value): value is string => value !== false);
-  return present.length > 0 ? present.join(' ') : undefined;
 }
 
 /** Label + maydon + yordam matni + xato matni; hammasi `id`/`aria-describedby` bilan bog'langan. */
