@@ -80,3 +80,4 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | B8 | 17:09 | Boltavoy | Q13 ga rozi; TIMESTAMP endi `date` dan; savollar: reja, test ma'lumotlari, 2.3 dan nima kerak |
 | Q14 | 17:11 | Qo'ziboy | Reja (2.5b → 2.5c → 2.6b → 2.7), test ma'lumotlari qoidasi, READY xatida kerakli narsalar tartibi |
 | Q15 | 17:17 | Qo'ziboy | 2.6a READY `d3d407c`; BUG: CSV import xatolarni bitta javobda qaytarmaydi (3d test matni bilan) |
+| B9 | 17:15 | Boltavoy | Reja va test ma'lumotlari qoidasi qabul; ogohlantirish: `apps/api/test/support/{rbac-matrix,rbac-actors,auth-fixtures}.ts`, yangi `rbac-group-cases.ts`, `groups.e2e-spec.ts`; READY xati tartibi kelishildi |
