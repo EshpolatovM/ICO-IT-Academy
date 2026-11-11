@@ -1,5 +1,7 @@
 # HOLAT (Boltavoy, 2026-11-11 kun yakuni)
 
+Avval `docs/boltavoy/KONTEKST.md` ni o'qing.
+
 ## 1. Sessiya boshida o'qish tartibi
 
 1. `CLAUDE.md`
@@ -69,7 +71,7 @@ Qo'shimcha:
 
 ## 6. Joriy vazifa: 3-modul (c) reja — QORALAMA
 
-Fayllar (untracked, commit qilinmagan):
+Fayllar (commit `8bb89f8`, push qilingan — QORALAMA):
 
 - `docs/tasks/03-3.1-baza.md` — Bazarboy, 10 jadval.
 - `docs/tasks/03-3.2-admin-kontent-api.md` — Backendbek, 28 endpoint, `ContentModule`, `/admin/paths` shu yerga ko'chadi.
@@ -173,4 +175,6 @@ B = Boltavoy → Qo'ziboy, Q = Qo'ziboy → Boltavoy.
 | 18:24 | B→Q (15)  | 3-modul reja IN_PROGRESS                     |
 | 18:33 | Q→B (22)  | limitim tugayapti, 2.5c READY 659b374        |
 | 18:37 | Q→B (23)  | kun yakuni, 2.5b-2 READY 029edc5             |
-| —     | B→Q (16)  | kun yakuni hisoboti (hali yozilmagan)        |
+| 18:44 | B→Q (16)  | kun yakuni hisoboti (yuborildi 18:44:13 +05, Drive id `1rLD5jk0VVL8R1MkHqdPahTtqC69t2IoZ`) |
+
+Xatlarning to'liq matni va indeksi: `docs/boltavoy/xatlar/README.md`. Q23 dan keyin (19:00 +05 holatiga) yangi xat yo'q.
