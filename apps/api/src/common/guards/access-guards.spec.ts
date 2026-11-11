@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { ErrorCode, Role } from '@lms/shared';
 
 import { PARENT_WRITE_ALLOWED_KEY } from '../decorators/parent-write-allowed.decorator.js';
+import { INVALID_UUID_MESSAGE } from '../pipes/parse-uuid.pipe.js';
 import { STUDENT_SCOPE_PARAM_KEY } from '../scope/student-scope.types.js';
 
 import { ParentReadOnlyGuard } from './parent-read-only.guard.js';
@@ -11,6 +12,9 @@ import { StudentScopeGuard } from './student-scope.guard.js';
 import type { RequestUser } from '../auth/request-user.types.js';
 import type { StudentScopeResolver } from '../scope/student-scope.types.js';
 import type { ExecutionContext } from '@nestjs/common';
+
+const STUDENT_ID = '00000000-0000-4000-8000-000000000001';
+const OTHER_STUDENT_ID = '00000000-0000-4000-8000-000000000009';
 
 function handler(): void {
   // metadata osiladigan soxta handler
@@ -41,7 +45,7 @@ const parent: RequestUser = {
   role: Role.PARENT,
   mustChangePassword: false,
   tokenIds: ['t1'],
-  studentIds: ['s1'],
+  studentIds: [STUDENT_ID],
 };
 const admin: RequestUser = { id: 'a1', role: Role.ADMIN, mustChangePassword: false };
 
@@ -93,16 +97,16 @@ describe('StudentScopeGuard', () => {
     const { canAccess, guard } = setup(true);
 
     await expect(
-      guard.canActivate(contextFor({ user: admin, params: { id: 's1' } }, scoped)),
+      guard.canActivate(contextFor({ user: admin, params: { id: STUDENT_ID } }, scoped)),
     ).resolves.toBe(true);
-    expect(canAccess).toHaveBeenCalledWith(admin, 's1');
+    expect(canAccess).toHaveBeenCalledWith(admin, STUDENT_ID);
   });
 
   it("scope'dan tashqari — 404 (mavjudligi oshkor qilinmaydi)", async () => {
     const { guard } = setup(false);
 
     await expect(
-      guard.canActivate(contextFor({ user: parent, params: { id: 's9' } }, scoped)),
+      guard.canActivate(contextFor({ user: parent, params: { id: OTHER_STUDENT_ID } }, scoped)),
     ).rejects.toMatchObject({ code: ErrorCode.NOT_FOUND, status: 404 });
   });
 
@@ -110,7 +114,7 @@ describe('StudentScopeGuard', () => {
     const { guard } = setup(Object.assign(new Error('x'), { code: ErrorCode.FORBIDDEN }));
 
     await expect(
-      guard.canActivate(contextFor({ user: admin, params: { id: 's1' } }, scoped)),
+      guard.canActivate(contextFor({ user: admin, params: { id: STUDENT_ID } }, scoped)),
     ).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
   });
 
@@ -121,7 +125,20 @@ describe('StudentScopeGuard', () => {
       code: ErrorCode.FORBIDDEN,
     });
     await expect(
-      guard.canActivate(contextFor({ params: { id: 's1' } }, scoped)),
+      guard.canActivate(contextFor({ params: { id: STUDENT_ID } }, scoped)),
     ).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+  });
+
+  it("noto'g'ri UUID — 400 VALIDATION_ERROR (pipe bilan bir xil shakl), resolver chaqirilmaydi", async () => {
+    const { canAccess, guard } = setup(false);
+
+    await expect(
+      guard.canActivate(contextFor({ user: admin, params: { id: 'not-a-uuid' } }, scoped)),
+    ).rejects.toMatchObject({
+      code: ErrorCode.VALIDATION_ERROR,
+      status: 400,
+      details: [{ field: 'id', message: INVALID_UUID_MESSAGE }],
+    });
+    expect(canAccess).not.toHaveBeenCalled();
   });
 });

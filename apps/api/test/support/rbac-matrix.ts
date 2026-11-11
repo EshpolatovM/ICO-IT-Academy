@@ -24,7 +24,7 @@ export interface RequestAttachment {
 }
 
 export interface RequestSpec {
-  method: 'get' | 'post' | 'patch' | 'delete';
+  method: 'get' | 'post' | 'patch' | 'put' | 'delete';
   path: string;
   body?: object;
   csrf?: boolean;
@@ -37,6 +37,8 @@ export interface EndpointCase {
   expected: Record<ActorKind, Expectation>;
   /** Muvaffaqiyatli javobda yaratilgan foydalanuvchilar (`id`, `students[].id`) tozalanadi. */
   createsUsers?: boolean;
+  /** Muvaffaqiyatli javobda yaratilgan guruh (`id`) tozalanadi. */
+  createsGroup?: boolean;
 }
 
 export const UNAUTHORIZED: Expectation = { status: 401, code: ErrorCode.UNAUTHORIZED };
@@ -59,16 +61,25 @@ export function row(...cells: [Expectation, ...Expectation[]]): Record<ActorKind
 export const accountOnly = (success: Expectation) =>
   row(UNAUTHORIZED, success, success, success, success, MCP_BLOCKED, FORBIDDEN);
 
-/** SA A (+ M guruh bilan, 2-bosqichgacha 403) — xodimning studentga oid amallari. */
+/**
+ * SA A M — xodimning studentga oid amallari. Matritsada nishon — mentorning guruhida bo'lmagan
+ * yangi student, shuning uchun M — 404 (scope'dan tashqari, docs/12 §0). O'z guruhi studenti
+ * uchun muvaffaqiyat — `groups.e2e-spec.ts`.
+ */
 export const staffStudentAccess = (success: Expectation) =>
-  row(UNAUTHORIZED, success, success, FORBIDDEN, FORBIDDEN, MCP_BLOCKED, FORBIDDEN);
+  row(UNAUTHORIZED, success, success, NOT_FOUND, FORBIDDEN, MCP_BLOCKED, FORBIDDEN);
 
 /** Faqat SA (adminlarni boshqarish, S-11 A). */
 export const superAdminOnly = (success: Expectation) =>
   row(UNAUTHORIZED, success, FORBIDDEN, FORBIDDEN, FORBIDDEN, MCP_BLOCKED, FORBIDDEN);
 
-/** SA va A (mentor/student boshqaruvi, docs/12 §2). */
-export const adminsOnly = staffStudentAccess;
+/** SA va A (mentor/student/guruh boshqaruvi, docs/12 §2). */
+export const adminsOnly = (success: Expectation) =>
+  row(UNAUTHORIZED, success, success, FORBIDDEN, FORBIDDEN, MCP_BLOCKED, FORBIDDEN);
+
+/** Faqat M (mentor sahifasi, docs/12 §12). */
+export const mentorOnly = (success: Expectation) =>
+  row(UNAUTHORIZED, FORBIDDEN, FORBIDDEN, success, FORBIDDEN, MCP_BLOCKED, FORBIDDEN);
 
 /** Studentga oid endpoint nishoni: student — o'zi, ota-ona — farzandi, qolganlar — yangi student. */
 export async function targetStudent(actor: Actor, actors: RbacActors): Promise<string> {

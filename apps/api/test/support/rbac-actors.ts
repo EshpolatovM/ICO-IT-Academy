@@ -11,7 +11,7 @@ import {
   resetParentExchangeLimits,
 } from './parent-fixtures.js';
 
-import type { AuthFixtures, TestUser } from './auth-fixtures.js';
+import type { AuthFixtures, TestGroup, TestUser } from './auth-fixtures.js';
 import type { INestApplication } from '@nestjs/common';
 import type request from 'supertest';
 import type { App } from 'supertest/types.js';
@@ -78,6 +78,11 @@ export class RbacActors {
 
   newUser(role: AccountRole): Promise<TestUser> {
     return this.fixtures.createUser({ role });
+  }
+
+  /** Test guruhi (ixtiyoriy mentor va faol a'zolar bilan). */
+  newGroup(options: Parameters<AuthFixtures['createGroup']>[0] = {}): Promise<TestGroup> {
+    return this.fixtures.createGroup(options);
   }
 
   /** Admin nomidan studentga ota-ona tokeni (API orqali, audit bilan). */

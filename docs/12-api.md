@@ -187,6 +187,7 @@ Laylo,"Karimova, Sh.",
   "details": [ { "row": 3, "field": "lastName", "message": "..." },
                { "row": 5, "field": "groupName", "message": "Bunday nomli faol guruh topilmadi" } ] } }
 ```
+Qatorning boshqa maydoni xato bo'lsa ham `groupName` tekshiriladi (bitta qatorda ikkala xato ham chiqadi). Import paytida (tekshiruvdan keyin, yozishdan oldin) guruh arxivlansa → 409 `GROUP_ARCHIVED` (`details.groups: [{ id, name }]`), hech kim yaratilmaydi.
 Muvaffaqiyatda hammasi bitta tranzaksiyada yaratiladi (`Cache-Control: no-store`, parollar FAQAT shu javobda); audit: har biriga `USER_CREATED` + partiyaga `STUDENTS_IMPORTED` (`entity_type = STUDENT_IMPORT`).
 ```http
 201
@@ -208,10 +209,10 @@ POST /students/0190.../parent-tokens
 
 ### 2.2 Guruhlar va yo'llar ro'yxati (2.3)
 
-**Ruxsat:** `/admin/groups*`, `/admin/paths` — SA va A (docs/01 §2.1). Barcha sxemalar `@lms/shared` da (`z.strictObject`). Sana `startsAt` — `YYYY-MM-DD` (`null` — sanasiz), qolgan vaqtlar ISO-8601 UTC. Guruh topilmasa yoki o'chirilgan bo'lsa — 404. O'chirish (DELETE) endpointi yo'q — arxivlash (`status: ARCHIVED`).
+**Ruxsat:** `/admin/groups*` — SA va A (docs/01 §2.1); `GET /admin/paths` — SA, A va M (mentor faqat o'qiydi, yozish endpointlari yo'q). Barcha sxemalar `@lms/shared` da (`z.strictObject`). Sana `startsAt` — `YYYY-MM-DD` (`null` — sanasiz), qolgan vaqtlar ISO-8601 UTC. Guruh topilmasa yoki o'chirilgan bo'lsa — 404. O'chirish (DELETE) endpointi yo'q — arxivlash (`status: ARCHIVED`).
 
 ```http
-GET /admin/paths                         (guruh formasi uchun; to'liq kontent CRUD — §3, 3-bosqich)
+GET /admin/paths                         (SA A M; guruh formasi uchun; to'liq kontent CRUD — §3, 3-bosqich)
 200 { "items": [ { "id": "0190...", "title": "Frontend dasturchi", "slug": "frontend", "status": "PUBLISHED" } ] }
 ```
 
@@ -248,6 +249,8 @@ POST /admin/groups/0190.../members
 - S-02 A: student faqat bitta faol guruhda (shu guruh ham hisoblanadi). "Ko'chirish" yo'q — avval `DELETE`, keyin `POST`. Chiqarishda yozuv o'chirilmaydi (`left_at = now()`).
 - Arxivlangan guruhga a'zo qo'shib bo'lmaydi (409 `GROUP_ARCHIVED`); arxivlashda mavjud a'zoliklar o'zgarmaydi (qayta faollashtirish mumkin), lekin guruh mentor scope'idan chiqadi. Arxivlangan guruh a'zosini boshqa guruhga o'tkazish uchun avval chiqarish kerak.
 - Mentor scope keshi (`mentor:{id}:studentIds`, 60 s) a'zolik o'zgarganda, mentor almashtirilganda, guruh holati o'zgarganda, yangi student guruh bilan yaratilganda/import qilinganda va mentor deaktivatsiya qilinganda darhol invalidatsiya qilinadi (S-10 A).
+- Invalidatsiya commit'dan keyin bajariladi: baza yozilgan bo'lsa javob ham muvaffaqiyatli (Redis xatosi 500 bermaydi — qisqa backoff bilan qayta urinish, so'ng `error` log). Shuning uchun **eng katta eskirish — 60 s** (kesh TTL'i). Poyga himoyasi: `mentor:{id}:gen` generatsiya hisoblagichi — invalidatsiyadan oldin bazadan o'qilgan eski to'plam keshga yozilmaydi.
+- Parallel o'zgarishlar (a'zo qo'shish/chiqarish, PATCH, mentor biriktirish) guruh qatorini `FOR UPDATE` bilan qulflaydi — ketma-ket bajariladi. 409 `STUDENT_ALREADY_IN_GROUP` `details.studentIds` da faqat haqiqatan to'qnashgan studentlar.
 - Student deaktivatsiyasi faol a'zolikka tegmaydi (qaytariladigan amal, S-08 A); mentor uni `INACTIVE` holati bilan ko'radi. Mentor deaktivatsiyasida `mentor_id` guruhlarda qoladi.
 
 ```http
@@ -259,6 +262,8 @@ GET /me/summary
 ---
 
 ## 3. Kontent: ilm yo'li (admin)
+
+> 2-bosqichda faqat `GET /admin/paths` (SA A M, qisqa ro'yxat — §2.2) amalga oshirilgan; mentor uchun faqat o'qish. Qolganlari — 3-bosqich.
 
 | Method | Yo'l | Kim |
 |---|---|---|

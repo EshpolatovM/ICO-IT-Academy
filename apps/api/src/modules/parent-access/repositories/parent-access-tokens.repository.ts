@@ -3,6 +3,9 @@ import { Injectable } from '@nestjs/common';
 import { ParentAccessAction, UserStatus } from '@lms/shared';
 
 import { PrismaService } from '../../../infra/prisma/prisma.service.js';
+import { ACTIVE_GROUP_MEMBERSHIP_SELECT } from '../../groups/repositories/group-members.repository.js';
+
+import { activeWhere } from './parent-access-token.where.js';
 
 import type { Prisma } from '../../../infra/prisma/generated/client.js';
 import type {
@@ -30,15 +33,16 @@ const GRANT_SELECT = {
   id: true,
   tokenHash: true,
   studentId: true,
-  student: { select: { firstName: true, lastName: true } },
+  student: {
+    select: {
+      firstName: true,
+      lastName: true,
+      groupMemberships: ACTIVE_GROUP_MEMBERSHIP_SELECT,
+    },
+  },
 } as const satisfies Prisma.ParentAccessTokenSelect;
 
 type GrantRow = Prisma.ParentAccessTokenGetPayload<{ select: typeof GRANT_SELECT }>;
-
-/** Faol token: bekor qilinmagan va muddati o'tmagan (docs/02 §5; `expires_at` ixtiyoriy, S-16). */
-function activeWhere(now: Date): Prisma.ParentAccessTokenWhereInput {
-  return { revokedAt: null, OR: [{ expiresAt: null }, { expiresAt: { gt: now } }] };
-}
 
 /** Faol token + faol (INACTIVE/o'chirilmagan) student — ota-ona kira oladigan holat. */
 function grantWhere(now: Date): Prisma.ParentAccessTokenWhereInput {
@@ -63,6 +67,7 @@ function toGrant(row: GrantRow): ParentGrantWithHash {
     studentId: row.studentId,
     firstName: row.student.firstName,
     lastName: row.student.lastName,
+    groupName: row.student.groupMemberships[0]?.group.name ?? null,
   };
 }
 

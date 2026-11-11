@@ -1,4 +1,4 @@
-import { ErrorCode } from '@lms/shared';
+import { ErrorCode, GROUP_NAME_MAX_LENGTH } from '@lms/shared';
 
 import { StudentImportParser } from './student-import-parser.service.js';
 
@@ -9,8 +9,12 @@ const MAX_ROWS = 3;
 const config = { get: jest.fn(() => MAX_ROWS) } as unknown as AppConfigService;
 const parser = new StudentImportParser(config);
 
-function parse(text: string | Buffer) {
+function parseAll(text: string | Buffer) {
   return parser.parse(Buffer.isBuffer(text) ? text : Buffer.from(text, 'utf8'));
+}
+
+function parse(text: string | Buffer) {
+  return parseAll(text).rows;
 }
 
 function detailsOf(text: string | Buffer): unknown {
@@ -40,13 +44,41 @@ describe('StudentImportParser', () => {
     ]);
   });
 
-  it('qator xatolari — barchasi qator raqamlari bilan', () => {
+  it("qator xatolari — exception emas, barchasi qator raqamlari bilan to'planadi", () => {
     const longName = 'x'.repeat(65);
 
-    expect(detailsOf(`firstName,lastName\nAli,\n${longName},V\nA,B,C`)).toEqual([
-      { row: 2, field: 'lastName', message: expect.any(String) as string },
-      { row: 3, field: 'firstName', message: expect.any(String) as string },
-      { row: 4, field: 'file', message: "Ustunlar soni sarlavhadagidan ko'p" },
+    expect(parseAll(`firstName,lastName\nAli,\n${longName},V\nA,B,C`)).toEqual({
+      rows: [],
+      errors: [
+        { row: 2, field: 'lastName', message: expect.any(String) as string },
+        { row: 3, field: 'firstName', message: expect.any(String) as string },
+        { row: 4, field: 'file', message: "Ustunlar soni sarlavhadagidan ko'p" },
+      ],
+      rejectedGroups: [],
+    });
+  });
+
+  it("to'g'ri qatorlar xatolilar bilan birga qaytadi (guruh tekshiruvi uchun)", () => {
+    expect(parseAll('firstName,lastName,groupName\nVali,,\nSardor,Aliyev,YoqGuruh123')).toEqual({
+      rows: [{ line: 3, firstName: 'Sardor', lastName: 'Aliyev', groupName: 'YoqGuruh123' }],
+      errors: [{ row: 2, field: 'lastName', message: expect.any(String) as string }],
+      rejectedGroups: [],
+    });
+  });
+
+  it("rad etilgan qatorning to'g'ri guruh nomi ham qaytadi (guruh xatosi ham chiqishi uchun)", () => {
+    const longGroup = 'g'.repeat(GROUP_NAME_MAX_LENGTH + 1);
+    const result = parseAll(
+      `firstName,lastName,groupName\nVali,, FE-12 \n,Aliyev,${longGroup}\nA,B,C,D`,
+    );
+
+    expect(result.rows).toEqual([]);
+    expect(result.rejectedGroups).toEqual([{ line: 2, groupName: 'FE-12' }]);
+    expect(result.errors.map(({ row, field }) => ({ row, field }))).toEqual([
+      { row: 2, field: 'lastName' },
+      { row: 3, field: 'firstName' },
+      { row: 3, field: 'groupName' },
+      { row: 4, field: 'file' },
     ]);
   });
 

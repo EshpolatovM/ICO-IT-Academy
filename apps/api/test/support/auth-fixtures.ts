@@ -29,11 +29,15 @@ const GROUP_SUFFIX_BYTES = 4;
 export interface TestGroup {
   id: string;
   name: string;
+  pathId: string;
 }
 
 interface CreateGroupOptions {
   name?: string;
   status?: 'ACTIVE' | 'ARCHIVED';
+  mentorId?: string | null;
+  /** Faol a'zolar (to'g'ridan-to'g'ri bazaga). */
+  studentIds?: readonly string[];
 }
 
 export interface TestUser {
@@ -99,11 +103,20 @@ export class AuthFixtures {
         name: options.name ?? `E2E-${suffix}`,
         pathId: path.id,
         status: options.status ?? 'ACTIVE',
+        mentorId: options.mentorId ?? null,
       },
-      select: { id: true, name: true },
+      select: { id: true, name: true, pathId: true },
     });
     this.groupIds.push(group.id);
+    await db.groupMember.createMany({
+      data: (options.studentIds ?? []).map((studentId) => ({ groupId: group.id, studentId })),
+    });
     return group;
+  }
+
+  /** API orqali yaratilgan guruhni tozalash ro'yxatiga qo'shadi. */
+  trackGroup(groupId: string): void {
+    this.groupIds.push(groupId);
   }
 
   /** Faqat shu fixture yaratgan foydalanuvchilar, guruhlar va ularga bog'langan yozuvlar o'chiriladi. */

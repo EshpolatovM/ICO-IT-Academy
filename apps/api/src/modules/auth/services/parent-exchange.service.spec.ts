@@ -27,7 +27,15 @@ function setup(stored: string[] = [], storedCookie: string | null = 'enc') {
         tokens.flatMap((token) => {
           const grant = VALID[token];
           return grant
-            ? [{ ...grant, token, firstName: NAMES[grant.studentId] ?? '', lastName: 'X' }]
+            ? [
+                {
+                  ...grant,
+                  token,
+                  firstName: NAMES[grant.studentId] ?? '',
+                  lastName: 'X',
+                  groupName: grant.studentId === 's1' ? 'FE-12' : null,
+                },
+              ]
             : [];
         }),
       ),
@@ -68,7 +76,7 @@ describe('ParentExchangeService', () => {
     const { run, grants, sessionTokens, cookies, rateLimiter, response } = setup(['B']);
 
     await expect(run({ tokens: ['A'] })).resolves.toEqual({
-      children: [{ studentId: 's1', firstName: 'Ali', lastName: 'X', groupName: null }],
+      children: [{ studentId: 's1', firstName: 'Ali', lastName: 'X', groupName: 'FE-12' }],
     });
     expect(rateLimiter.consumeAttempt).toHaveBeenCalledWith('10.0.0.1');
     expect(cookies.decodeStoredTokens).not.toHaveBeenCalled();

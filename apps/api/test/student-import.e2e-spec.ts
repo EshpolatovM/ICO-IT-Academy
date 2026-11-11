@@ -12,6 +12,49 @@ import { useE2eContext } from './support/e2e-context.js';
 /** Excel saqlaydigan UTF-8 BOM. */
 const UTF8_BOM = Buffer.from([0xef, 0xbb, 0xbf]);
 
+const LOCK_POLL_MS = 50;
+const LOCK_POLL_ATTEMPTS = 100;
+const ARCHIVE_TX_TIMEOUT_MS = 15_000;
+
+const delay = (ms: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+/** Import tranzaksiyasi guruh qulfini (`lockManyForUpdate`) kutib turibdimi. */
+async function waitForImportLockWaiter(prisma: PrismaService): Promise<void> {
+  for (let attempt = 0; attempt < LOCK_POLL_ATTEMPTS; attempt += 1) {
+    const [row] = await prisma.dbIncludingDeleted.$queryRaw<[{ waiting: number }]>`
+      SELECT count(*)::int AS waiting FROM pg_stat_activity
+      WHERE wait_event_type = 'Lock' AND query LIKE '%FROM groups%' AND query LIKE '%uuid[]%'`;
+    if (row.waiting > 0) {
+      return;
+    }
+    await delay(LOCK_POLL_MS);
+  }
+  throw new Error('Import guruh qulfini kutmadi');
+}
+
+/**
+ * Guruhni qulflab arxivlaydi, lekin `release()` gacha commit qilmaydi: import validatsiyasi guruhni
+ * hali faol ko'radi, writer esa qulfda kutadi.
+ */
+function archiveHoldingLock(prisma: PrismaService, groupId: string) {
+  let release: () => void = () => undefined;
+  const released = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const done = prisma.dbIncludingDeleted.$transaction(
+    async (tx) => {
+      await tx.$queryRaw`SELECT id FROM groups WHERE id = ${groupId}::uuid FOR UPDATE`;
+      await tx.group.update({ where: { id: groupId }, data: { status: 'ARCHIVED' } });
+      await released;
+    },
+    { timeout: ARCHIVE_TX_TIMEOUT_MS },
+  );
+  return { release, done };
+}
+
 /** CSV import (S-21, docs/12 §2): hammasi yoki hech narsa, qator raqamli xatolar, limitlar. */
 describe('Studentlar CSV importi (e2e)', () => {
   const context = useE2eContext();
@@ -87,7 +130,10 @@ describe('Studentlar CSV importi (e2e)', () => {
     expect(response.body).toMatchObject({
       error: {
         code: ErrorCode.VALIDATION_ERROR,
-        details: [{ row: 3, field: 'lastName' }],
+        details: [
+          { row: 3, field: 'lastName' },
+          { row: 4, field: 'groupName' },
+        ],
       },
     });
     expect(await countByMarker()).toBe(before);
@@ -95,6 +141,56 @@ describe('Studentlar CSV importi (e2e)', () => {
       ['firstName,lastName,groupName', `${marker}E,X,Yoq guruh`].join('\n'),
     ).expect(400);
     expect(groupError.body).toMatchObject({ error: { details: [{ row: 2, field: 'groupName' }] } });
+  });
+
+  it('maydon va guruh xatolari bitta javobda (qator tartibida, bitta qatorda ikkalasi ham)', async () => {
+    const before = await countByMarker();
+    const missingGroup = `YoqGuruh${randomBytes(4).toString('hex')}`;
+    const csv = [
+      'firstName,lastName,groupName',
+      `${marker}F,,`,
+      `${marker}G,Aliyev,${missingGroup}`,
+      `${marker}H,,${missingGroup}`,
+    ].join('\n');
+
+    const response = await upload(csv).expect(400);
+
+    expect(response.body).toMatchObject({
+      error: {
+        code: ErrorCode.VALIDATION_ERROR,
+        details: [
+          { row: 2, field: 'lastName' },
+          { row: 3, field: 'groupName' },
+          { row: 4, field: 'lastName' },
+          { row: 4, field: 'groupName' },
+        ],
+      },
+    });
+    expect(await countByMarker()).toBe(before);
+  });
+
+  it('import paytida guruh arxivlansa — 409 GROUP_ARCHIVED, hech kim yaratilmaydi', async () => {
+    const prisma = context.app.get(PrismaService);
+    const group = await context.fixtures.createGroup();
+    const before = await countByMarker();
+    const archive = archiveHoldingLock(prisma, group.id);
+
+    const importing = upload(
+      ['firstName,lastName,groupName', `${marker}R,Poyga,${group.name}`].join('\n'),
+    ).then((response) => response);
+    await waitForImportLockWaiter(prisma);
+    archive.release();
+    await archive.done;
+    const response = await importing;
+
+    expect(response.status).toBe(409);
+    expect(response.body).toMatchObject({
+      error: {
+        code: ErrorCode.GROUP_ARCHIVED,
+        details: { groups: [{ id: group.id, name: group.name }] },
+      },
+    });
+    expect(await countByMarker()).toBe(before);
   });
 
   it("limitlar: hajmi katta — 413, qatorlar soni — 400, fayl yo'q — 400", async () => {

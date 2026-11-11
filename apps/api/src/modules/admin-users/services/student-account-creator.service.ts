@@ -20,7 +20,8 @@ const GROUP_ID_FIELD = 'groupId';
  * Student yaratish (docs/12 §2, docs/02 §2): kod `student_code_seq` dan, parol berilmasa —
  * vaqtinchalik (javobda bir marta), `must_change_password = true`. `groupId` berilsa — guruh
  * faol bo'lishi shart (400), student faol a'zo bo'ladi (S-02; boshqa faol guruh — 409).
- * Guruh tekshiruvi, yaratish, a'zolik va `USER_CREATED` audit — bitta tranzaksiyada.
+ * Guruh tekshiruvi, yaratish, a'zolik va `USER_CREATED` audit — bitta tranzaksiyada; so'ng guruh
+ * mentorining scope keshi yangilanadi.
  */
 @Injectable()
 export class StudentAccountCreator {
@@ -64,6 +65,9 @@ export class StudentAccountCreator {
       });
       return student;
     });
+    if (request.groupId) {
+      await this.enrollment.refreshMentorScopes([request.groupId]);
+    }
     return { ...created, temporaryPassword, mustChangePassword: true };
   }
 }

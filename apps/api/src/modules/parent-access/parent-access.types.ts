@@ -24,6 +24,8 @@ export interface ParentGrant {
   studentId: string;
   firstName: string;
   lastName: string;
+  /** Studentning faol guruhi nomi (guruhsiz — `null`). */
+  groupName: string | null;
 }
 
 export interface ParentGrantWithHash extends ParentGrant {

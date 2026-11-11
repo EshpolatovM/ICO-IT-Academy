@@ -1,7 +1,9 @@
 import {
   DECREMENT_IF_POSITIVE_SCRIPT,
   INCREMENT_WITH_TTL_SCRIPT,
+  REPLACE_SET_IF_VERSION_SCRIPT,
   SET_IF_GREATER_SCRIPT,
+  SET_MEMBERSHIP_SCRIPT,
   SET_UNLESS_BLOCKED_SCRIPT,
 } from './redis-scripts.js';
 import { RedisService } from './redis.service.js';
@@ -21,8 +23,27 @@ function createFakeClient(status = 'ready') {
     eval: jest.fn().mockResolvedValue(3),
     mget: jest.fn().mockResolvedValue(['a', null]),
     expire: jest.fn().mockResolvedValue(1),
+    multi: jest.fn(),
     disconnect: jest.fn(),
   };
+}
+
+interface FakeMulti {
+  del: jest.Mock<FakeMulti>;
+  incr: jest.Mock<FakeMulti>;
+  expire: jest.Mock<FakeMulti>;
+  exec: jest.Mock<Promise<unknown[] | null>>;
+}
+
+/** `MULTI` zanjiri: har bir buyruq yoziladi, `exec` — bajariladi. */
+function createFakeMulti(): FakeMulti {
+  const multi: FakeMulti = {
+    del: jest.fn(() => multi),
+    incr: jest.fn(() => multi),
+    expire: jest.fn(() => multi),
+    exec: jest.fn((): Promise<unknown[] | null> => Promise.resolve([])),
+  };
+  return multi;
 }
 
 function createService(status?: string) {
@@ -121,5 +142,80 @@ describe('RedisService', () => {
 
     await service.expire('k', 3600);
     expect(client.expire).toHaveBeenCalledWith('k', 3600);
+  });
+
+  it("isSetMember: kalit yo'q — null, aks holda a'zolik (Lua)", async () => {
+    const { client, service } = createService();
+    client.eval.mockResolvedValueOnce(-1).mockResolvedValueOnce(1).mockResolvedValueOnce(0);
+
+    await expect(service.isSetMember('s', 'm')).resolves.toBeNull();
+    await expect(service.isSetMember('s', 'm')).resolves.toBe(true);
+    await expect(service.isSetMember('s', 'm')).resolves.toBe(false);
+    expect(client.eval).toHaveBeenCalledWith(SET_MEMBERSHIP_SCRIPT, 1, 's', 'm');
+  });
+
+  it('replaceSetIfVersion: Lua (versiya sharti bilan), natija — yozildimi', async () => {
+    const { client, service } = createService();
+    client.eval.mockResolvedValueOnce(1).mockResolvedValueOnce(0);
+    const write = {
+      key: 's',
+      versionKey: 'g',
+      expectedVersion: '',
+      members: ['-', 'a'],
+      ttlSeconds: 60,
+    };
+
+    await expect(service.replaceSetIfVersion(write)).resolves.toBe(true);
+    await expect(service.replaceSetIfVersion(write)).resolves.toBe(false);
+    expect(client.eval).toHaveBeenCalledWith(
+      REPLACE_SET_IF_VERSION_SCRIPT,
+      2,
+      's',
+      'g',
+      '',
+      60,
+      '-',
+      'a',
+    );
+  });
+
+  it('bumpVersionsAndDelete: bitta MULTI — har versiyaga INCR + EXPIRE, bitta DEL', async () => {
+    const { client, service } = createService();
+    const multi = createFakeMulti();
+    client.multi.mockReturnValue(multi);
+
+    await service.bumpVersionsAndDelete(
+      [
+        { versionKey: 'g1', dataKey: 's1' },
+        { versionKey: 'g2', dataKey: 's2' },
+      ],
+      100,
+    );
+    expect(multi.incr).toHaveBeenCalledWith('g1');
+    expect(multi.incr).toHaveBeenCalledWith('g2');
+    expect(multi.expire).toHaveBeenCalledWith('g1', 100);
+    expect(multi.del).toHaveBeenCalledTimes(1);
+    expect(multi.del).toHaveBeenCalledWith('s1', 's2');
+    expect(multi.exec).toHaveBeenCalledTimes(1);
+
+    client.multi.mockClear();
+    await service.bumpVersionsAndDelete([], 100);
+    expect(client.multi).not.toHaveBeenCalled();
+  });
+
+  it('bumpVersionsAndDelete: EXEC bekor qilinsa yoki buyruq xato bersa — rad etiladi', async () => {
+    const { client, service } = createService();
+    const multi = createFakeMulti();
+    client.multi.mockReturnValue(multi);
+    const entries = [{ versionKey: 'g', dataKey: 's' }];
+
+    multi.exec.mockResolvedValueOnce(null);
+    await expect(service.bumpVersionsAndDelete(entries, 1)).rejects.toThrow('bekor');
+
+    multi.exec.mockResolvedValueOnce([
+      [null, 1],
+      [new Error('WRONGTYPE'), null],
+    ]);
+    await expect(service.bumpVersionsAndDelete(entries, 1)).rejects.toThrow('WRONGTYPE');
   });
 });

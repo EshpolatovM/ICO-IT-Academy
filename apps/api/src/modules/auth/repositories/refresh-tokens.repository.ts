@@ -42,12 +42,15 @@ function toCreateInput(data: NewRefreshTokenData): Prisma.RefreshTokenUncheckedC
 /** `refresh_tokens` jadvali: sessiyalar, rotation va reuse detection (docs/02 §3, docs/11 §1). */
 @Injectable()
 export class RefreshTokensRepository extends BaseRepository<RefreshTokenRepositoryTypes> {
-  protected readonly delegate: PrismaService['db']['refreshToken'];
   protected readonly defaultOrderBy = { createdAt: 'desc' } as const;
 
   constructor(private readonly prisma: PrismaService) {
     super();
-    this.delegate = prisma.db.refreshToken;
+  }
+
+  /** Joriy tranzaksiya (yoki standart `db`) — meros metodlar ham `UnitOfWork` ga qo'shiladi. */
+  protected get delegate(): PrismaService['client']['refreshToken'] {
+    return this.prisma.client.refreshToken;
   }
 
   findByHash(tokenHash: string): Promise<RefreshTokenRecord | null> {

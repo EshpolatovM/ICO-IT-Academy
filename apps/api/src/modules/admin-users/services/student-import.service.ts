@@ -11,10 +11,21 @@ import { StudentImportWriter } from './student-import-writer.service.js';
 
 import type { ActorContext } from '../../../common/auth/request-user.types.js';
 import type { UploadedCsvFile } from '../admin-users.types.js';
-import type { ParsedImportRow } from './student-import-parser.service.js';
 import type { PreparedImportStudent } from './student-import-writer.service.js';
 
 const GROUP_NAME_FIELD = 'groupName';
+
+/** Guruh nomi tekshiriladigan qator (to'g'ri yoki parser rad etgan). */
+interface RowGroupName {
+  line: number;
+  groupName?: string;
+}
+
+interface ResolvedGroups {
+  /** Qator raqami → guruh (guruh nomi bo'lmagan qatorlar yo'q). */
+  byLine: Map<number, GroupRef>;
+  errors: ImportRowError[];
+}
 
 function nameKey(name: string): string {
   return name.toLowerCase();
@@ -22,9 +33,11 @@ function nameKey(name: string): string {
 
 /**
  * Studentlarni CSV orqali import qilish (S-21, docs/12 §2): avval TO'LIQ validatsiya (fayl,
- * qatorlar, guruh nomlari — faol guruh aniq bitta bo'lishi shart); birorta xato bo'lsa hech narsa
- * yaratilmaydi (400, qator raqamlari bilan). Aks holda hammasi bitta tranzaksiyada yaratiladi va
- * javobda har bir student vaqtinchalik paroli bilan BIR MARTA qaytadi.
+ * qatorlar, guruh nomlari — faol guruh aniq bitta bo'lishi shart; rad etilgan qatorlarniki ham);
+ * qator va guruh xatolari birlashtirilib (qator tartibida, qator ichida maydon xatolaridan keyin
+ * guruh) bitta 400 javobda qaytadi, hech narsa yaratilmaydi. Aks holda hammasi bitta tranzaksiyada
+ * yaratiladi (guruh shu orada arxivlansa — 409 `GROUP_ARCHIVED`, writer) va javobda har bir
+ * student vaqtinchalik paroli bilan BIR MARTA qaytadi.
  */
 @Injectable()
 export class StudentImportService {
@@ -42,13 +55,17 @@ export class StudentImportService {
     if (!file) {
       throw fileError('CSV fayl yuborilmagan');
     }
-    const rows = this.parser.parse(file.buffer);
-    const groups = await this.resolveGroups(rows);
+    const { rows, errors, rejectedGroups } = this.parser.parse(file.buffer);
+    const { byLine, errors: groupErrors } = await this.resolveGroups([...rows, ...rejectedGroups]);
+    const allErrors = [...errors, ...groupErrors].sort((a, b) => a.row - b.row);
+    if (allErrors.length > 0) {
+      throw importValidationException(allErrors);
+    }
     const passwords = await Promise.all(rows.map(() => this.passwords.generate()));
     const prepared = rows.map((row, index): PreparedImportStudent => ({
       firstName: row.firstName,
       lastName: row.lastName,
-      group: groups[index] ?? null,
+      group: byLine.get(row.line) ?? null,
       passwordHash: passwords[index]?.passwordHash ?? '',
     }));
     const created = await this.writer.write(prepared, actor);
@@ -62,31 +79,26 @@ export class StudentImportService {
     return { count: students.length, students };
   }
 
-  /** Har bir qator uchun guruh (yoki `null`); topilmagan/ko'p ma'noli nom — qator xatosi. */
-  private async resolveGroups(rows: readonly ParsedImportRow[]): Promise<(GroupRef | null)[]> {
+  /** Guruh nomli qatorlar uchun guruh; topilmagan/ko'p ma'noli nom — qator xatosi. */
+  private async resolveGroups(rows: readonly RowGroupName[]): Promise<ResolvedGroups> {
     const names = [...new Set(rows.flatMap((row) => (row.groupName ? [row.groupName] : [])))];
     const found = await this.enrollment.findActiveGroupsByNames(names);
     const byName = new Map<string, GroupRef[]>();
     for (const group of found) {
       byName.set(nameKey(group.name), [...(byName.get(nameKey(group.name)) ?? []), group]);
     }
-    const errors: ImportRowError[] = [];
-    const resolved = rows.map((row) => {
-      if (!row.groupName) {
-        return null;
-      }
-      const matches = byName.get(nameKey(row.groupName)) ?? [];
-      if (matches.length !== 1) {
-        errors.push({
-          row: row.line,
+    const resolved: ResolvedGroups = { byLine: new Map(), errors: [] };
+    for (const { line, groupName } of rows) {
+      const matches = groupName ? (byName.get(nameKey(groupName)) ?? []) : [];
+      if (groupName && matches.length !== 1) {
+        resolved.errors.push({
+          row: line,
           field: GROUP_NAME_FIELD,
           message: groupError(matches.length),
         });
+      } else if (matches[0]) {
+        resolved.byLine.set(line, matches[0]);
       }
-      return matches[0] ?? null;
-    });
-    if (errors.length > 0) {
-      throw importValidationException(errors);
     }
     return resolved;
   }

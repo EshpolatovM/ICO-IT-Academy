@@ -7,7 +7,7 @@ import { STUDENT_SCOPE_RESOLVER } from './student-scope.types.js';
 
 /**
  * Scope (resursga egalik) mexanizmi — global: `@StudentScope` istalgan modul controller'ida ishlaydi.
- * 2-bosqichda `STUDENT_SCOPE_RESOLVER` guruhlarni biladigan implementatsiyaga almashtiriladi.
+ * Mentor scope'i (`MentorStudentScope`) — `modules/groups` dagi global `MentorScopeModule` dan.
  */
 @Global()
 @Module({

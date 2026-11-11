@@ -1,3 +1,8 @@
+import {
+  STUDENT_IMPORT_DEFAULT_MAX_FILE_BYTES,
+  STUDENT_IMPORT_DEFAULT_MAX_ROWS,
+} from '@lms/shared';
+
 import { AppConfigService } from './app-config.service.js';
 import { EnvValidationError, validateEnv } from './env.schema.js';
 
@@ -72,6 +77,22 @@ describe('validateEnv', () => {
     expect(
       validateEnv({ ...VALID_ENV, WEB_BASE_URL: 'https://app.example.uz/' }).WEB_BASE_URL,
     ).toBe('https://app.example.uz');
+  });
+
+  it('CSV import chegaralari berilmasa — @lms/shared standart qiymatlari; env ustun', () => {
+    const {
+      STUDENT_IMPORT_MAX_FILE_BYTES: _bytes,
+      STUDENT_IMPORT_MAX_ROWS: _rows,
+      ...rest
+    } = VALID_ENV;
+
+    expect(validateEnv(rest)).toMatchObject({
+      STUDENT_IMPORT_MAX_FILE_BYTES: STUDENT_IMPORT_DEFAULT_MAX_FILE_BYTES,
+      STUDENT_IMPORT_MAX_ROWS: STUDENT_IMPORT_DEFAULT_MAX_ROWS,
+    });
+    expect(
+      validateEnv({ ...VALID_ENV, STUDENT_IMPORT_MAX_ROWS: '20' }).STUDENT_IMPORT_MAX_ROWS,
+    ).toBe(20);
   });
 
   it('API_PORT ni songa aylantiradi', () => {

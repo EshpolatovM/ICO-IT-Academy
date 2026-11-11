@@ -73,7 +73,7 @@ describe('Parolni tiklash va parol siyosati (e2e)', () => {
     await reset(adminToken, 'staff', admin.id).expect(403);
   });
 
-  it('mentor va student reset endpointlariga 403; topilmagan student — 404', async () => {
+  it('mentor: guruhidan tashqari student — 404, staff — 403; student — 403; topilmagan — 404', async () => {
     const { app, fixtures } = context;
     const mentor: TestUser = await fixtures.createUser({ role: Role.MENTOR });
     const student = await fixtures.createUser({ role: Role.STUDENT });
@@ -82,7 +82,7 @@ describe('Parolni tiklash va parol siyosati (e2e)', () => {
     const studentToken = (await login(app, student)).accessToken;
     const adminToken = (await login(app, admin)).accessToken;
 
-    await reset(mentorToken, 'students', student.id).expect(403);
+    await reset(mentorToken, 'students', student.id).expect(404);
     await reset(mentorToken, 'staff', admin.id).expect(403);
     await reset(studentToken, 'students', student.id).expect(403);
     await reset(adminToken, 'students', mentor.id).expect(404);

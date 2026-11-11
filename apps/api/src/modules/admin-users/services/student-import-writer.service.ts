@@ -24,7 +24,9 @@ export interface PreparedImportStudent {
 }
 
 /**
- * Import natijasini yozish — hammasi yoki hech narsa (bitta tranzaksiya, S-21): studentlar (kodlar
+ * Import natijasini yozish — hammasi yoki hech narsa (bitta tranzaksiya, S-21): avval import
+ * guruhlari qulflanib faolligi qayta tekshiriladi (validatsiyadan keyin arxivlangan bo'lsa — 409
+ * `GROUP_ARCHIVED`, hech kim yaratilmaydi), so'ng studentlar (kodlar
  * bitta so'rovda), guruh a'zoliklari, har bir student uchun `USER_CREATED` va partiya uchun
  * `STUDENTS_IMPORTED` audit. Natija kirish tartibida.
  */
@@ -37,11 +39,23 @@ export class StudentImportWriter {
     private readonly unitOfWork: UnitOfWork,
   ) {}
 
-  write(
+  async write(
     students: readonly PreparedImportStudent[],
     actor: ActorContext,
   ): Promise<CreatedStudentRecord[]> {
+    const groups = students.flatMap(({ group }) => (group ? [group] : []));
+    const created = await this.insert(students, groups, actor);
+    await this.enrollment.refreshMentorScopes([...new Set(groups.map((group) => group.id))]);
+    return created;
+  }
+
+  private insert(
+    students: readonly PreparedImportStudent[],
+    groups: readonly GroupRef[],
+    actor: ActorContext,
+  ): Promise<CreatedStudentRecord[]> {
     return this.unitOfWork.run(async () => {
+      await this.enrollment.requireGroupsStillActive(groups);
       const created = await this.accounts.createStudents(
         students.map(({ firstName, lastName, passwordHash }) => ({
           firstName,

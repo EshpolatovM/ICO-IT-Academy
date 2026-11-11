@@ -31,7 +31,7 @@ export class MeService {
   }
 
   private async getParent(user: ParentRequestUser): Promise<ParentMeResponse> {
-    const students = await this.users.findStudentsByIds(user.studentIds);
+    const students = await this.users.findChildrenByIds(user.studentIds);
     const byId = new Map(students.map((student) => [student.id, student]));
     const ordered = user.studentIds.flatMap((studentId) => {
       const student = byId.get(studentId);

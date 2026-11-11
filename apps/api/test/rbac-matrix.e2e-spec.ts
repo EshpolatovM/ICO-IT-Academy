@@ -6,8 +6,10 @@ import type { AccountRole } from '@lms/shared';
 import { API, http, TEST_PASSWORD } from './support/auth-fixtures.js';
 import { useE2eContext } from './support/e2e-context.js';
 import { ALL_ACTORS, RbacActors } from './support/rbac-actors.js';
+import { GROUP_CASES } from './support/rbac-group-cases.js';
 import {
   accountOnly,
+  adminsOnly,
   FORBIDDEN,
   MCP_BLOCKED,
   NOT_FOUND,
@@ -26,10 +28,10 @@ import type { EndpointCase, RequestSpec } from './support/rbac-matrix.js';
 import type request from 'supertest';
 
 /**
- * RBAC matritsasi — 1-bosqich va 2.2 (docs/01 §2.1, docs/02 §7, docs/12 §1, §2, §16): har bir endpoint × har bir
+ * RBAC matritsasi — 1-bosqich, 2.2 va 2.3 (docs/01 §2.1, docs/02 §7, docs/12 §1, §2, §16): har bir endpoint × har bir
  * aktyor → kutilgan status (va xato kodi). Global guard tartibi: autentifikatsiya (401) →
  * `PASSWORD_CHANGE_REQUIRED` (403) → `@Roles` (403) → ota-ona faqat o'qish (403) → `@StudentScope`.
- * Mentor uchun student endpointlari hozir 403 (guruhlar 2-bosqichda — 1.6 qarori).
+ * Mentor uchun student endpointlari — guruh scope'i orqali (begona student — 404).
  * Har bir katak o'z aktyori va nishon yozuvlari bilan ishlaydi (natijalar bir-biriga ta'sir qilmaydi).
  */
 
@@ -131,7 +133,7 @@ const FOUNDATION_CASES: EndpointCase[] = [
   {
     endpoint: 'POST /staff/:id/reset-password (nishon: MENTOR)',
     build: staffResetOf(Role.MENTOR),
-    expected: staffStudentAccess(ok(200)),
+    expected: adminsOnly(ok(200)),
   },
   {
     endpoint: 'POST /staff/:id/reset-password (nishon: ADMIN)',
@@ -141,12 +143,12 @@ const FOUNDATION_CASES: EndpointCase[] = [
   {
     endpoint: 'POST /staff/:id/reset-password (nishon: SUPER_ADMIN)',
     build: staffResetOf(Role.SUPER_ADMIN),
-    expected: staffStudentAccess(FORBIDDEN),
+    expected: adminsOnly(FORBIDDEN),
   },
   {
     endpoint: 'POST /staff/:id/reset-password (nishon: STUDENT)',
     build: staffResetOf(Role.STUDENT),
-    expected: staffStudentAccess(NOT_FOUND),
+    expected: adminsOnly(NOT_FOUND),
   },
   {
     endpoint: "POST /staff/:id/reset-password (nishon: o'zi)",
@@ -155,11 +157,11 @@ const FOUNDATION_CASES: EndpointCase[] = [
         method: 'post',
         path: `/staff/${actor.user?.id ?? randomUUID()}/reset-password`,
       }),
-    expected: staffStudentAccess(FORBIDDEN),
+    expected: adminsOnly(FORBIDDEN),
   },
 ];
 
-const CASES: EndpointCase[] = [...FOUNDATION_CASES, ...USER_MANAGEMENT_CASES];
+const CASES: EndpointCase[] = [...FOUNDATION_CASES, ...USER_MANAGEMENT_CASES, ...GROUP_CASES];
 
 /** Muvaffaqiyatli yaratish javobidagi foydalanuvchilar (`id`, `students[].id`) tozalanadi. */
 function trackCreatedUsers(fixtures: AuthFixtures, response: request.Response): void {
@@ -180,7 +182,7 @@ const CELLS = CASES.flatMap((testCase) =>
   })),
 );
 
-describe('RBAC matritsasi — 1-bosqich va 2.2 endpointlari (e2e)', () => {
+describe('RBAC matritsasi — 1-bosqich, 2.2 va 2.3 endpointlari (e2e)', () => {
   const context = useE2eContext();
   let actors: RbacActors;
 
@@ -205,6 +207,10 @@ describe('RBAC matritsasi — 1-bosqich va 2.2 endpointlari (e2e)', () => {
     const response = await send(spec, actor);
     if (cell.createsUsers) {
       trackCreatedUsers(context.fixtures, response);
+    }
+    const createdGroupId = (response.body as { id?: string } | undefined)?.id;
+    if (cell.createsGroup && createdGroupId) {
+      context.fixtures.trackGroup(createdGroupId);
     }
 
     const want = expected[kind];

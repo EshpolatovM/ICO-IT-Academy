@@ -223,17 +223,17 @@ describe('Ota-ona kirishi va tokenlari (e2e)', () => {
     await exchange(app, { tokens: [created.token] }).expect(200);
   });
 
-  it('mentor: parent-token endpointlari 403 (2-bosqichgacha); begona student — 404; student — 403', async () => {
+  it("mentor: o'z guruhida bo'lmagan student — 404; student — 403; xodim nishon — 404", async () => {
     const mentor = await fixtures.createUser({ role: Role.MENTOR });
     const student = await fixtures.createUser({ role: Role.STUDENT });
     const mentorToken = (await login(app, mentor)).accessToken;
     const studentToken = (await login(app, student)).accessToken;
 
-    await createParentToken(app, mentorToken, student.id).expect(403);
+    await createParentToken(app, mentorToken, student.id).expect(404);
     await http(app)
       .get(`${API}/students/${student.id}/parent-tokens`)
       .auth(mentorToken, { type: 'bearer' })
-      .expect(403);
+      .expect(404);
     await createParentToken(app, studentToken, student.id).expect(403);
     await createParentToken(app, adminToken, mentor.id).expect(404);
   });

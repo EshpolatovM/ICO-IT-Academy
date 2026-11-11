@@ -3,11 +3,14 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   DECREMENT_IF_POSITIVE_SCRIPT,
   INCREMENT_WITH_TTL_SCRIPT,
+  REPLACE_SET_IF_VERSION_SCRIPT,
   SET_IF_GREATER_SCRIPT,
+  SET_MEMBERSHIP_SCRIPT,
   SET_UNLESS_BLOCKED_SCRIPT,
 } from './redis-scripts.js';
 import { REDIS_CLIENT } from './redis.constants.js';
 
+import type { VersionedKey, VersionedSetWrite } from './redis.types.js';
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import type { Redis } from 'ioredis';
 
@@ -18,6 +21,20 @@ const SINGLE_KEY = 1;
 const KEY_PAIR = 2;
 /** Skript "yozildi" natijasi. */
 const SCRIPT_APPLIED = 1;
+/** `SET_MEMBERSHIP_SCRIPT` natijalari. */
+const SET_MISSING = -1;
+const SET_MEMBER = 1;
+
+/** `MULTI ... EXEC` natijasi: `null` (bekor qilingan) yoki biror buyruq xatosi — rad etiladi. */
+function assertExecSucceeded(results: [Error | null, unknown][] | null): void {
+  if (results === null) {
+    throw new Error('Redis MULTI bekor qilindi');
+  }
+  const failed = results.find(([error]) => error !== null);
+  if (failed?.[0]) {
+    throw failed[0];
+  }
+}
 
 /**
  * Redis ulanishi va oddiy wrapper (docs/13 §1, §6). Kesh strategiyalari, pub/sub, BullMQ — keyingi modullarda.
@@ -117,5 +134,50 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       ttlSeconds,
     );
     return Number(applied) === SCRIPT_APPLIED;
+  }
+
+  /**
+   * To'plamda a'zo bormi (atomar, Lua): kalit yo'q bo'lsa — `null` (kesh bo'sh), aks holda `true`/`false`.
+   */
+  async isSetMember(key: string, member: string): Promise<boolean | null> {
+    const result = Number(await this.client.eval(SET_MEMBERSHIP_SCRIPT, SINGLE_KEY, key, member));
+    return result === SET_MISSING ? null : result === SET_MEMBER;
+  }
+
+  /**
+   * Versiya hisoblagichi o'qilgandan beri o'zgarmagan bo'lsagina to'plamni almashtiradi (Lua, atomar:
+   * DEL + SADD + EXPIRE). Yozilsa — `true`; oraliqda invalidatsiya bo'lgan bo'lsa — `false`.
+   * `members` bo'sh bo'lmasligi kerak (Redis bo'sh set saqlamaydi).
+   */
+  async replaceSetIfVersion(write: VersionedSetWrite): Promise<boolean> {
+    const applied = await this.client.eval(
+      REPLACE_SET_IF_VERSION_SCRIPT,
+      KEY_PAIR,
+      write.key,
+      write.versionKey,
+      write.expectedVersion,
+      write.ttlSeconds,
+      ...write.members,
+    );
+    return Number(applied) === SCRIPT_APPLIED;
+  }
+
+  /**
+   * Har bir versiya hisoblagichini oshiradi (`INCR` + `EXPIRE`) va barcha ma'lumot kalitlarini
+   * bitta `DEL k1 k2 ...` bilan o'chiradi — hammasi bitta `MULTI` da. Biror buyruq xato bersa — rad etiladi.
+   */
+  async bumpVersionsAndDelete(
+    entries: readonly VersionedKey[],
+    versionTtlSeconds: number,
+  ): Promise<void> {
+    if (entries.length === 0) {
+      return;
+    }
+    const transaction = this.client.multi();
+    for (const { versionKey } of entries) {
+      transaction.incr(versionKey).expire(versionKey, versionTtlSeconds);
+    }
+    transaction.del(...entries.map(({ dataKey }) => dataKey));
+    assertExecSucceeded(await transaction.exec());
   }
 }

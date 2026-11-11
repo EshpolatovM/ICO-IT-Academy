@@ -25,3 +25,8 @@ export interface StudentProfileRecord {
   firstName: string;
   lastName: string;
 }
+
+/** Ota-ona panelidagi farzand: qisqa ma'lumot va faol guruhi nomi (guruhsiz — `null`). */
+export interface StudentChildRecord extends StudentProfileRecord {
+  groupName: string | null;
+}

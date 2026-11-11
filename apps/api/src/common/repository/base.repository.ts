@@ -12,7 +12,10 @@ import type {
 
 /**
  * Umumiy CRUD va offset pagination (docs/12 §0: `{ items, total, page, pageSize }`).
- * Merosxo'r faqat `delegate` (masalan `prisma.db.user`) va `defaultOrderBy` ni beradi.
+ * Merosxo'r faqat `delegate` va `defaultOrderBy` ni beradi. `delegate` — getter
+ * (`get delegate() { return this.prisma.client.user; }`): har chaqiruvda joriy tranzaksiya klienti
+ * olinadi, shuning uchun meros metodlar (`findById`, `update`, ...) ham `UnitOfWork` ichida ishlaydi;
+ * tranzaksiyadan tashqarida — standart `db` (soft delete filtri bilan).
  * Soft delete'li modellar uchun — `SoftDeletableBaseRepository`.
  */
 export abstract class BaseRepository<T extends RepositoryTypes> implements Repository<T> {

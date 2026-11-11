@@ -14,7 +14,7 @@ import type { ActorContext } from '../../../common/auth/request-user.types.js';
 
 /**
  * Parolni tiklash (docs/12 §2, docs/02 §4.3). Vaqtinchalik parol faqat shu javobda (keshlanmaydi).
- * - `POST /students/:id/reset-password` — SA A M (mentor — `@StudentScope`, 2-bosqichgacha yopiq);
+ * - `POST /students/:id/reset-password` — SA A M (mentor — `@StudentScope`: faqat o'z guruhi studenti);
  * - `POST /staff/:id/reset-password` — SA (admin va mentor uchun), A (faqat mentor uchun).
  */
 @Controller()

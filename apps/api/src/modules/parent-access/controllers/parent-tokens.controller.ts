@@ -13,7 +13,7 @@ import type { ActorContext } from '../../../common/auth/request-user.types.js';
 
 /**
  * Ota-ona tokenlari (docs/12 §2: SA A M; docs/02 §7). Mentor — `@StudentScope` orqali
- * (guruhlar 2-bosqichda; hozir mentor uchun yopiq).
+ * (faqat o'z guruhi studenti, aks holda 404).
  */
 @StaffStudentAccess('id')
 @Controller('students/:id/parent-tokens')

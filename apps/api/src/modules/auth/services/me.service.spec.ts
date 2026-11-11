@@ -22,7 +22,7 @@ const account = { id: 'u1', role: Role.MENTOR, mustChangePassword: false } as co
 function createService(found: object | null, students: object[] = []) {
   const users = {
     findAuthById: jest.fn().mockResolvedValue(found),
-    findStudentsByIds: jest.fn().mockResolvedValue(students),
+    findChildrenByIds: jest.fn().mockResolvedValue(students),
   };
   return new MeService(users as unknown as UsersRepository);
 }
@@ -45,10 +45,10 @@ describe('MeService', () => {
     });
   });
 
-  it('ota-ona — sessiyadagi farzandlar (sessiya tartibida, guruh hozircha null)', async () => {
+  it('ota-ona — sessiyadagi farzandlar (sessiya tartibida, faol guruh nomi bilan)', async () => {
     const service = createService(null, [
-      { id: 's2', firstName: 'Vali', lastName: 'B' },
-      { id: 's1', firstName: 'Ali', lastName: 'A' },
+      { id: 's2', firstName: 'Vali', lastName: 'B', groupName: 'FE-12' },
+      { id: 's1', firstName: 'Ali', lastName: 'A', groupName: null },
     ]);
     const parent = {
       id: 't1',
@@ -62,7 +62,7 @@ describe('MeService', () => {
       role: Role.PARENT,
       children: [
         { studentId: 's1', firstName: 'Ali', lastName: 'A', groupName: null },
-        { studentId: 's2', firstName: 'Vali', lastName: 'B', groupName: null },
+        { studentId: 's2', firstName: 'Vali', lastName: 'B', groupName: 'FE-12' },
       ],
     });
   });

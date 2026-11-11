@@ -4,6 +4,7 @@ import { Role, UserStatus } from '@lms/shared';
 
 import { SoftDeletableBaseRepository } from '../../../common/repository/base.repository.js';
 import { PrismaService } from '../../../infra/prisma/prisma.service.js';
+import { ACTIVE_GROUP_MEMBERSHIP_SELECT } from '../../groups/repositories/group-members.repository.js';
 import { StudentCodeRepository } from '../../users/repositories/student-code.repository.js';
 
 import type { Prisma } from '../../../infra/prisma/generated/client.js';
@@ -37,11 +38,7 @@ const ACCOUNT_SELECT = {
     orderBy: { name: 'asc' },
     select: GROUP_REF_SELECT,
   },
-  groupMemberships: {
-    where: { leftAt: null, group: { deletedAt: null } },
-    take: 1,
-    select: { group: { select: GROUP_REF_SELECT } },
-  },
+  groupMemberships: ACTIVE_GROUP_MEMBERSHIP_SELECT,
 } as const satisfies Prisma.UserSelect;
 
 type AccountRow = Prisma.UserGetPayload<{ select: typeof ACCOUNT_SELECT }>;
@@ -63,7 +60,6 @@ const NEW_ACCOUNT_DEFAULTS = {
  */
 @Injectable()
 export class UserAccountsRepository extends SoftDeletableBaseRepository<UserRepositoryTypes> {
-  protected readonly delegate: PrismaService['db']['user'];
   protected readonly defaultOrderBy = { createdAt: 'desc' } as const;
 
   constructor(
@@ -71,7 +67,11 @@ export class UserAccountsRepository extends SoftDeletableBaseRepository<UserRepo
     private readonly studentCodes: StudentCodeRepository,
   ) {
     super();
-    this.delegate = prisma.db.user;
+  }
+
+  /** Joriy tranzaksiya (yoki standart `db`) — meros metodlar ham `UnitOfWork` ga qo'shiladi. */
+  protected get delegate(): PrismaService['client']['user'] {
+    return this.prisma.client.user;
   }
 
   async findAccount(id: string): Promise<UserAccountRecord | null> {

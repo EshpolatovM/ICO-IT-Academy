@@ -43,3 +43,34 @@ if redis.call('EXISTS', KEYS[2]) == 1 then
 end
 redis.call('SET', KEYS[1], ARGV[1], 'EX', ARGV[2])
 return 1`;
+
+/**
+ * To'plam a'zoligi: kalit yo'q bo'lsa `-1` (kesh bo'sh), aks holda `SISMEMBER` natijasi (1/0).
+ * KEYS[1], ARGV[1]=a'zo.
+ */
+export const SET_MEMBERSHIP_SCRIPT = `
+if redis.call('EXISTS', KEYS[1]) == 0 then
+  return -1
+end
+return redis.call('SISMEMBER', KEYS[1], ARGV[1])`;
+
+/** `unpack` bitta chaqiruvda Lua steki chegarasidan oshmasligi uchun `SADD` bo'laklari hajmi. */
+const SADD_CHUNK_SIZE = 1000;
+
+/**
+ * Versiya tekshiruvli to'plam almashtirish (kesh poygasidan himoya): `KEYS[2]` (versiya hisoblagichi)
+ * qiymati o'qishdan oldingi bilan bir xil bo'lsagina (`''` — kalit yo'q edi) `KEYS[1]` set'i
+ * DEL + SADD + EXPIRE bilan almashtiriladi. ARGV[1]=kutilgan versiya, ARGV[2]=ttl, ARGV[3..]=a'zolar
+ * (kamida bittasi). Yozilsa 1, versiya o'zgargan bo'lsa 0.
+ */
+export const REPLACE_SET_IF_VERSION_SCRIPT = `
+local current = redis.call('GET', KEYS[2])
+if (current or '') ~= ARGV[1] then
+  return 0
+end
+redis.call('DEL', KEYS[1])
+for i = 3, #ARGV, ${SADD_CHUNK_SIZE} do
+  redis.call('SADD', KEYS[1], unpack(ARGV, i, math.min(i + ${SADD_CHUNK_SIZE - 1}, #ARGV)))
+end
+redis.call('EXPIRE', KEYS[1], ARGV[2])
+return 1`;

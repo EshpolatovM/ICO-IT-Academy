@@ -23,6 +23,7 @@ function setup() {
   const enrollment = {
     requireActiveGroup: jest.fn().mockResolvedValue(GROUP),
     enroll: jest.fn().mockResolvedValue(undefined),
+    refreshMentorScopes: jest.fn().mockResolvedValue(undefined),
   };
   const { audit, asAudit } = fakeAudit();
   const { unitOfWork, asUnitOfWork } = fakeUnitOfWork();
@@ -52,6 +53,7 @@ describe('StudentAccountCreator', () => {
     });
     expect(enrollment.requireActiveGroup).not.toHaveBeenCalled();
     expect(enrollment.enroll).not.toHaveBeenCalled();
+    expect(enrollment.refreshMentorScopes).not.toHaveBeenCalled();
   });
 
   it("groupId bilan: guruh tekshiriladi, faol a'zo, audit groupId bilan — bitta tranzaksiyada", async () => {
@@ -62,6 +64,7 @@ describe('StudentAccountCreator', () => {
     expect(unitOfWork.run).toHaveBeenCalledTimes(1);
     expect(enrollment.requireActiveGroup).toHaveBeenCalledWith('g1', 'groupId');
     expect(enrollment.enroll).toHaveBeenCalledWith({ groupId: 'g1', studentId: 's1' });
+    expect(enrollment.refreshMentorScopes).toHaveBeenCalledWith(['g1']);
     expect(audit.record).toHaveBeenCalledWith(
       expect.objectContaining({
         action: AuditAction.USER_CREATED,

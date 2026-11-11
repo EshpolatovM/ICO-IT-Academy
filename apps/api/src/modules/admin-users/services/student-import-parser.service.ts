@@ -24,6 +24,30 @@ export interface ParsedImportRow extends StudentImportRow {
   line: number;
 }
 
+/** Rad etilgan qatorning (o'zi to'g'ri) guruh nomi — uning guruh xatosi ham chiqishi uchun (barcha xatolar). */
+export interface RejectedRowGroup {
+  line: number;
+  groupName: string;
+}
+
+/**
+ * Tahlil natijasi: to'g'ri qatorlar, qator darajasidagi xatolar va rad etilgan qatorlarning guruh
+ * nomlari (chaqiruvchi guruhlarni tekshirib, barcha xatolarni bitta 400 javobda qaytaradi).
+ * Fayl/sarlavha xatolari — darhol 400.
+ */
+export interface ParsedImport {
+  rows: ParsedImportRow[];
+  errors: ImportRowError[];
+  rejectedGroups: RejectedRowGroup[];
+}
+
+interface RejectedRow {
+  errors: ImportRowError[];
+  groupName?: string;
+}
+
+const groupNameSchema = studentImportRowSchema.shape.groupName;
+
 type ColumnIndexes = Partial<Record<StudentImportColumn, number>>;
 
 const KNOWN_COLUMNS = new Map<string, StudentImportColumn>(
@@ -81,16 +105,23 @@ function readRow(
   record: CsvRecord,
   indexes: ColumnIndexes,
   width: number,
-): ParsedImportRow | ImportRowError[] {
+): ParsedImportRow | RejectedRow {
   if (record.fields.length > width) {
-    return [{ row: record.line, field: FILE_FIELD, message: "Ustunlar soni sarlavhadagidan ko'p" }];
+    return {
+      errors: [
+        { row: record.line, field: FILE_FIELD, message: "Ustunlar soni sarlavhadagidan ko'p" },
+      ],
+    };
   }
-  const raw = Object.fromEntries(
+  const raw: Partial<Record<StudentImportColumn, string>> = Object.fromEntries(
     Object.entries(indexes).map(([column, index]) => [column, record.fields[index] ?? '']),
   );
   const parsed = studentImportRowSchema.safeParse(raw);
   if (!parsed.success) {
-    return toFieldErrors(parsed.error).map((issue) => ({ ...issue, row: record.line }));
+    return {
+      errors: toFieldErrors(parsed.error).map((issue) => ({ ...issue, row: record.line })),
+      groupName: groupNameSchema.safeParse(raw.groupName).data,
+    };
   }
   return { ...parsed.data, line: record.line };
 }
@@ -98,33 +129,32 @@ function readRow(
 /**
  * CSV import faylini o'qish va TO'LIQ validatsiya (S-21, docs/12 §2): UTF-8, birinchi qator —
  * sarlavha (`firstName,lastName[,groupName]`, `,` yoki `;`), qatorlar soni chegarasi (env).
- * Birorta xato bo'lsa — barcha xatolar qator raqamlari bilan bitta 400 javobda.
+ * Fayl yoki sarlavha xatosi — darhol 400. Qator xatolari to'planib qaytariladi (`ParsedImport.errors`).
  */
 @Injectable()
 export class StudentImportParser {
   constructor(private readonly config: AppConfigService) {}
 
-  parse(content: Buffer): ParsedImportRow[] {
+  parse(content: Buffer): ParsedImport {
     const [header, ...records] = readRecords(decodeUtf8(content));
     if (!header) {
       throw fileError("Fayl bo'sh");
     }
     const indexes = mapHeader(header.fields);
     this.assertRowCount(records.length);
-    const rows: ParsedImportRow[] = [];
-    const errors: ImportRowError[] = [];
+    const parsed: ParsedImport = { rows: [], errors: [], rejectedGroups: [] };
     for (const record of records) {
       const result = readRow(record, indexes, header.fields.length);
-      if (Array.isArray(result)) {
-        errors.push(...result);
+      if ('errors' in result) {
+        parsed.errors.push(...result.errors);
+        if (result.groupName) {
+          parsed.rejectedGroups.push({ line: record.line, groupName: result.groupName });
+        }
       } else {
-        rows.push(result);
+        parsed.rows.push(result);
       }
     }
-    if (errors.length > 0) {
-      throw importValidationException(errors);
-    }
-    return rows;
+    return parsed;
   }
 
   private assertRowCount(count: number): void {

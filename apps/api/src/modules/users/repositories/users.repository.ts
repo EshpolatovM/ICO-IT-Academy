@@ -5,10 +5,16 @@ import { Role } from '@lms/shared';
 import { STAFF_ROLES } from '../../../common/constants/roles.constants.js';
 import { SoftDeletableBaseRepository } from '../../../common/repository/base.repository.js';
 import { PrismaService } from '../../../infra/prisma/prisma.service.js';
+import { ACTIVE_GROUP_MEMBERSHIP_SELECT } from '../../groups/repositories/group-members.repository.js';
 
 import type { RepositoryTypes } from '../../../common/repository/repository.types.js';
 import type { Prisma, User } from '../../../infra/prisma/generated/client.js';
-import type { PasswordChangeResult, StudentProfileRecord, UserAuthRecord } from '../users.types.js';
+import type {
+  PasswordChangeResult,
+  StudentChildRecord,
+  StudentProfileRecord,
+  UserAuthRecord,
+} from '../users.types.js';
 
 export interface UserRepositoryTypes extends RepositoryTypes {
   model: User;
@@ -47,12 +53,15 @@ const STUDENT_PROFILE_SELECT = {
 /** `users` jadvali. O'chirilgan (soft delete) foydalanuvchilar avtomatik yashiriladi. */
 @Injectable()
 export class UsersRepository extends SoftDeletableBaseRepository<UserRepositoryTypes> {
-  protected readonly delegate: PrismaService['db']['user'];
   protected readonly defaultOrderBy = { createdAt: 'desc' } as const;
 
   constructor(private readonly prisma: PrismaService) {
     super();
-    this.delegate = prisma.db.user;
+  }
+
+  /** Joriy tranzaksiya (yoki standart `db`) — meros metodlar ham `UnitOfWork` ga qo'shiladi. */
+  protected get delegate(): PrismaService['client']['user'] {
+    return this.prisma.client.user;
   }
 
   /** Staff (SA, A, M) — telefon bo'yicha (docs/02 §4.1). */
@@ -93,12 +102,17 @@ export class UsersRepository extends SoftDeletableBaseRepository<UserRepositoryT
     });
   }
 
-  findStudentsByIds(ids: readonly string[]): Promise<StudentProfileRecord[]> {
-    return this.delegate.findMany({
+  /** Ota-ona paneli uchun: farzandlar va ularning faol guruhi nomi. */
+  async findChildrenByIds(ids: readonly string[]): Promise<StudentChildRecord[]> {
+    const rows = await this.delegate.findMany({
       where: { id: { in: [...ids] }, role: Role.STUDENT },
       orderBy: this.defaultOrderBy,
-      select: STUDENT_PROFILE_SELECT,
+      select: { ...STUDENT_PROFILE_SELECT, groupMemberships: ACTIVE_GROUP_MEMBERSHIP_SELECT },
     });
+    return rows.map(({ groupMemberships, ...student }) => ({
+      ...student,
+      groupName: groupMemberships[0]?.group.name ?? null,
+    }));
   }
 
   /**
