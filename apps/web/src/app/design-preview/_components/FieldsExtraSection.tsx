@@ -2,7 +2,15 @@
 
 import { useState } from 'react';
 
-import { FileInput, FormField, SearchInput, Select, Stack, Textarea } from '@/components/ui';
+import {
+  DateInput,
+  FileInput,
+  FormField,
+  SearchInput,
+  Select,
+  Stack,
+  Textarea,
+} from '@/components/ui';
 
 import { PreviewSection } from './PreviewSection';
 
@@ -58,17 +66,47 @@ function TextareaAndFile() {
   );
 }
 
-/** Qo'shimcha forma elementlari: SearchInput, Select, Textarea, FileInput. */
+function DateFields() {
+  const [startsAt, setStartsAt] = useState('');
+  const [filled, setFilled] = useState('2026-11-11');
+  return (
+    <Stack gap="4">
+      <FormField label="Boshlanish sanasi (DateInput)" hint={startsAt === '' ? 'Bo`sh' : startsAt}>
+        {(control) => <DateInput value={startsAt} onChange={setStartsAt} {...control} />}
+      </FormField>
+      <FormField label="DateInput min/max bilan" hint="2026-yil ichida">
+        {(control) => (
+          <DateInput
+            value={filled}
+            onChange={setFilled}
+            min="2026-01-01"
+            max="2026-12-31"
+            {...control}
+          />
+        )}
+      </FormField>
+      <FormField label="DateInput xato holati" error="Sana noto'g'ri">
+        {(control) => <DateInput value="" onChange={setStartsAt} {...control} />}
+      </FormField>
+      <FormField label="DateInput disabled">
+        {(control) => <DateInput value="2026-09-01" onChange={setStartsAt} disabled {...control} />}
+      </FormField>
+    </Stack>
+  );
+}
+
+/** Qo'shimcha forma elementlari: SearchInput, Select, Textarea, FileInput, DateInput. */
 export function FieldsExtraSection() {
   return (
     <PreviewSection
       id="fields-extra"
       title="Qo'shimcha forma elementlari"
-      description="SearchInput, Select, Textarea, FileInput — oddiy, focus (Tab), disabled va xato holatlari."
+      description="SearchInput, Select, Textarea, FileInput, DateInput — oddiy, focus (Tab), disabled va xato holatlari."
     >
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         <SelectAndSearch />
         <TextareaAndFile />
+        <DateFields />
       </div>
     </PreviewSection>
   );

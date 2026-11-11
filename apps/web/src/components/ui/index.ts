@@ -20,6 +20,8 @@ export { ConfirmDialog } from './ConfirmDialog';
 export type { ConfirmDialogProps, ConfirmDialogVariant } from './ConfirmDialog';
 export { Container } from './Container';
 export type { ContainerProps, ContainerSize } from './Container';
+export { DateInput } from './DateInput';
+export type { DateInputProps } from './DateInput';
 export { DescriptionList } from './DescriptionList';
 export type { DescriptionItem, DescriptionListProps } from './DescriptionList';
 export {
