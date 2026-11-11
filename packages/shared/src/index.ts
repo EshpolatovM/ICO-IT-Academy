@@ -36,6 +36,8 @@ export {
   STUDENT_CODE_PREFIX,
 } from './auth/credentials.js';
 export type { PasswordResetResponse } from './auth/password-reset.types.js';
+export { ContentStatus } from './enums/content-status.js';
+export { GroupStatus } from './enums/group-status.js';
 export { ParentAccessAction } from './enums/parent-access-action.js';
 export { Role } from './enums/role.js';
 export { UserStatus } from './enums/user-status.js';
@@ -72,10 +74,47 @@ export {
   PAGINATION_DEFAULTS,
 } from './pagination/offset-pagination.js';
 export type { OffsetPaginationQuery, PaginatedResult } from './pagination/offset-pagination.js';
-export { GROUP_NAME_MAX_LENGTH } from './groups/group.constants.js';
-export type { GroupRef } from './groups/group.types.js';
+export {
+  GROUP_MEMBERS_ADD_MAX,
+  GROUP_NAME_MAX_LENGTH,
+  GROUP_SEARCH_MAX_LENGTH,
+} from './groups/group.constants.js';
+export {
+  addGroupMembersSchema,
+  assignGroupMentorSchema,
+  createGroupSchema,
+  DUPLICATE_STUDENT_IDS_MESSAGE,
+  groupListQuerySchema,
+  groupNameSchema,
+  groupStatusSchema,
+  updateGroupSchema,
+} from './groups/group.schemas.js';
+export type {
+  AddGroupMembersRequest,
+  AssignGroupMentorRequest,
+  CreateGroupRequest,
+  GroupListQuery,
+  UpdateGroupRequest,
+} from './groups/group.schemas.js';
+export type {
+  AdminGroupDetail,
+  AdminGroupListItem,
+  AdminGroupMember,
+  GroupMentorRef,
+  GroupPathRef,
+  GroupRef,
+  LearningPathListItem,
+  LearningPathsResponse,
+  MentorGroupItem,
+  MentorGroupsResponse,
+  MentorGroupStudent,
+  MentorGroupStudentsResponse,
+  MentorStudentProfile,
+} from './groups/group.types.js';
 export {
   PERSON_NAME_MAX_LENGTH,
+  STUDENT_IMPORT_DEFAULT_MAX_FILE_BYTES,
+  STUDENT_IMPORT_DEFAULT_MAX_ROWS,
   STUDENT_IMPORT_FILE_FIELD,
   STUDENT_IMPORT_REQUIRED_COLUMNS,
   StudentImportColumn,
@@ -83,8 +122,8 @@ export {
   USER_SORT_DEFAULT,
   UserSort,
 } from './users/users.constants.js';
+export { AT_LEAST_ONE_FIELD_MESSAGE } from './validation/schema-helpers.js';
 export {
-  AT_LEAST_ONE_FIELD_MESSAGE,
   createStaffSchema,
   createStudentSchema,
   personNameSchema,

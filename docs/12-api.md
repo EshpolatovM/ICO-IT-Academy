@@ -29,7 +29,7 @@
 | 401 | Token yo'q yoki eskirgan |
 | 403 | Rol/scope ruxsati yo'q, `PASSWORD_CHANGE_REQUIRED`, `LOCKED` |
 | 404 | Topilmadi (scope'dan tashqari resurs uchun ham 404 qaytariladi, mavjudligini oshkor qilmaslik uchun) |
-| 409 | `REVIEW_REQUIRED`, `INSUFFICIENT_COINS`, `OUT_OF_STOCK`, `ALREADY_DONE`, `STUDENT_ALREADY_IN_GROUP`, `CONFLICT` (masalan telefon band) |
+| 409 | `REVIEW_REQUIRED`, `INSUFFICIENT_COINS`, `OUT_OF_STOCK`, `ALREADY_DONE`, `STUDENT_ALREADY_IN_GROUP`, `GROUP_ARCHIVED`, `CONFLICT` (masalan telefon band) |
 | 413 | `PAYLOAD_TOO_LARGE` — yuklangan fayl hajmi limitdan katta (CSV import) |
 | 429 | Rate limit |
 
@@ -205,6 +205,50 @@ POST /students/0190.../parent-tokens
 { "id": "0191...", "token": "k2Jd8...", "link": "https://app.example.uz/parent#t=k2Jd8...",
   "prefix": "k2Jd8x", "createdAt": "2026-11-10T08:00:00Z" }
 ```
+
+### 2.2 Guruhlar va yo'llar ro'yxati (2.3)
+
+**Ruxsat:** `/admin/groups*`, `/admin/paths` — SA va A (docs/01 §2.1). Barcha sxemalar `@lms/shared` da (`z.strictObject`). Sana `startsAt` — `YYYY-MM-DD` (`null` — sanasiz), qolgan vaqtlar ISO-8601 UTC. Guruh topilmasa yoki o'chirilgan bo'lsa — 404. O'chirish (DELETE) endpointi yo'q — arxivlash (`status: ARCHIVED`).
+
+```http
+GET /admin/paths                         (guruh formasi uchun; to'liq kontent CRUD — §3, 3-bosqich)
+200 { "items": [ { "id": "0190...", "title": "Frontend dasturchi", "slug": "frontend", "status": "PUBLISHED" } ] }
+```
+
+**Ro'yxat** — `GET /admin/groups?q=&status=&mentorId=&pathId=&page=1&pageSize=20` (offset pagination, `q` — nom bo'yicha qism moslik, katta-kichik harf farqisiz; tartib — yangilari birinchi):
+```http
+200
+{ "items": [ { "id": "0190...", "name": "FE-12", "status": "ACTIVE", "startsAt": "2026-12-01",
+               "createdAt": "2026-11-11T08:00:00.000Z", "path": { "id": "0190...", "title": "Frontend dasturchi" },
+               "mentor": { "id": "0190...", "firstName": "Bobur", "lastName": "Karimov" }, "membersCount": 24 } ],
+  "total": 1, "page": 1, "pageSize": 20 }
+```
+**Tafsilot** — `GET /admin/groups/:id`: ro'yxat elementi + `members` (faol a'zolar, familiya bo'yicha):
+```http
+200 { "id": "0190...", "name": "FE-12", ..., "membersCount": 1,
+      "members": [ { "id": "0190...", "studentCode": "ST-10245", "firstName": "Ali", "lastName": "Valiyev",
+                     "status": "ACTIVE", "joinedAt": "2026-11-11T08:00:00.000Z" } ] }
+```
+Quyidagi barcha mutatsiyalar javobi — shu tafsilot (DELETE dan tashqari). Yozuv va audit bitta tranzaksiyada.
+
+| So'rov | Body | Javob | Xatolar | Audit |
+|---|---|---|---|---|
+| `POST /admin/groups` | `{ name, pathId, mentorId?, startsAt? }` | 201 | 400 `details[].field = pathId` (yo'l yo'q) / `mentorId` (faol MENTOR emas) | `GROUP_CREATED` |
+| `PATCH /admin/groups/:id` | `{ name?, status?: ACTIVE\|ARCHIVED, startsAt? }` (kamida bittasi) | 200 | — (o'zgarmagan qiymat — no-op) | `GROUP_UPDATED` (oldin/keyin) |
+| `PUT /admin/groups/:id/mentor` | `{ mentorId: uuid \| null }` | 200 | 400 `mentorId` (faol MENTOR emas) | `GROUP_MENTOR_ASSIGNED` |
+| `POST /admin/groups/:id/members` | `{ studentIds: uuid[] }` (1–100, takrorsiz) | 200 | 400 `studentIds.<i>` (student topilmadi), 409 `STUDENT_ALREADY_IN_GROUP`, 409 `GROUP_ARCHIVED` | `GROUP_MEMBERS_ADDED` |
+| `DELETE /admin/groups/:id/members/:studentId` | — | 204 | 404 (faol a'zo emas) | `GROUP_MEMBER_REMOVED` |
+
+```http
+POST /admin/groups/0190.../members
+{ "studentIds": ["0190...a", "0190...b"] }
+409 { "error": { "code": "STUDENT_ALREADY_IN_GROUP", "message": "Student allaqachon boshqa faol guruhda",
+                 "details": { "studentIds": ["0190...b"] } } }
+```
+- S-02 A: student faqat bitta faol guruhda (shu guruh ham hisoblanadi). "Ko'chirish" yo'q — avval `DELETE`, keyin `POST`. Chiqarishda yozuv o'chirilmaydi (`left_at = now()`).
+- Arxivlangan guruhga a'zo qo'shib bo'lmaydi (409 `GROUP_ARCHIVED`); arxivlashda mavjud a'zoliklar o'zgarmaydi (qayta faollashtirish mumkin), lekin guruh mentor scope'idan chiqadi. Arxivlangan guruh a'zosini boshqa guruhga o'tkazish uchun avval chiqarish kerak.
+- Mentor scope keshi (`mentor:{id}:studentIds`, 60 s) a'zolik o'zgarganda, mentor almashtirilganda, guruh holati o'zgarganda, yangi student guruh bilan yaratilganda/import qilinganda va mentor deaktivatsiya qilinganda darhol invalidatsiya qilinadi (S-10 A).
+- Student deaktivatsiyasi faol a'zolikka tegmaydi (qaytariladigan amal, S-08 A); mentor uni `INACTIVE` holati bilan ko'radi. Mentor deaktivatsiyasida `mentor_id` guruhlarda qoladi.
 
 ```http
 GET /me/summary
@@ -497,10 +541,22 @@ POST /mentor/projects/pr1/review
 | GET | `/mentor/students/:id/results` | M |
 | GET | `/student/mentor` | S |
 
+Mentor faqat o'z **ACTIVE** guruhlarini ko'radi (boshqa mentorning yoki arxivlangan guruh — 404). Student endpointlari (`/mentor/students/:id*`, `/students/:id/reset-password`, `/students/:id/parent-tokens*`) — `@StudentScope`: student mentorning ACTIVE guruhining faol a'zosi bo'lmasa — 404 (docs/01 §3.1, S-10 A). 2.3 da progress, XP, streak, davomat qaytarilmaydi (keyingi bosqichlarda qo'shiladi); `?sort` hozircha yo'q (tartib — familiya).
+
 ```http
-GET /mentor/groups/g1/students?sort=-weeklyXp
-200 { "items": [ { "id": "...", "name": "Ali Valiyev", "studentCode": "ST-10245", "progress": 0.34,
-                   "xp": 12450, "weeklyXp": 820, "streak": 12, "lastActiveAt": "...", "attendanceRate": 0.92 } ] }
+GET /mentor/groups
+200 { "items": [ { "id": "0190...", "name": "FE-12", "status": "ACTIVE", "startsAt": "2026-12-01",
+                   "path": { "id": "0190...", "title": "Frontend dasturchi" }, "studentsCount": 24 } ] }
+
+GET /mentor/groups/0190...            → xuddi shu element (o'ziniki bo'lmasa — 404)
+
+GET /mentor/groups/0190.../students
+200 { "items": [ { "id": "0190...", "studentCode": "ST-10245", "firstName": "Ali", "lastName": "Valiyev",
+                   "status": "ACTIVE", "lastLoginAt": "2026-11-10T06:12:00.000Z" } ] }
+
+GET /mentor/students/0190...
+200 { "id": "0190...", "studentCode": "ST-10245", "firstName": "Ali", "lastName": "Valiyev", "status": "ACTIVE",
+      "lastLoginAt": "2026-11-10T06:12:00.000Z", "group": { "id": "0190...", "name": "FE-12" }, "parentTokensCount": 1 }
 ```
 
 ## 13. Chat, meeting, davomat, materiallar

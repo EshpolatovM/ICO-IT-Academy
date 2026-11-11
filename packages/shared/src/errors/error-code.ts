@@ -31,6 +31,8 @@ export const ErrorCode = {
   ALREADY_DONE: 'ALREADY_DONE',
   /** Studentning boshqa faol guruhi bor (S-02: bitta faol guruh) — 409. */
   STUDENT_ALREADY_IN_GROUP: 'STUDENT_ALREADY_IN_GROUP',
+  /** Guruh arxivlangan (`ARCHIVED`) — unga a'zo qo'shib bo'lmaydi — 409. */
+  GROUP_ARCHIVED: 'GROUP_ARCHIVED',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

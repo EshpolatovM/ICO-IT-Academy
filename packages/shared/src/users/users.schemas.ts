@@ -4,6 +4,11 @@ import { passwordSchema, phoneSchema } from '../auth/credentials.js';
 import { UserStatus } from '../enums/user-status.js';
 import { GROUP_NAME_MAX_LENGTH } from '../groups/group.constants.js';
 import { offsetPaginationQuerySchema } from '../pagination/offset-pagination.js';
+import {
+  AT_LEAST_ONE_FIELD_MESSAGE,
+  hasAnyField,
+  optionalTrimmed,
+} from '../validation/schema-helpers.js';
 
 import {
   PERSON_NAME_MAX_LENGTH,
@@ -17,23 +22,12 @@ import {
  * maydon — 400 `VALIDATION_ERROR`.
  */
 
-export const AT_LEAST_ONE_FIELD_MESSAGE = "Kamida bitta maydon o'zgartirilishi kerak.";
-
 export const personNameSchema = z.string().trim().min(1).max(PERSON_NAME_MAX_LENGTH);
 
 export const userStatusSchema = z.enum(UserStatus);
 
 /** Boshlang'ich parol: berilmasa (`null`/yo'q) — tizim vaqtinchalik parol yaratadi (S-18). */
 const initialPasswordSchema = passwordSchema.nullish();
-
-/** Bo'sh satr — "berilmagan" (`?q=` formadan bo'sh kelishi mumkin). */
-const optionalTrimmed = (max: number) =>
-  z
-    .string()
-    .trim()
-    .max(max)
-    .optional()
-    .transform((value) => (value === '' ? undefined : value));
 
 /** `POST /super/admins`, `POST /admin/mentors`. */
 export const createStaffSchema = z.strictObject({
@@ -42,10 +36,6 @@ export const createStaffSchema = z.strictObject({
   lastName: personNameSchema,
   password: initialPasswordSchema,
 });
-
-function hasAnyField(value: Record<string, unknown>): boolean {
-  return Object.values(value).some((field) => field !== undefined);
-}
 
 /** `PATCH /super/admins/:id`, `PATCH /admin/mentors/:id`. */
 export const updateStaffSchema = z

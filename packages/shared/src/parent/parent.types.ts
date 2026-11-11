@@ -3,7 +3,7 @@ export interface ParentChild {
   studentId: string;
   firstName: string;
   lastName: string;
-  /** Guruh nomi. Guruhlar 2-bosqichda qo'shiladi — hozircha har doim `null`. */
+  /** Studentning faol guruhi nomi (guruhsiz bo'lsa — `null`). */
   groupName: string | null;
 }
 

@@ -11,6 +11,11 @@ export const AuditAction = {
   USER_DEACTIVATED: 'USER_DEACTIVATED',
   USER_ACTIVATED: 'USER_ACTIVATED',
   STUDENTS_IMPORTED: 'STUDENTS_IMPORTED',
+  GROUP_CREATED: 'GROUP_CREATED',
+  GROUP_UPDATED: 'GROUP_UPDATED',
+  GROUP_MENTOR_ASSIGNED: 'GROUP_MENTOR_ASSIGNED',
+  GROUP_MEMBERS_ADDED: 'GROUP_MEMBERS_ADDED',
+  GROUP_MEMBER_REMOVED: 'GROUP_MEMBER_REMOVED',
 } as const;
 
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];
@@ -21,6 +26,7 @@ export const AuditEntityType = {
   PARENT_ACCESS_TOKEN: 'PARENT_ACCESS_TOKEN',
   /** CSV import partiyasi (`entity_id` — partiya id'si, docs/12 §2). */
   STUDENT_IMPORT: 'STUDENT_IMPORT',
+  GROUP: 'GROUP',
 } as const;
 
 export type AuditEntityType = (typeof AuditEntityType)[keyof typeof AuditEntityType];

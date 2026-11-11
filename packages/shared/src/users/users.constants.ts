@@ -36,5 +36,18 @@ export const STUDENT_IMPORT_REQUIRED_COLUMNS: readonly StudentImportColumn[] = [
   StudentImportColumn.LAST_NAME,
 ];
 
+/** Bayt birliklari (fayl hajmi uchun). */
+const BYTES_PER_KIB = 1024;
+const KIB_PER_MIB = 1024;
+
+/**
+ * CSV import fayl hajmi chegarasining standart qiymati — 1 MiB (docs/12 §2). Server env
+ * `STUDENT_IMPORT_MAX_FILE_BYTES` bilan o'zgartirilishi mumkin; frontend faylni oldindan tekshiradi.
+ */
+export const STUDENT_IMPORT_DEFAULT_MAX_FILE_BYTES = KIB_PER_MIB * BYTES_PER_KIB;
+
+/** CSV importdagi ma'lumot qatorlari chegarasining standart qiymati (env `STUDENT_IMPORT_MAX_ROWS`). */
+export const STUDENT_IMPORT_DEFAULT_MAX_ROWS = 500;
+
 /** `multipart/form-data` dagi fayl maydoni nomi. */
 export const STUDENT_IMPORT_FILE_FIELD = 'file';
