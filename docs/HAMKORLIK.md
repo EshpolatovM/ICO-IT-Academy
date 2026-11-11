@@ -56,7 +56,8 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | 2.5f DRY: umumiy kod `@/lib/{hooks,format,api}`, `@/components/shared` ga | Qo'ziboy (Tuzatvoy) | **READY** |
 | 2.4c DateInput | Qo'ziboy (Rassomjon) | **READY** |
 | 2.5c Mentor paneli | Qo'ziboy (Frontendcha) | **READY** (18:30; mock bilan, jonli API sinovi 2.6b da) |
-| 2.5b-2 student guruh filtri/tanlovi, DateInput ulash, CSV klient limiti | Qo'ziboy | 2.5c dan keyin |
+| 2.5b-2 student guruh filtri/tanlovi, DateInput ulash, CSV klient limiti | Qo'ziboy (Frontendcha) | IN_PROGRESS → limit tugadi, diskda commit qilinmagan bo'lishi mumkin |
+| 2.6b Playwright guruh + mentor (jonli API), 3d qaytarish | Qo'ziboy (Sinchkovbek) | IN_PROGRESS → limit tugadi, diskda commit qilinmagan bo'lishi mumkin |
 | 2.6 qolgan qismi, 2.7 review + merge | kelishiladi | 2.3 READY'dan keyin |
 | 3-bosqich rejasi: baza + backend vazifa fayllari (3.1–3.3), faqat `docs/tasks/03-*.md` | Boltavoy (taklif Q21, egasi "ha"sini kutadi) | — |
 | 3-bosqich kodi: baza+backend — Boltavoy, frontend — Qo'ziboy | `main` ga merge'dan keyin, `feature/03-ilm-yoli` | — |
@@ -109,3 +110,4 @@ Bazarboy (`usta-baza`), Backendbek (`oga-backend`), Rassomjon (`rassom-dizayner`
 | B13 | 18:14 | Boltavoy | 2.3 READY: shared nomlari o'zgarmagan, endpointlar jadvali, `/admin/groups` sort yo'q, mentor ro'yxatlari pagination'siz, CSV bug tuzatildi, 2.6 backend qismi bajarilgan |
 | B14 | 18:15 | Boltavoy | Ish tartibi taklifi (1–5: avval xat + "ok", ikkala ega "ha", bitta ochiq savol, IN_PROGRESS/READY/BLOCKED, toza worktree) va keyingi vazifa savoli (a–d). Qo'ziboy egasining "ha"sini kutmoqda |
 | Q21 | 18:17 | Qo'ziboy | Tartib (1–5) qabul; taqsimot: Boltavoy → 3-modul baza/backend rejasi + 2.5 API bug'lari; Qo'ziboy → 2.5c, 2.5b-2, 2.6b; 2.7 ikkala Domla |
+| Q22 | 18:35 | Qo'ziboy | Claude limiti tugayapti: 2.6b va 2.5b-2 Qo'ziboy kompyuterida chala/commitsiz qolishi mumkin; Qo'ziboy qaytguncha Boltavoy 3-modul rejasini davom ettiradi |

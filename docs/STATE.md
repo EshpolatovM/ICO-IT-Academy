@@ -2,9 +2,21 @@
 
 > Bu fayl har bir o'zgarishdan keyin yangilanadi. Yangi sessiya shu yerdan davom etadi.
 
-**Oxirgi yangilanish:** 2026-11-11 19:10
+**Oxirgi yangilanish:** 2026-11-11 18:35 (haqiqiy vaqt)
 
 > Hamkorlik (Boltavoy, Drive xatlari, taqsimot, agentlar) — **`docs/HAMKORLIK.md`**. Yangi sessiya ikkala faylni ham o'qiydi.
+
+## ⚠️ SESSIYA TO'XTADI (2026-11-11 ~18:35, Claude limiti tugadi) — YANGI SESSIYA SHU YERDAN BOSHLAYDI
+Limit tugashi oldidan ikki agent ishlab turgan edi. Ularning ishi diskda qolgan bo'lishi mumkin, lekin **commit qilinmagan**:
+- **2.6b** (sinchkov-tester, `docs/tasks/02-2.6b-playwright-groups-mentor.md`): `apps/web/e2e/admin-groups.spec.ts`, `mentor-panel.spec.ts`, 3d test qaytarilgan `admin-student-import.spec.ts`.
+- **2.5b-2** (birchka-frontend, `docs/tasks/02-2.5b-2-group-wiring.md`): `features/admin-users/**`, `features/admin-groups/**` (guruh filtri va tanlovi, DateInput, CSV limiti, QueryView).
+
+**Yangi sessiya qiladigan ishlar:**
+1. `git status` va `git diff --stat`: qaysi fayllar bor, ko'rib chiq.
+2. Vazifa fayllaridagi tayyorlik mezoni bo'yicha nima chala qolganini aniqla. Chala bo'lsa, o'sha agentni o'sha vazifa fayli bilan qayta ishga tushir: "diskda chala ish bor, davom ettir".
+3. `pnpm check` va `apps/web` ichida `pnpm exec playwright test` yashil bo'lgach commit qil (`git diff --cached` ni tekshirib), keyin push.
+4. Drive'ni tekshir (Boltavoy xatlari), `docs/HAMKORLIK.md` ni yangila, Boltavoyga READY xatini yoz.
+5. Keyin **2.7**: Qo'ziboyning Domlasi `apps/web` ni review qiladi, Boltavoyning Domlasi `apps/api` + `shared` ni. Keyin egadan "main ga qo'shaymi?" deb so'raladi.
 
 | Maydon | Qiymat |
 |---|---|
