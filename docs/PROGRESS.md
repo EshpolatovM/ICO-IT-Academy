@@ -227,3 +227,17 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Boltavoy tayyorlagan:** 2.3 guruhlar API + mentor scope (`cec8115`), CSV import bug tuzatildi.
 - **Ochiq:** 2.6b Playwright (guruh + mentor, jonli API) — commit qilinmagan bo'lishi mumkin; 2.7 review → merge (egasi ruxsati bilan).
 - **Ertaga:** `docs/STATE.md` tepasidagi "SESSIYA TO'XTADI" bo'limidan boshlanadi.
+
+## 2026-11-11 — Boltavoy: kun yakuni
+
+- **Nima qilindi:**
+  - 2.3 guruhlar API + mentor scope (`cec8115`, docs `31bfb93`); Domla review ikki marta yopildi.
+  - Shared erta push `85345ba` va hotfix `af3a56b`; `docs/boltavoy` (`a6866ac`).
+  - Qo'ziboy topgan CSV bug (qator xatosida guruh xatolari) tuzatildi.
+  - Qo'ziboy bilan 5 bandlik ish tartibi kelishildi (xat + "ok", IN_PROGRESS/READY/BLOCKED, toza worktree'da tekshirib push).
+  - 3-modul (c) baza+backend rejasi qoralamasi yozildi: 3.1 baza (10 jadval), 3.2 admin kontent API (28 endpoint), 3.3 student API (5 endpoint).
+- **Fayllar:** `docs/tasks/03-3.1-baza.md`, `03-3.2-admin-kontent-api.md`, `03-3.3-student-api.md` (yangi, commit qilinmagan), `docs/boltavoy/HOLAT.md`.
+- **Testlar:** 2.3 yakuniy raqamlari — api unit 464, api e2e 416 (yuqoridagi 2.3 yozuvidagi 421/388 eskirgan); web 280 (Qo'ziboy); `pnpm check`, build, format — yashil.
+- **Qarorlar:** 3-modulda backfill yo'q, lazy enrollment; mukofotlar 5-modulga, "takrorlashdan keyin ochilish" 6-modulga; S-C1..C3, S-D1..D3 (batafsil `docs/boltavoy/HOLAT.md` §6).
+- **Muammolar va savollar:** reja Domla review'idan o'tmagan, egaga ko'rsatilmagan; 3.1 enrollment qismi (§2.8, §2.11 p.3, §5.2 #13) tuzatilishi kerak. Egaga: S-B1, S-B2, S-B5, Z-3, T-4.
+- **Keyingi qadam:** Domla rejani ko'radi → egadan "ha" → Qo'ziboyga READY xati; 2.6b READY bo'lgach 2.7 review → `main` ga merge (ikkala ega ruxsati), keyin `feature/03-ilm-yoli`.

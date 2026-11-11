@@ -1,139 +1,176 @@
-# HOLAT (Boltavoy, 2026-11-11)
+# HOLAT (Boltavoy, 2026-11-11 kun yakuni)
 
 ## 1. Sessiya boshida o'qish tartibi
+
 1. `CLAUDE.md`
-2. `docs/STATE.md` (Qo'ziboy yuritadi)
-3. `docs/HAMKORLIK.md` (Qo'ziboy yuritadi; pull qilinmaguncha lokalda bo'lmasligi mumkin)
+2. `docs/STATE.md` (Qo'ziboyniki; tepasidagi "SESSIYA TO'XTADI" bo'limini albatta o'qi)
+3. `docs/HAMKORLIK.md` (Qo'ziboyniki)
 4. Shu fayl (`docs/boltavoy/HOLAT.md`)
 5. `docs/PROGRESS.md` ning oxirgi yozuvlari
+6. Drive papkasi `ICO_IT_Academy_Bus` (id `1NFba5lKcrnqpOJJM_cL8Xf5CUXgDAavW`) dagi yangi xatlar (B16 dan keyingilar)
+7. `git fetch`, so'ng `git pull --rebase` (branch `feature/02-admin-asosi`)
 
-Keyin: Drive papkasi `ICO_IT_Academy_Bus` (id `1NFba5lKcrnqpOJJM_cL8Xf5CUXgDAavW`) dagi yangi xatlarni ko'rish va `git fetch`.
+Muhit:
 
-## 2. Kim kim
-- **Boltavoy** — shu sessiya, egamiz Asadbek kompyuteridagi Tech Lead.
-- **Qo'ziboy** — hamkor sessiya, do'stning kompyuterida. Egamiz ba'zan "Teshaboy" deydi.
-- Kanal: Drive papkasidagi alohida "XAT — ..." md fayllari. Faqat yangi fayl yaratiladi, mavjudlari tahrirlanmaydi. Git'dagi AGENT_BUS/PROJECT_STATE fayllari ishlatilmaydi.
+- pnpm: `export PATH=$HOME/.local/bin:$PATH` (pnpm 10.34.9).
+- Konteynerlar `podman run --env-file .env` bilan: `ico-it-academy_postgres_1` (`postgres:16-alpine`, port 5433) va `ico-it-academy_redis_1` (`redis:7-alpine`, port 6379), volume'lar `ico-it-academy_*_data`. `podman compose` ishlamaydi. `.env` ni `source` qilma.
+- Lokal `main` da push qilinmagan `b8c747f` (eski AGENT_BUS INIT) bor — hech qayerga ketmasin.
 
-## 3. Egamizning qarorlari (2026-11-11)
-- Boltavoy qo'lda kod yozmaydi va o'zi hech narsa qilmaydi; har bir vazifa agentlarga beriladi. Egaga faqat qisqa, o'zbekcha, samimiy hisobot.
-- Qo'ziboy vazifalari faqat ega roziligi bilan bajariladi. Ega joriy vazifalarni bajarishni aytgan.
-- Ega tasdiqlagan: pnpm o'rnatish va `pnpm install`; 2.3 ustida ishlash; Qo'ziboy bilan kelishib takroriy agentlarni o'chirish.
-- Har bir ishdan keyin Drive tekshiriladi va Qo'ziboyga hisobot xati yoziladi ("dosim" deb murojaat).
+## 2. Kim kim, kanal, agentlar
 
-### Yangi qarorlar (2026-11-11, ~17:30)
-- shared + docs ni erta push qilish — HA.
-- Review tuzatishlarini parallel qilish — HA.
-- M4: mentor `GET /admin/paths` ni faqat o'qish uchun ko'ra oladi.
-- "Qo'ziboy bilan kelishib, shoshilmasdan ishlanglar."
+- **Boltavoy** — shu sessiya, Tech Lead. Qo'lda hech narsa qilmaydi: hamma ish 9 agentga, egaga qisqa o'zbekcha hisobot.
+- **Qo'ziboy** — hamkor sessiya (egamiz ba'zan "Teshaboy" deydi).
+- Kanal: Drive papkasidagi "XAT — ..." md fayllari; faqat yangi fayl yaratiladi, eskilari tahrirlanmaydi.
+- Asosiy yordamchilar: **Pushbek** (git), **Xatboy** (xat/holat; promptda "Boltavoy dan Qo'ziboyga" va `docs/boltavoy/HOLAT.md`), **Tuzatvoy** (mayda tuzatish).
+- Qolganlar: Bazarboy (usta-baza), Backendbek (oga-backend), Rassomjon (rassom-dizayner), Frontendcha (birchka-frontend), Sinchkovbek (sinchkov-tester), Domla (domla-reviewer). Fayllar `.claude/agents/`.
 
-### Tech Lead qarori
-- CSV import paytida guruh arxivlangan bo'lsa → 409 `GROUP_ARCHIVED` (`details.groups`), hech kim yaratilmaydi.
+## 3. Egamizning bugungi qarorlari (2026-11-11)
 
-## 4. Hamkorlik qoidalari (kelishilgan)
-- Bitta umumiy branch: `feature/02-admin-asosi`, GitHub `origin` (`EshpolatovM/ICO-IT-Academy`).
-- Har push oldidan `git pull --rebase`. Force push yo'q. `main` ga merge faqat egalar ruxsati bilan.
-- Har qadam uchun IN_PROGRESS / READY xati, xatlarda commit hash'lari.
-- Umumiy fayllarga (`packages/shared/**`, `docs/STATE.md`, root config'lar, `pnpm-lock.yaml`) tegishdan oldin Qo'ziboy ogohlantiriladi.
-- `docs/STATE.md` va `docs/HAMKORLIK.md` — Qo'ziboyniki. Biz `docs/boltavoy/HOLAT.md` ni yuritamiz va `docs/PROGRESS.md` oxiriga faqat qo'shamiz.
-- Ish rejimi: sekin va nazorat ostida.
-- **Kelishuv (Qo'ziboy (20), roziman):** shared'ga enum yoki kod qo'shilsa, unga bog'liq barcha `Record` map'lar bilan birga push qilinadi. Har qanday qisman/erta push oldidan o'sha commit toza worktree'da tekshiriladi (`pnpm typecheck`, iloji bo'lsa `pnpm check`). Sabab: `85345ba` branch'da typecheck'ni sindirdi, `af3a56b` da tuzatildi.
+- Hamma ish agentlarga, egaga qisqa hisobot.
+- Qo'ziboy bilan kelishib, chalkashliksiz, vazifalarni birga taqsimlash.
+- pnpm o'rnatish va `pnpm install` — HA.
+- 2.3 — tasdiqlandi.
+- Shared kodni erta push qilish — HA.
+- Review tuzatishlari parallel — HA.
+- M4: mentor `/admin/paths` ni (faqat o'qish) ko'ra oladi.
+- Takroriy agentlarni o'chirish — HA (bizning 3 shaxsiy agent o'chirildi).
+- (c) 3-modul baza+backend rejasi — HA.
+- Kun yakuni: hisobot, HOLAT, PROGRESS, commit+push.
+- Tech Lead qarori (2.3): CSV import paytida guruh arxivlangan bo'lsa → 409 `GROUP_ARCHIVED`, hech kim yaratilmaydi.
 
-## 5. Agentlar (9 ta, repo `.claude/agents/`, kelishilgan)
-| Laqab | Fayl | Vazifa |
-|---|---|---|
-| Bazarboy | usta-baza | Prisma, migratsiya, seed |
-| Backendbek | oga-backend | NestJS API |
-| Rassomjon | rassom-dizayner | Token'lar, `components/ui` |
-| Frontendcha | birchka-frontend | Next.js sahifalar |
-| Sinchkovbek | sinchkov-tester | Testlar + env sozlash va tekshiruvlar |
-| Domla | domla-reviewer | Review (faqat o'qiydi) |
-| Pushbek | pushbek-git | Commit/push |
-| Xatboy | hisobotchi-xatboy | Xatlar, holat fayli |
-| Tuzatvoy | chaqqon-tuzatkich | Kichik tuzatishlar |
+## 4. Kelishuvlar bilan Qo'ziboy
 
-- 9 ta repo agenti (Pushbek, Xatboy, Tuzatvoy ham) endi mavjud, qayta ishga tushirish shart emas. Parallel ishlash qoidasi CLAUDE.md da.
-- Xatboyga vazifa berilganda promptda xat yo'nalishi "Boltavoy dan Qo'ziboyga" va holat fayli `docs/boltavoy/HOLAT.md` ko'rsatiladi.
-- O'zimizning 3 ta shaxsiy agent (pochtachi-ping, git-pushbek, devops-monitorjon) o'chirildi.
-- Xavfsizlik ("Qalqonbek") va real-time ("Jonlibek") agentlari 7-moduldan keyin qayta ko'riladi.
+Ish tartibi (Q14/Q21, 5 band):
 
-## 6. Taqsimot
-- **Boltavoy:** 2.3 — guruhlar API + mentor scope (`docs/tasks/02-2.3-groups-scope.md`).
-- **Qo'ziboy:** 2.5a READY (`184be06`); 2.5d + 2.6a ustida ishladi (2.6a READY, Q15). 2.5b va 2.5c — 2.3 READY bo'lgach.
+1. Vazifani olishdan oldin xat bilan e'lon qilish va "ok" olish.
+2. Ishni taqsimlash ikkala egamizning "ha"si bilan.
+3. Bir vaqtda faqat bitta ochiq savol.
+4. Xat statuslari: IN_PROGRESS / READY / BLOCKED (commit hash'lari bilan).
+5. Push faqat toza worktree'da tekshirilgandan keyin (`pnpm typecheck`, iloji bo'lsa `pnpm check`).
 
-## 7. Joriy holat va keyingi qadam
-- **2.3: kod + review tuzatishlari DONE, barcha testlar yashil** (hali commit qilinmagan).
-  - unit 464; e2e 416 (16 suite); `pnpm check`, `format:check`, `build` — yashil.
-  - Domla qayta review: B1, M2–M6, CSV, T1, T3–T5, T7, T9 yopildi. Qolgan Y1 (import lock) va Y2 (INSERT tartibi) ni Backendbek tuzatdi. R1 va R4 ham bajarildi.
-- 2.3 ga qo'shimcha (Qo'ziboy taklifi, qabul qilingan): `STUDENT_IMPORT_DEFAULT_MAX_FILE_BYTES` va `STUDENT_IMPORT_DEFAULT_MAX_ROWS` konstantalarini `@lms/shared` ga ko'chirish.
-- **Push qilingan commitlarimiz:** `85345ba` (shared + docs/12, erta push); `af3a56b` (GROUP_ARCHIVED map hotfix).
-- Lokal HEAD hali `85345ba`; remote oldinda (`11a940a`, `af3a56b`, balki yana boshqalar).
-- Lokal `main` da push qilinmagan `b8c747f` (eski AGENT_BUS INIT bloki) bor — branch'ga ham, `main` ga ham KETMASIN.
-- Muhit: pnpm 10.34.9 `~/.local/bin` da (`export PATH=$HOME/.local/bin:$PATH`).
+Qo'shimcha:
 
-### `pnpm check` (2.3 dan oldin, tarix)
-- EXIT 0 — lint, typecheck, jscpd (2 klon, 0.09% < 3%), depcruise (0 buzilish, 468 modul), api unit 380/380 (66 suite), web 144/144 (29 fayl).
+- Shared'ga enum qo'shilsa, unga bog'liq barcha `Record` map'lar bilan birga push qilinadi (sabab: `85345ba` → `af3a56b`).
+- Test ma'lumotlari `e2e-…` nomi bilan, har test o'zini tozalaydi, seed'ga tegilmaydi.
+- Umumiy fayllar (`packages/shared/**`, root config'lar, `pnpm-lock.yaml`) ga tegishdan oldin ogohlantirish xati.
+- `docs/STATE.md` va `docs/HAMKORLIK.md` — Qo'ziboyniki. Biz shu faylni yuritamiz, `docs/PROGRESS.md` oxiriga faqat qo'shamiz.
+- Bitta branch, har push oldidan `git pull --rebase`, force push yo'q, `main` ga merge faqat ikkala ega ruxsati bilan.
 
-### Keyingi aniq qadamlar
-1. Commit (kod+testlar va docs alohida).
-2. `git pull --rebase` — `docs/PROGRESS.md` da konflikt kutiladi: ikkala tomon saqlanadi, biznikilar oxirida.
-3. Toza HEAD'da `pnpm check` + e2e.
-4. Push.
-5. Qo'ziboyga READY xati: shared export nomlari, endpointlar (§ bilan), `groupId`/`group` maydoni, pagination, 2.6 ning qolgan qismlari, shared test fayllari.
-6. Egaga hisobot.
+## 5. Bugun bajarilgan ishlar va commitlar
 
-### Ochiq tavsiyalar (keyinroq)
-- R3 (Redis `commandTimeout`), R5 (modullararo where/select fragmentlari), R6 (EVALSHA + haqiqiy Redis Lua testi), T2, T6.
-- Xato xabarlarini o'zbekchalashtirish — 2.3 dan keyin alohida vazifa.
+- 2.3 guruhlar API + mentor scope: `cec8115` (kod), `31bfb93` (docs).
+- Erta push (shared + docs/12): `85345ba`; hotfix (GROUP_ARCHIVED map): `af3a56b`.
+- docs/boltavoy (xarita, holat, kuzatuvlar): `a6866ac`.
+- Testlar: api unit 464, web 249 → hozir 280 (Qo'ziboyniki), api e2e 416. `pnpm check`, build, format — yashil.
+- Domla review ikki marta o'tdi, topilmalar yopildi.
+- Qo'ziboy topgan CSV bug (qator xatosida guruh xatolari) tuzatildi.
 
-## 2-bosqich holati
-| # | Vazifa | Holat |
-|---|---|---|
-| 2.1 | Baza: learning_paths, groups, group_members, seed | DONE |
-| 2.2 | Foydalanuvchilar API + CSV import | DONE (`186107f`, `aa1f773`) |
-| 2.3 | Guruhlar API, mentor scope | Kod+review DONE, testlar yashil; commit/push kutilmoqda (Boltavoy; shared `85345ba`, `af3a56b`) |
-| 2.4 | UI komponentlar | DONE |
-| 2.5a | Admin: studentlar/mentorlar/adminlar sahifalari | READY (`184be06`, Qo'ziboy) |
-| 2.5b/c | Admin guruhlar, mentor sahifalari | TODO (2.3 kerak, Qo'ziboy) |
-| 2.6a/b | API e2e+RBAC, Playwright | 2.6a READY (Qo'ziboy, Q15); qolgani TODO |
-| 2.7 | Review → merge | TODO |
+2-bosqich: 2.1, 2.2, 2.3, 2.4, 2.5a/b/c/d/e/f, 2.5b-2 (`029edc5`), 2.6a — DONE. 2.6b (Qo'ziboy) — ochiq. 2.7 review → merge — TODO.
 
-## 8. Ochiq savollar
-- S-65 (jamoa/muddat/MVP).
-- Tasdiqlanmagan docs nomuvofiqliklari: `KUZATUVLAR.md` ga qarang.
+## 6. Joriy vazifa: 3-modul (c) reja — QORALAMA
 
-## 9. Xatlar jurnali (UTC, 2026-11-11)
-| Vaqt | Yo'nalish | Mazmun |
-|---|---|---|
-| 11:02 | B→T (1) | tanishuv |
-| 11:08 | Q→B (1) | tanishuv + o'rganish vazifasi |
-| 11:10 | Q→B (2) | bo'linma yo'q, docs/boltavoy, agentlar |
-| 11:18 | B→Q (1) | salom + xulosa + laqablar |
-| 11:20 | B→Q (2) | keyingi vazifa savoli |
-| 11:21 | Q→B (3) | kanal/rejim/branch/git qoidalari |
-| 11:24 | B→Q (3) | pnpm check yashil |
-| 11:29 | Q→B (4) | 2.3 Boltavoyga, 2.5a Qo'ziboyga |
-| 11:31 | B→Q (4) | 2.3 IN_PROGRESS + b8c747f izohi |
-| 11:38 | Q→B (5) | yangi agentlar 4fa31d1 |
-| 11:40 | Q→B (6) | agent matnlari |
-| 11:42 | B→Q (5) | agentlar muhokamasi |
-| 11:45 | Q→B (7) | 9 agent kelishuvi f4c0ae9 |
-| 11:46 | Q→B (8) | agentlar yetarlimi? |
-| 11:49 | Q→B (9) | 2.5a READY 184be06, import konstantalari taklifi |
-| ~11:52 | B→Q (6) | agentlarga rozilik, import konstantalari qabul |
-| 11:53 | Q→B (10) | hammasini faylga saqlash, HAMKORLIK.md |
-| 11:58 | Q→B (11) | shoshilma, mustahkam qil |
-| ~12:00 | B→Q (7) | 2.3 holati va muddat |
-| 12:02 | Q→B (12) | muddat qabul, soat |
-| 12:05 | Q→B (13) | men ham davom etyapman (2.5d+2.6a) |
-| 12:09 | B→Q (8) | roziman, nima qilyapsan |
-| 12:12 | Q→B (14) | reja va test ma'lumotlari |
-| 12:15 | B→Q (9) | reja qabul |
-| 12:17 | Q→B (15) | 2.6a READY + CSV bug |
-| 12:20 | Q→B (16) | egalar uchun oddiy hisobot |
-| 12:23 | Q→B (17) | SHOSHILINCH |
-| 12:26 | B→Q (10) | shoshilinch javob |
-| 12:28 | Q→B (18) | qarorlar, boshla |
-| 12:32 | Q→B (19) | bo'sh turmaylik |
-| 12:39 | B→Q (11) | erta push 85345ba |
-| 12:44 | Q→B (20) | 85345ba branchni sindirdi |
-| 12:53 | B→Q (12) | typecheck tuzatildi af3a56b |
+Fayllar (untracked, commit qilinmagan):
+
+- `docs/tasks/03-3.1-baza.md` — Bazarboy, 10 jadval.
+- `docs/tasks/03-3.2-admin-kontent-api.md` — Backendbek, 28 endpoint, `ContentModule`, `/admin/paths` shu yerga ko'chadi.
+- `docs/tasks/03-3.3-student-api.md` — 5 endpoint, lazy enrollment, `PathUnlockCalculator`, `ReviewGate`.
+
+**Domla hali ko'rmagan. Egaga hali ko'rsatilmagan.**
+
+Ma'lum nomuvofiqlik: 3.1 §2.8, §2.11 p.3 va §5.2 #13 backfill va "a'zolikda servis yozadi" deydi. Tech Lead qarori: backfill YO'Q + lazy enrollment → 3.1 tuzatilishi kerak.
+
+Tech Lead qarorlari (Domla review'da qayta ko'riladi):
+
+- Status har darajada; student faqat to'liq PUBLISHED zanjirni ko'radi.
+- Mavzuni bo'limlar orasida ko'chirish yo'q.
+- Tartiblash tugmalar bilan, `PUT …/order`, DEFERRABLE; ustun nomi `order`.
+- S-31: barcha nashr qilingan darslar.
+- Bu modulda mukofot yo'q (5-modul).
+- "Takrorlashdan keyin ochilish" qoidasi 6-modulga ko'chirildi.
+- S-C1: mentor faqat daraxtni ko'radi, dars matnini emas (docs/12).
+- S-C2: mentor barcha statuslarni ko'radi.
+- S-C3: `/admin/paths` pagination'siz.
+- S-D1: yo'l yo'q bo'lsa 200 `path:null`.
+- S-D2: `@nestjs/event-emitter` paketi yo'q, faqat port.
+- S-D3: reconcile `GET /student/path` ichida.
+
+Egaga savollar (javobsiz):
+
+- S-B1: `min_read_seconds` (default: yo'q).
+- S-B2: tugagan mavzuga yangi dars qo'shilsa (default: mavzu COMPLETED qoladi, yangi dars AVAILABLE).
+- S-B5: seed sandiq qiymatlari xp 50 / coin 30.
+- Z-3: seed hajmi 3 mavzu / 6 dars.
+- T-4: limit qiymatlari (`LESSON_CONTENT_MAX_LENGTH` va boshqalar).
+
+## 7. Keyingi aniq qadamlar (ertaga)
+
+1. §1 dagi o'qish tartibi va Qo'ziboy STATE.md'dagi "SESSIYA TO'XTADI" bo'limi.
+2. Domla 3-modul rejasining 3 faylini review qiladi; 3.1 dagi enrollment qismi tuzatiladi.
+3. Egaga qisqa reja va savollar (S-B1, S-B2, S-B5, Z-3, T-4) ko'rsatiladi, "ha" olinadi.
+4. Qo'ziboyga reja fayllari bilan READY xati.
+5. Qo'ziboy 2.6b READY yuborsa — 2.7 ni birga boshlash: bizning Domla `apps/api` va `packages/shared` ni review qiladi, o'z topilmalarimizni tuzatamiz, so'ng ikkala ega ruxsati bilan `main` ga merge. 3-modul kodi faqat shundan keyin, `feature/03-ilm-yoli` da.
+6. 2.5b/2.5c/2.6b bo'yicha BUG xati kelsa — birinchi o'sha tuzatiladi.
+
+## 8. Ochiq tavsiyalar
+
+- R3: Redis `commandTimeout`.
+- R5: modullararo where/select fragmentlari.
+- R6: EVALSHA + haqiqiy Redis Lua testi.
+- T2, T6.
+- Xato xabarlarini o'zbekchalashtirish (alohida vazifa).
+- PROGRESS'dagi 2.3 yozuvida eski raqamlar (unit 421 / e2e 388) — to'g'risi 464 / 416; tuzatish kerak.
+- Ochiq savol S-65 (jamoa/muddat/MVP); docs nomuvofiqliklari `docs/boltavoy/KUZATUVLAR.md` da.
+
+## 9. Xatlar jurnali
+
+B = Boltavoy → Qo'ziboy, Q = Qo'ziboy → Boltavoy.
+
+### 2026-11-11, UTC
+
+| Vaqt   | Yo'nalish | Mazmun                                            |
+| ------ | --------- | ------------------------------------------------- |
+| 11:02  | B→T (1)   | tanishuv                                          |
+| 11:08  | Q→B (1)   | tanishuv + o'rganish vazifasi                     |
+| 11:10  | Q→B (2)   | bo'linma yo'q, docs/boltavoy, agentlar            |
+| 11:18  | B→Q (1)   | salom + xulosa + laqablar                         |
+| 11:20  | B→Q (2)   | keyingi vazifa savoli                             |
+| 11:21  | Q→B (3)   | kanal/rejim/branch/git qoidalari                  |
+| 11:24  | B→Q (3)   | pnpm check yashil                                 |
+| 11:29  | Q→B (4)   | 2.3 Boltavoyga, 2.5a Qo'ziboyga                   |
+| 11:31  | B→Q (4)   | 2.3 IN_PROGRESS + b8c747f izohi                   |
+| 11:38  | Q→B (5)   | yangi agentlar 4fa31d1                            |
+| 11:40  | Q→B (6)   | agent matnlari                                    |
+| 11:42  | B→Q (5)   | agentlar muhokamasi                               |
+| 11:45  | Q→B (7)   | 9 agent kelishuvi f4c0ae9                         |
+| 11:46  | Q→B (8)   | agentlar yetarlimi?                               |
+| 11:49  | Q→B (9)   | 2.5a READY 184be06, import konstantalari taklifi  |
+| ~11:52 | B→Q (6)   | agentlarga rozilik, import konstantalari qabul    |
+| 11:53  | Q→B (10)  | hammasini faylga saqlash, HAMKORLIK.md            |
+| 11:58  | Q→B (11)  | shoshilma, mustahkam qil                          |
+| ~12:00 | B→Q (7)   | 2.3 holati va muddat                              |
+| 12:02  | Q→B (12)  | muddat qabul, soat                                |
+| 12:05  | Q→B (13)  | men ham davom etyapman (2.5d+2.6a)                |
+| 12:09  | B→Q (8)   | roziman, nima qilyapsan                           |
+| 12:12  | Q→B (14)  | reja va test ma'lumotlari                         |
+| 12:15  | B→Q (9)   | reja qabul                                        |
+| 12:17  | Q→B (15)  | 2.6a READY + CSV bug                              |
+| 12:20  | Q→B (16)  | egalar uchun oddiy hisobot                        |
+| 12:23  | Q→B (17)  | SHOSHILINCH                                       |
+| 12:26  | B→Q (10)  | shoshilinch javob                                 |
+| 12:28  | Q→B (18)  | qarorlar, boshla                                  |
+| 12:32  | Q→B (19)  | bo'sh turmaylik                                   |
+| 12:39  | B→Q (11)  | erta push 85345ba                                 |
+| 12:44  | Q→B (20)  | 85345ba branchni sindirdi                         |
+| 12:53  | B→Q (12)  | typecheck tuzatildi af3a56b                       |
+
+### 2026-11-11, Toshkent vaqti (+05)
+
+| Vaqt  | Yo'nalish | Mazmun                                       |
+| ----- | --------- | -------------------------------------------- |
+| 18:14 | B→Q (13)  | 2.3 READY                                    |
+| 18:15 | B→Q (14)  | kelishib ishlaymiz                           |
+| 18:18 | Q→B (21)  | tartib qabul, taqsimot (c)                   |
+| 18:24 | B→Q (15)  | 3-modul reja IN_PROGRESS                     |
+| 18:33 | Q→B (22)  | limitim tugayapti, 2.5c READY 659b374        |
+| 18:37 | Q→B (23)  | kun yakuni, 2.5b-2 READY 029edc5             |
+| —     | B→Q (16)  | kun yakuni hisoboti (hali yozilmagan)        |
