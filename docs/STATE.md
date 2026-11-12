@@ -4,6 +4,16 @@
 
 **Oxirgi yangilanish:** 2026-11-11 18:35 (haqiqiy vaqt)
 
+## QISQA HOLAT (yangi sessiya FAQAT shu blokni o'qiydi; qolgani kerak bo'lsa grep bilan)
+- **Yangilandi:** 2026-11-13
+- **Branch:** `feature/03-ilm-yoli` (stacked, 02 ustidan), toza, push qilingan.
+- **2-bosqich:** tayyor (review, testlar yashil) — `main`ga merge faqat ikkala ega ruxsati bilan.
+- **3-modul:** 3.4a UI tayyor. Boltavoyga Q-1…Q-9 yuborilgan, javob yo'q (13-noyabr tekshirildi: Drive'da yangi xat yo'q, git'da yangi commit yo'q).
+- **Keyingi vazifa:** ega bilan kelishib — 3.1 bazani Qo'ziboy oladi (avval Boltavoyga "olaman" xati, 10 daq kutish, uning qoralamasi `docs/tasks/03-3.1-baza.md` asosida, lazy enrollment). Yoki avval 2-bosqich merge.
+- **Qoida:** token tejash — md fayllar to'liq o'qilmaydi, faqat kerakli bo'lak (grep/tail).
+
+---
+
 > Hamkorlik (Boltavoy, Drive xatlari, taqsimot, agentlar) — **`docs/HAMKORLIK.md`**. Yangi sessiya ikkala faylni ham o'qiydi.
 
 ## ⚠️ SESSIYA TO'XTADI (2026-11-11 ~18:35, Claude limiti tugadi) — YANGI SESSIYA SHU YERDAN BOSHLAYDI
