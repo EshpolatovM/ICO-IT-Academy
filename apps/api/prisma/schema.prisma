@@ -56,6 +56,21 @@ enum ContentStatus {
   ARCHIVED
 }
 
+/// docs/11 §3 `topic_progress.status`. `LOCKED` yozilmaydi (qator yo'q = locked) — CHECK
+/// `chk_topic_progress_status_not_locked`; enum'da API holatlari bilan bir xil bo'lishi uchun bor.
+enum TopicStatus {
+  LOCKED
+  AVAILABLE
+  IN_PROGRESS
+  COMPLETED
+}
+
+/// docs/11 §3 `lesson_progress.status`.
+enum LessonProgressStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
 /// docs/11 §2 `groups.status`.
 enum GroupStatus {
   ACTIVE
@@ -103,15 +118,18 @@ model User {
   createdUsers User[] @relation("UserCreatedBy")
 
   refreshTokens         RefreshToken[]
-  parentTokensAsStudent ParentAccessToken[] @relation("ParentTokenStudent")
-  parentTokensCreated   ParentAccessToken[] @relation("ParentTokenCreatedBy")
-  parentTokensRevoked   ParentAccessToken[] @relation("ParentTokenRevokedBy")
+  parentTokensAsStudent ParentAccessToken[]     @relation("ParentTokenStudent")
+  parentTokensCreated   ParentAccessToken[]     @relation("ParentTokenCreatedBy")
+  parentTokensRevoked   ParentAccessToken[]     @relation("ParentTokenRevokedBy")
   parentAccessLogs      ParentAccessLog[]
   auditLogs             AuditLog[]
-  ownedFiles            File[]              @relation("FileOwner")
+  ownedFiles            File[]                  @relation("FileOwner")
   updatedSystemSettings SystemSetting[]
-  mentoredGroups        Group[]             @relation("GroupMentor")
-  groupMemberships      GroupMember[]       @relation("GroupMemberStudent")
+  mentoredGroups        Group[]                 @relation("GroupMentor")
+  groupMemberships      GroupMember[]           @relation("GroupMemberStudent")
+  pathEnrollments       StudentPathEnrollment[]
+  topicProgress         TopicProgress[]
+  lessonProgress        LessonProgress[]
 
   @@unique([phone], map: "uq_users_phone")
   @@unique([studentCode], map: "uq_users_student_code")
@@ -256,7 +274,12 @@ model GroupMember {
 }
 
 // ---------------------------------------------------------------------------
-// 3. Ilm yo'li (docs/11 §3) — 2-bosqichda faqat `learning_paths` (guruh FK uchun).
+// 3. Ilm yo'li (docs/11 §3). Kontent ierarxiyasi ichida `onDelete: Cascade`
+// (yo'l → bo'lim → mavzu → dars; bo'lim → sandiq; mavzu/ko'nikma → topic_skills); progress va
+// enrollment'dan kontentga va `users` ga `Restrict` (tarix himoyasi). Soft delete yo'q: kontent
+// `status = ARCHIVED` bo'ladi. `ContentStatus` uchun DB default yo'q (servis `DRAFT` yozadi).
+// `(…, "order")` unique'lari migratsiyada DEFERRABLE INITIALLY IMMEDIATE constraint (qo'lda SQL).
+// Raw SQL'da `order` ustuni qo'shtirnoqda yoziladi: `"order"`.
 // ---------------------------------------------------------------------------
 
 model LearningPath {
@@ -271,10 +294,192 @@ model LearningPath {
 
   coverFile File? @relation("LearningPathCover", fields: [coverFileId], references: [id])
 
-  groups Group[]
+  groups      Group[]
+  sections    PathSection[]
+  enrollments StudentPathEnrollment[]
 
   @@unique([slug], map: "uq_learning_paths_slug")
   @@map("learning_paths")
+}
+
+/// Migratsiyada `uq_path_sections_path_id_order` — DEFERRABLE INITIALLY IMMEDIATE constraint.
+model PathSection {
+  id          String        @id @default(uuid(7)) @db.Uuid
+  pathId      String        @map("path_id") @db.Uuid
+  /// Yo'l ichidagi tartib.
+  order       Int
+  title       String        @db.VarChar(128)
+  description String?
+  status      ContentStatus
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  path LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
+
+  topics Topic[]
+  chests PathChest[]
+
+  @@unique([pathId, order], map: "uq_path_sections_path_id_order")
+  @@map("path_sections")
+}
+
+/// Migratsiyada `uq_topics_section_id_order` — DEFERRABLE INITIALLY IMMEDIATE constraint.
+/// `pass_threshold` (S-31) 4-bosqichda alohida migratsiya bilan qo'shiladi.
+model Topic {
+  id          String        @id @default(uuid(7)) @db.Uuid
+  sectionId   String        @map("section_id") @db.Uuid
+  /// Bo'lim ichidagi tartib.
+  order       Int
+  title       String        @db.VarChar(128)
+  description String?
+  icon        String?       @db.VarChar(64)
+  status      ContentStatus
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  section PathSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  lessons    Lesson[]
+  chestAfter PathChest?
+  skills     TopicSkill[]
+  progress   TopicProgress[]
+
+  @@unique([sectionId, order], map: "uq_topics_section_id_order")
+  @@map("topics")
+}
+
+/// Migratsiyada `uq_lessons_topic_id_order` — DEFERRABLE INITIALLY IMMEDIATE constraint.
+/// `updated_at` — S-35 bo'yicha yagona "versiya" belgisi.
+model Lesson {
+  id         String        @id @default(uuid(7)) @db.Uuid
+  topicId    String        @map("topic_id") @db.Uuid
+  /// Mavzu ichidagi tartib.
+  order      Int
+  title      String        @db.VarChar(128)
+  /// Markdown. DB default yo'q (bo'sh qoralama uchun servis `''` yozadi).
+  contentMd  String        @map("content_md")
+  /// Faqat `https:` — DTO'da tekshiriladi, DB'da CHECK yo'q.
+  videoUrl   String?       @map("video_url") @db.VarChar(512)
+  estMinutes Int?          @map("est_minutes") @db.SmallInt
+  status     ContentStatus
+  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  progress LessonProgress[]
+
+  @@unique([topicId, order], map: "uq_lessons_topic_id_order")
+  @@map("lessons")
+}
+
+/// Mukofot sandig'i: bitta mavzudan keyin bitta sandiq. `status` yo'q — ko'rinishi `after_topic`
+/// ko'rinishiga bog'liq (TL Q-1). `after_topic_id` → `NoAction`: mavzuni yolg'iz o'chirish xato
+/// beradi, bo'lim kaskadida esa statement oxirida tekshirilgani uchun o'tadi.
+/// `section_id = after_topic.section_id` mosligini servis tekshiradi.
+model PathChest {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  sectionId    String   @map("section_id") @db.Uuid
+  afterTopicId String   @map("after_topic_id") @db.Uuid
+  title        String   @db.VarChar(64)
+  /// `{ "xp": {"min","max"}, "coin": {"min","max"} }` (S-26 A); qat'iy qiymat = `min = max`.
+  /// Sxema zod'da (`@lms/shared`), DB'da tekshirilmaydi. 5-bosqichgacha hech narsa bermaydi.
+  reward       Json
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  section    PathSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  afterTopic Topic       @relation(fields: [afterTopicId], references: [id], onDelete: NoAction)
+
+  @@unique([afterTopicId], map: "uq_path_chests_after_topic_id")
+  @@index([sectionId], map: "idx_path_chests_section_id")
+  @@map("path_chests")
+}
+
+model Skill {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  name      String   @db.VarChar(64)
+  icon      String?  @db.VarChar(64)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  topics TopicSkill[]
+
+  @@unique([name], map: "uq_skills_name")
+  @@map("skills")
+}
+
+model TopicSkill {
+  topicId String @map("topic_id") @db.Uuid
+  skillId String @map("skill_id") @db.Uuid
+
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([topicId, skillId], map: "topic_skills_pkey")
+  @@index([skillId], map: "idx_topic_skills_skill_id")
+  @@map("topic_skills")
+}
+
+/// Lazy enrollment (TL Q-5): student `/student/*` ga birinchi murojaat qilganda 3.3 servisi
+/// `createMany({ skipDuplicates: true })` bilan yozadi. `uq_..._student_id_path_id` — idempotentlik
+/// kafolati. "Joriy yo'l" saqlanmaydi — `groups.path_id` dan hisoblanadi.
+model StudentPathEnrollment {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  studentId   String    @map("student_id") @db.Uuid
+  pathId      String    @map("path_id") @db.Uuid
+  /// Studentning shu yo'lga birinchi murojaati vaqti.
+  startedAt   DateTime  @default(now()) @map("started_at") @db.Timestamptz
+  completedAt DateTime? @map("completed_at") @db.Timestamptz
+
+  student User         @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  path    LearningPath @relation(fields: [pathId], references: [id], onDelete: Restrict)
+
+  @@unique([studentId, pathId], map: "uq_student_path_enrollments_student_id_path_id")
+  @@index([pathId], map: "idx_student_path_enrollments_path_id")
+  @@map("student_path_enrollments")
+}
+
+/// Qator yo'q = `LOCKED`. Migratsiyada CHECK'lar: `chk_topic_progress_status_not_locked`,
+/// `chk_topic_progress_completed_at` (`completed_at` faqat va albatta `COMPLETED` da) —
+/// `status` va `completed_at` bitta statement'da yoziladi.
+model TopicProgress {
+  studentId        String      @map("student_id") @db.Uuid
+  topicId          String      @map("topic_id") @db.Uuid
+  status           TopicStatus
+  lessonsCompleted Int         @default(0) @map("lessons_completed") @db.SmallInt
+  /// 4-bosqich (savollar) to'ldiradi.
+  firstTryCorrect  Int         @default(0) @map("first_try_correct")
+  /// 4-bosqich (savollar) to'ldiradi.
+  firstTryTotal    Int         @default(0) @map("first_try_total")
+  startedAt        DateTime?   @map("started_at") @db.Timestamptz
+  completedAt      DateTime?   @map("completed_at") @db.Timestamptz
+  updatedAt        DateTime    @updatedAt @map("updated_at") @db.Timestamptz
+
+  student User  @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  topic   Topic @relation(fields: [topicId], references: [id], onDelete: Restrict)
+
+  @@id([studentId, topicId], map: "topic_progress_pkey")
+  @@index([studentId, status], map: "idx_topic_progress_student_id_status")
+  @@index([topicId, status], map: "idx_topic_progress_topic_id_status")
+  @@map("topic_progress")
+}
+
+/// Migratsiyada CHECK `chk_lesson_progress_completed_at`. Qator mavjudligi = dars boshlangan
+/// (6-bosqich blok qoidasi).
+model LessonProgress {
+  studentId   String               @map("student_id") @db.Uuid
+  lessonId    String               @map("lesson_id") @db.Uuid
+  status      LessonProgressStatus
+  startedAt   DateTime             @default(now()) @map("started_at") @db.Timestamptz
+  completedAt DateTime?            @map("completed_at") @db.Timestamptz
+
+  student User   @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  lesson  Lesson @relation(fields: [lessonId], references: [id], onDelete: Restrict)
+
+  @@id([studentId, lessonId], map: "lesson_progress_pkey")
+  @@index([studentId, completedAt], map: "idx_lesson_progress_student_id_completed_at")
+  @@map("lesson_progress")
 }
 
 // ---------------------------------------------------------------------------
