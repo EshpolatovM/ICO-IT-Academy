@@ -3,6 +3,7 @@ import {
   INCREMENT_WITH_TTL_SCRIPT,
   REPLACE_SET_IF_VERSION_SCRIPT,
   SET_IF_GREATER_SCRIPT,
+  SET_IF_VERSION_SCRIPT,
   SET_MEMBERSHIP_SCRIPT,
   SET_UNLESS_BLOCKED_SCRIPT,
 } from './redis-scripts.js';
@@ -186,6 +187,16 @@ describe('RedisService', () => {
       '-',
       'a',
     );
+  });
+
+  it('setIfVersion: Lua (versiya sharti bilan), natija — yozildimi', async () => {
+    const { client, service } = createService();
+    client.eval.mockResolvedValueOnce(1).mockResolvedValueOnce(0);
+    const write = { key: 'k', versionKey: 'g', expectedVersion: '3', value: '{}', ttlSeconds: 600 };
+
+    await expect(service.setIfVersion(write)).resolves.toBe(true);
+    await expect(service.setIfVersion(write)).resolves.toBe(false);
+    expect(client.eval).toHaveBeenCalledWith(SET_IF_VERSION_SCRIPT, 2, 'k', 'g', '3', '{}', 600);
   });
 
   it('bumpVersionsAndDelete: bitta MULTI — har versiyaga INCR + EXPIRE, bitta DEL', async () => {

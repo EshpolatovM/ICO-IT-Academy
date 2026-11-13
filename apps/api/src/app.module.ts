@@ -21,6 +21,7 @@ import { ContentModule } from './modules/content/content.module.js';
 import { GroupsModule } from './modules/groups/groups.module.js';
 import { MentorScopeModule } from './modules/groups/mentor-scope.module.js';
 import { HealthModule } from './modules/health/health.module.js';
+import { LearningModule } from './modules/learning/learning.module.js';
 import { ParentAccessModule } from './modules/parent-access/parent-access.module.js';
 import { PasswordResetModule } from './modules/password-reset/password-reset.module.js';
 import { UsersModule } from './modules/users/users.module.js';
@@ -43,6 +44,7 @@ import type { ExceptionMapper } from './common/filters/exception-mapper.interfac
     AdminUsersModule,
     GroupsModule,
     ContentModule,
+    LearningModule,
     HealthModule,
   ],
   providers: [

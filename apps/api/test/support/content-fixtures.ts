@@ -7,6 +7,8 @@ import { PrismaService } from '../../src/infra/prisma/prisma.service.js';
 import { RedisService } from '../../src/infra/redis/redis.service.js';
 import { contentVersionKey } from '../../src/modules/content/services/content-cache-version.service.js';
 
+import { deletePathProgress } from './test-users.js';
+
 import type { AuthFixtures } from './auth-fixtures.js';
 import type { PrismaClient } from '../../src/infra/prisma/generated/client.js';
 import type { INestApplication } from '@nestjs/common';
@@ -46,11 +48,7 @@ export async function deleteTestContent(
   skillIds: readonly string[],
 ): Promise<void> {
   const inPaths = { in: [...pathIds] };
-  await db.lessonProgress.deleteMany({
-    where: { lesson: { topic: { section: { pathId: inPaths } } } },
-  });
-  await db.topicProgress.deleteMany({ where: { topic: { section: { pathId: inPaths } } } });
-  await db.studentPathEnrollment.deleteMany({ where: { pathId: inPaths } });
+  await deletePathProgress(db, pathIds);
   await db.groupMember.deleteMany({ where: { group: { pathId: inPaths } } });
   await db.group.deleteMany({ where: { pathId: inPaths } });
   await db.learningPath.deleteMany({ where: { id: inPaths } });

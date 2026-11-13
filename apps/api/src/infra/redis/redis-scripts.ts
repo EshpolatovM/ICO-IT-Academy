@@ -74,3 +74,16 @@ for i = 3, #ARGV, ${SADD_CHUNK_SIZE} do
 end
 redis.call('EXPIRE', KEYS[1], ARGV[2])
 return 1`;
+
+/**
+ * Versiya tekshiruvli string yozuvi (`REPLACE_SET_IF_VERSION_SCRIPT` ning string analogi): `KEYS[2]`
+ * qiymati kutilgani bilan bir xil bo'lsagina (`''` — kalit yo'q edi) `KEYS[1]` ga `SET ... EX`.
+ * ARGV[1]=kutilgan versiya, ARGV[2]=qiymat, ARGV[3]=ttl. Yozilsa 1, versiya o'zgargan bo'lsa 0.
+ */
+export const SET_IF_VERSION_SCRIPT = `
+local current = redis.call('GET', KEYS[2])
+if (current or '') ~= ARGV[1] then
+  return 0
+end
+redis.call('SET', KEYS[1], ARGV[2], 'EX', ARGV[3])
+return 1`;

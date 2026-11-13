@@ -13,3 +13,13 @@ export interface VersionedSetWrite {
   members: readonly string[];
   ttlSeconds: number;
 }
+
+/** `RedisService.setIfVersion` argumenti (string qiymat). */
+export interface VersionedValueWrite {
+  key: string;
+  versionKey: string;
+  /** O'qishdan oldingi versiya; kalit yo'q bo'lgan bo'lsa — `''`. */
+  expectedVersion: string;
+  value: string;
+  ttlSeconds: number;
+}

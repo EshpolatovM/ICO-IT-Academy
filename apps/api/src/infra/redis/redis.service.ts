@@ -5,12 +5,13 @@ import {
   INCREMENT_WITH_TTL_SCRIPT,
   REPLACE_SET_IF_VERSION_SCRIPT,
   SET_IF_GREATER_SCRIPT,
+  SET_IF_VERSION_SCRIPT,
   SET_MEMBERSHIP_SCRIPT,
   SET_UNLESS_BLOCKED_SCRIPT,
 } from './redis-scripts.js';
 import { REDIS_CLIENT } from './redis.constants.js';
 
-import type { VersionedKey, VersionedSetWrite } from './redis.types.js';
+import type { VersionedKey, VersionedSetWrite, VersionedValueWrite } from './redis.types.js';
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import type { Redis } from 'ioredis';
 
@@ -163,6 +164,23 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       write.expectedVersion,
       write.ttlSeconds,
       ...write.members,
+    );
+    return Number(applied) === SCRIPT_APPLIED;
+  }
+
+  /**
+   * Versiya hisoblagichi o'qilgandan beri o'zgarmagan bo'lsagina string qiymatni yozadi (Lua, atomar).
+   * Yozilsa — `true`; oraliqda invalidatsiya bo'lgan bo'lsa — `false`.
+   */
+  async setIfVersion(write: VersionedValueWrite): Promise<boolean> {
+    const applied = await this.client.eval(
+      SET_IF_VERSION_SCRIPT,
+      KEY_PAIR,
+      write.key,
+      write.versionKey,
+      write.expectedVersion,
+      write.value,
+      write.ttlSeconds,
     );
     return Number(applied) === SCRIPT_APPLIED;
   }

@@ -87,6 +87,10 @@ export const contentReaders = (success: Expectation) =>
 export const mentorOnly = (success: Expectation) =>
   row(UNAUTHORIZED, FORBIDDEN, FORBIDDEN, success, FORBIDDEN, MCP_BLOCKED, FORBIDDEN);
 
+/** Faqat S (student ilm yo'li, docs/12 §4). */
+export const studentOnly = (success: Expectation) =>
+  row(UNAUTHORIZED, FORBIDDEN, FORBIDDEN, FORBIDDEN, success, MCP_BLOCKED, FORBIDDEN);
+
 /** Studentga oid endpoint nishoni: student — o'zi, ota-ona — farzandi, qolganlar — yangi student. */
 export async function targetStudent(actor: Actor, actors: RbacActors): Promise<string> {
   return actor.ownStudentId ?? (await actors.newUser(Role.STUDENT)).id;

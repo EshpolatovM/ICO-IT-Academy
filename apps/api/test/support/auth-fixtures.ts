@@ -38,6 +38,8 @@ interface CreateGroupOptions {
   mentorId?: string | null;
   /** Faol a'zolar (to'g'ridan-to'g'ri bazaga). */
   studentIds?: readonly string[];
+  /** Mavjud yo'l (tozalashni uning egasi qiladi); berilmasa — yangi `PUBLISHED` bo'sh yo'l. */
+  pathId?: string;
 }
 
 export interface TestUser {
@@ -100,15 +102,11 @@ export class AuthFixtures {
   async createGroup(options: CreateGroupOptions = {}): Promise<TestGroup> {
     const suffix = randomBytes(GROUP_SUFFIX_BYTES).toString('hex');
     const db = this.prisma().dbIncludingDeleted;
-    const path = await db.learningPath.create({
-      data: { title: `E2E ${suffix}`, slug: `e2e-${suffix}`, status: 'PUBLISHED' },
-      select: { id: true },
-    });
-    this.pathIds.push(path.id);
+    const pathId = options.pathId ?? (await this.createGroupPath(suffix));
     const group = await db.group.create({
       data: {
         name: options.name ?? `E2E-${suffix}`,
-        pathId: path.id,
+        pathId,
         status: options.status ?? 'ACTIVE',
         mentorId: options.mentorId ?? null,
       },
@@ -119,6 +117,15 @@ export class AuthFixtures {
       data: (options.studentIds ?? []).map((studentId) => ({ groupId: group.id, studentId })),
     });
     return group;
+  }
+
+  private async createGroupPath(suffix: string): Promise<string> {
+    const path = await this.prisma().dbIncludingDeleted.learningPath.create({
+      data: { title: `E2E ${suffix}`, slug: `e2e-${suffix}`, status: 'PUBLISHED' },
+      select: { id: true },
+    });
+    this.pathIds.push(path.id);
+    return path.id;
   }
 
   /** API orqali yaratilgan guruhni tozalash ro'yxatiga qo'shadi. */

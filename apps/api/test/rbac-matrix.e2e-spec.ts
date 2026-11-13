@@ -8,6 +8,7 @@ import { useE2eContext } from './support/e2e-context.js';
 import { ALL_ACTORS, RbacActors } from './support/rbac-actors.js';
 import { CONTENT_CASES } from './support/rbac-content-cases.js';
 import { GROUP_CASES } from './support/rbac-group-cases.js';
+import { LEARNING_CASES } from './support/rbac-learning-cases.js';
 import {
   accountOnly,
   adminsOnly,
@@ -29,7 +30,7 @@ import type { EndpointCase, RequestSpec } from './support/rbac-matrix.js';
 import type request from 'supertest';
 
 /**
- * RBAC matritsasi — 1-bosqich, 2.2, 2.3 va 3.2 (docs/01 §2.1, docs/02 §7, docs/12 §1, §2, §3, §16): har bir endpoint × har bir
+ * RBAC matritsasi — 1-bosqich, 2.2, 2.3, 3.2 va 3.3 (docs/01 §2.1, docs/02 §7, docs/12 §1, §2, §3, §16): har bir endpoint × har bir
  * aktyor → kutilgan status (va xato kodi). Global guard tartibi: autentifikatsiya (401) →
  * `PASSWORD_CHANGE_REQUIRED` (403) → `@Roles` (403) → ota-ona faqat o'qish (403) → `@StudentScope`.
  * Mentor uchun student endpointlari — guruh scope'i orqali (begona student — 404).
@@ -167,6 +168,7 @@ const CASES: EndpointCase[] = [
   ...USER_MANAGEMENT_CASES,
   ...GROUP_CASES,
   ...CONTENT_CASES,
+  ...LEARNING_CASES,
 ];
 
 /** Muvaffaqiyatli yaratish javobidagi foydalanuvchilar (`id`, `students[].id`) tozalanadi. */
@@ -204,7 +206,7 @@ const CELLS = CASES.flatMap((testCase) =>
   })),
 );
 
-describe('RBAC matritsasi — 1-bosqich, 2.2, 2.3 va 3.2 endpointlari (e2e)', () => {
+describe('RBAC matritsasi — 1-bosqich, 2.2, 2.3, 3.2 va 3.3 endpointlari (e2e)', () => {
   const context = useE2eContext();
   let actors: RbacActors;
 

@@ -247,3 +247,25 @@ export type {
   SkillsResponse,
   TopicSkillsResponse,
 } from './content/content.types.js';
+export { ChestStatus } from './learning/enums/chest-status.js';
+export { LessonStatus } from './learning/enums/lesson-status.js';
+export { TopicStatus } from './learning/enums/topic-status.js';
+export type { ReviewDueTopic, ReviewRequiredDetails } from './learning/learning-errors.js';
+export { PathNodeKind, RewardType } from './learning/learning.types.js';
+export type {
+  LessonCompleteResponse,
+  LessonStartResponse,
+  NextLessonRef,
+  ReviewBlock,
+  RewardItem,
+  StartedLessonStatus,
+  StudentChestNode,
+  StudentLesson,
+  StudentPathMap,
+  StudentPathNode,
+  StudentPathSection,
+  StudentPathSummary,
+  StudentTopicDetail,
+  StudentTopicLesson,
+  StudentTopicNode,
+} from './learning/learning.types.js';
