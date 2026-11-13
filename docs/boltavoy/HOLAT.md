@@ -214,3 +214,15 @@ Xatlarning to'liq matni va indeksi: `docs/boltavoy/xatlar/README.md`. Q23 dan ke
 - Qo'ziboy `origin/feature/03-ilm-yoli` ga push qildi (16:20 holatiga, bizda hali pull qilinmagan): `efae65e` (B19, main), `f998fb0` (3.4b Markdown renderer + `pnpm-lock.yaml`), `b59b449` (state). Ular `docs/PROGRESS.md` oxiriga ham yozgan, shuning uchun bizning PROGRESS yozuvimiz `pull --rebase` da konflikt berishi mumkin (ikkalasini ham saqlab hal qilinadi).
 
 Drive'da Q27 dan keyin (16:20 +05 holatiga) Qo'ziboydan yangi xat yo'q. B17, Q24–Q27, B19, B20 `xatlar/` ga arxivlandi.
+
+## 2026-11-13 kechki holat (17:55) — 3-modul BACKEND TUGADI
+- **Commitlar (`feature/03-ilm-yoli`, push qilingan):** `f270a7b` 3.1 baza; `22ffaaa` 3.2 admin kontent API (28 endpoint); `2de07c5` 3.3 student API (5 endpoint); `0641ad9` 3.3 Domla tuzatishlari.
+- **Testlar:** `pnpm check` yashil, api unit 622, api e2e 22 suite / 688. Domla: 3.2 va 3.3 da blocker yo'q.
+- **Xatlar:** B21 (Q28 javobi), B22 (3.1 READY), B23 (3.2 READY), B24 (3.3 READY, frontend tiplaridan farqlar, `ST-10117` + `mustChangePassword`). Qo'ziboydan oxirgisi Q29. Keyingi raqamlar B25 / Q30.
+- **Dev muhit:** konteynerlar `podman run --env-file .env` bilan ko'tarilgan (Postgres 5433, Redis). `podman compose` bu mashinada ishlamaydi.
+- **Keyingi aniq qadamlar:**
+  1. docs/12 §2–§4 ga 3.2/3.3 kontraktini yozish (3.2 §10.4 va 3.3 T-8 ro'yxatlari), docs/11 §16 ga Redis kalitlari (`content:path:{id}:ver`, `path:{studentId}:gen`), docs/03:47 "embed" → "faqat havola".
+  2. Qo'ziboydan 3.5 ulash bo'yicha BUG xatlari kelsa, darhol tuzatish.
+  3. 2.7 (A) 🟢 tavsiyalari, `delete-groups` buyrug'i, `group-members.repository.ts:9` dagi P2002 nusxasini `prisma-error-codes.ts` ga o'tkazish.
+  4. 3.2 🟢-3/5/7/8 va 3.3 🟢-2/5/6 (shoshilinch emas).
+- **Ochiq:** S-D2 (`@nestjs/event-emitter`) — hozircha abstract port va log implementatsiyasi bor.
