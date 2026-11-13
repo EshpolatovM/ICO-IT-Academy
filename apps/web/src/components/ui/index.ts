@@ -47,6 +47,8 @@ export { Input } from './Input';
 export type { InputProps, InputType } from './Input';
 export { Label } from './Label';
 export type { LabelProps } from './Label';
+export { Markdown } from './Markdown';
+export type { MarkdownProps } from './Markdown';
 export { NavItem } from './NavItem';
 export type { NavItemProps } from './NavItem';
 export { PageHeader } from './PageHeader';

@@ -30,7 +30,18 @@ const ARBITRARY_MESSAGE =
 
 const CLASS_CONTEXTS = ["JSXAttribute[name.name='className']", "CallExpression[callee.name='cn']"];
 
+/*
+ * `react/no-danger` ekvivalenti (XSS, docs/reviews/03-reja-frontend-izoh.md): eslint-plugin-react
+ * o'rnatilmagan, yangi paket qo'shmaslik uchun `no-restricted-syntax` orqali butun src'da taqiqlanadi.
+ */
+const noDangerRestriction = {
+  selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
+  message:
+    '`dangerouslySetInnerHTML` taqiqlangan (XSS). Markdown uchun components/ui dagi <Markdown /> dan foydalaning.',
+};
+
 const paletteRestrictions = [
+  noDangerRestriction,
   { selector: `Literal[value=${PALETTE_CLASS_RE}]`, message: PALETTE_MESSAGE },
   { selector: `TemplateElement[value.raw=${PALETTE_CLASS_RE}]`, message: PALETTE_MESSAGE },
 ];
@@ -78,6 +89,12 @@ export default defineConfig(
               group: ['../../*'],
               message:
                 "Uzun nisbiy import taqiqlangan: '@/components', '@/features', '@/stores', '@/lib' alias'laridan foydalaning.",
+            },
+          ],
+          paths: [
+            {
+              name: 'rehype-raw',
+              message: "Markdown'da raw HTML taqiqlangan (XSS) — rehype-raw ishlatilmaydi.",
             },
           ],
         },
