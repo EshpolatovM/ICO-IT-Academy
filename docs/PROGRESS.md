@@ -266,3 +266,4 @@ Yangi yozuvlar pastga qo'shiladi.
 - **Muammolar va savollar:** yo'q. docs/12 tuzatishlari implementatsiyadan keyin (3.2 §10.4, 3.3 T-8).
 - **Keyingi qadam:** 3.1 baza implementatsiyasi (usta-baza, `apps/api/prisma/**`, lockfile'ga tegilmaydi), keyin 3.2, 3.3; 2.7 (A) 🟢 va `delete-groups` — shoshilinch emas.
 - 2026-11-13 16:50 — 3.5-admin kontent sahifalari (Frontendcha, efe40d2, 394 test); B20–B22 o'qildi; Boltavoy 3.1 rebase bilan olindi; PathSelect ARCHIVED filtri + test, 03-reja M-4 (615883a).
+- 2026-11-13 18:05 — B23 (3.2 READY), B24 (3.3 READY) o'qildi, pull qilindi; ertangi reja STATE.md ga yozildi. Kun yakuni.

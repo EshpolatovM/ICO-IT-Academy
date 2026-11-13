@@ -8,10 +8,17 @@
 - **Yangilandi:** 2026-11-13
 - **Branch:** `feature/03-ilm-yoli` (stacked, 02 ustidan), toza, push qilingan.
 - **2-bosqich:** `main` ga qo'shildi (13-nov 16:09, ff `bc084cc`).
-- **3-modul:** 3.4a UI tayyor. 3.4b Markdown renderer tayyor (`f998fb0`; `components/ui/Markdown`, `lib/safeUrl.ts`; nisbiy linklar matn bo'ladi; `dangerouslySetInnerHTML`/`rehype-raw` ESLint bilan taqiqlangan). 3.5a student sahifalari mock bilan tayyor (`e774819`; real API'ga o'tish: `features/learning-path/api/learning-path.api.ts` da mock→http; tiplar vaqtincha `types/learning-path.types.ts`). 3.5-admin `efe40d2` mock bilan (`features/admin-content`). Boltavoy: 3.1 baza READY `f270a7b`, 3.2 IN_PROGRESS. Boltavoyga Q-1…Q-9 yuborilgan, javob yo'q (13-noyabr tekshirildi: Drive'da yangi xat yo'q, git'da yangi commit yo'q).
+- **3-modul:** 3.4a UI tayyor. 3.4b Markdown renderer tayyor (`f998fb0`; `components/ui/Markdown`, `lib/safeUrl.ts`; nisbiy linklar matn bo'ladi; `dangerouslySetInnerHTML`/`rehype-raw` ESLint bilan taqiqlangan). 3.5a student sahifalari mock bilan tayyor (`e774819`; real API'ga o'tish: `features/learning-path/api/learning-path.api.ts` da mock→http; tiplar vaqtincha `types/learning-path.types.ts`). 3.5-admin `efe40d2` mock bilan (`features/admin-content`). Boltavoy: 3-modul backendi TO'LIQ tayyor — 3.1 `f270a7b`, 3.2 `22ffaaa`, 3.3 `2de07c5` (B23, B24). Boltavoyga Q-1…Q-9 yuborilgan, javob yo'q (13-noyabr tekshirildi: Drive'da yangi xat yo'q, git'da yangi commit yo'q).
 - **Ega qarori (13-nov):** hammasi Tech Lead qo'lida; Boltavoy bilan o'zaro kelishamiz, egalardan so'ralmaydi, egaga faqat hisobot.
 - **Taqsimot (Q27):** 3.1–3.3 Boltavoy; 3.4b Markdown renderer + 3.5 sahifalar Qo'ziboy.
-- **Keyingi vazifa:** Boltavoyning 3.2 READY xatini kutish (ega 13-nov: Boltavoy tugatsa ega o'zi xabar beradi, Drive'ni tinmay tekshirish shart emas) → admin-content'ni real API'ga ulash (`admin-content.api.ts` mock→http, shared tiplar/sxemalarga o'tish, `SAFE_URL_PROTOCOLS`→shared `content.constants.ts`, publish `cascade` tugmasi, `isContentVisible` belgisi). Keyin 3.3 → learning-path real API (`currentTopicId` serverdan). Kutish paytida: lokal muhitni yangilash (`pnpm install --frozen-lockfile`, `db:generate`, `prisma migrate dev`, seed).
+- **13-nov kechqurun ega:** bugungi ish yetarli, ertangi ish — B23/B24 xatlari bo'yicha.
+- **Keyingi vazifa (14-noyabr):**
+  1. Muhit: `pnpm install --frozen-lockfile`, `pnpm --filter @lms/api db:generate`, migrate + seed.
+  2. `SAFE_URL_PROTOCOLS` → `packages/shared/src/content/content.constants.ts` (alohida commit), web `lib/safeUrl.ts` shundan oladi.
+  3. admin-content → real API: `admin-content.api.ts` mock→http; `TODO(3.2)` tip/sxemalar → `@lms/shared` (`AdminPath*`, `Admin*Node`, `AdminLesson`, `content.schemas.ts`); publish `{cascade}` tugmasi; `isContentVisible` belgisi; reorder 409 (details'siz) → daraxtni qayta so'rash; `PATH_IN_USE groupsCount:0` matni.
+  4. learning-path → real API: tiplar `@lms/shared` `learning/` dan (farqlar B24: SkillRef icon, estMinutes nullable, LessonStatus, RewardType); `currentTopicId` serverdan, frontend hisobi (`lib/current-node.ts`) olib tashlanadi.
+  5. Brauzerda sinov: dev student `ST-10117` (avval parolni almashtirish), seed yo'li "Frontend".
+  6. 3.6 testlar (Playwright) → 3.7 review → merge.
 - **Frontend kichik qarzlar:** TreeList `movable`/`meta` props (Rassomjon), `paths` query key → `lib/query/admin-keys.ts`, admin nav nomi "Kontent" (docs/03:15 bo'yicha qoldirildi).
 - **Qoida:** token tejash — md fayllar to'liq o'qilmaydi, faqat kerakli bo'lak (grep/tail).
 
