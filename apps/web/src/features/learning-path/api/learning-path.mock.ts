@@ -1,6 +1,6 @@
 import { ErrorCode } from '@lms/shared';
 
-import { ApiError, HttpStatus } from '@/lib/api';
+import { ApiError, HttpStatus, mockNotFound, mockRespond } from '@/lib/api';
 
 import { LessonStatus, TopicStatus } from '../types/learning-path.types';
 
@@ -28,8 +28,6 @@ import type {
  * haqiqiy kontraktdagidek `ApiError` (404 `NOT_FOUND`, 403 `LOCKED`).
  */
 
-const NOT_FOUND_STATUS = 404;
-
 let progress = initialMockProgress();
 
 /** Testlar uchun: progressni boshlang'ich holatga qaytaradi. */
@@ -41,14 +39,6 @@ interface LessonLocation {
   entry: ChainTopic;
   index: number;
   status: LessonStatus;
-}
-
-function notFound(): ApiError {
-  return new ApiError({
-    status: NOT_FOUND_STATUS,
-    code: ErrorCode.NOT_FOUND,
-    message: 'Topilmadi',
-  });
 }
 
 function locked(): ApiError {
@@ -66,7 +56,7 @@ function chain(): ChainTopic[] {
 function findTopic(topicId: string): ChainTopic {
   const entry = chain().find((item) => item.topic.id === topicId);
   if (entry === undefined) {
-    throw notFound();
+    throw mockNotFound();
   }
   if (entry.status === TopicStatus.LOCKED) {
     throw locked();
@@ -85,7 +75,7 @@ function findLesson(lessonId: string): LessonLocation {
       return { entry, index, status };
     }
   }
-  throw notFound();
+  throw mockNotFound();
 }
 
 function topicDetail(entry: ChainTopic): StudentTopicDetail {
@@ -113,7 +103,7 @@ function lessonDetail({ entry, index, status }: LessonLocation): StudentLesson {
   const lessons = entry.topic.lessons;
   const lesson = lessons[index];
   if (lesson === undefined) {
-    throw notFound();
+    throw mockNotFound();
   }
   const row = progress.get(lesson.id);
   return {
@@ -193,19 +183,10 @@ function completeLesson(lessonId: string): LessonCompleteResponse {
   };
 }
 
-/** Sinxron hisobni Promise'ga o'raydi: xato — rad etilgan Promise (haqiqiy API kabi). */
-function respond<T>(compute: () => T): Promise<T> {
-  try {
-    return Promise.resolve(structuredClone(compute()));
-  } catch (error) {
-    return Promise.reject(error instanceof Error ? error : new Error(String(error)));
-  }
-}
-
 export const learningPathMockApi: LearningPathApi = {
-  getPathMap: () => respond(() => buildPathMap(MOCK_PATH, progress)),
-  getTopic: (topicId) => respond(() => topicDetail(findTopic(topicId))),
-  getLesson: (lessonId) => respond(() => lessonDetail(findLesson(lessonId))),
-  startLesson: (lessonId) => respond(() => startLesson(lessonId)),
-  completeLesson: (lessonId) => respond(() => completeLesson(lessonId)),
+  getPathMap: () => mockRespond(() => buildPathMap(MOCK_PATH, progress)),
+  getTopic: (topicId) => mockRespond(() => topicDetail(findTopic(topicId))),
+  getLesson: (lessonId) => mockRespond(() => lessonDetail(findLesson(lessonId))),
+  startLesson: (lessonId) => mockRespond(() => startLesson(lessonId)),
+  completeLesson: (lessonId) => mockRespond(() => completeLesson(lessonId)),
 };

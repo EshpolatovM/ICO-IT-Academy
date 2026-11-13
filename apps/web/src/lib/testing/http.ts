@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { afterEach, beforeEach, expect, vi } from 'vitest';
 
 import type { Mock } from 'vitest';
 
@@ -63,7 +63,37 @@ export function requestHeader(init: RequestInit, name: string): string | null {
   return new Headers(init.headers).get(name);
 }
 
+const OK_STATUS = 200;
 const NOT_FOUND_STATUS = 404;
+
+/**
+ * `describe` ichida: har test oldidan `fetch` mock'i (javob — 200 `{}`), keyin tiklanadi.
+ * Qaytgan funksiya joriy testning mock'ini beradi (API qatlami kontrakt testlari uchun).
+ */
+export function setupJsonFetch(): () => FetchMock {
+  let fetchMock: FetchMock = vi.fn<typeof fetch>();
+  beforeEach(() => {
+    fetchMock = mockFetch();
+    fetchMock.mockImplementation(() => Promise.resolve(jsonResponse(OK_STATUS, {})));
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+  return () => fetchMock;
+}
+
+/** `index`-chi `fetch` chaqiruvi metodi va URL'ini tekshiradi; sozlamalarini qaytaradi. */
+export function expectRequest(
+  fetchMock: FetchMock,
+  index: number,
+  method: string,
+  url: string,
+): RequestInit {
+  const { url: actualUrl, init } = fetchCall(fetchMock, index);
+  expect(actualUrl).toBe(url);
+  expect(init.method ?? 'GET').toBe(method);
+  return init;
+}
 
 /** `"METHOD /api/v1/yo'l"` (query'siz) → javob yaratuvchi. */
 export type FetchRoutes = Record<string, (init: RequestInit) => Response>;

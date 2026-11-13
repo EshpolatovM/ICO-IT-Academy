@@ -1,21 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, it } from 'vitest';
 
-import { fetchCall, jsonResponse, mockFetch } from '@/lib/testing/http';
-import type { FetchMock } from '@/lib/testing/http';
+import { expectRequest, setupJsonFetch } from '@/lib/testing/http';
 
 import { learningPathHttpApi as api } from './learning-path.http';
 
 describe('learningPathHttpApi (3.3 kontrakti)', () => {
-  let fetchMock: FetchMock;
-
-  beforeEach(() => {
-    fetchMock = mockFetch();
-    fetchMock.mockImplementation(() => Promise.resolve(jsonResponse(200, {})));
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
+  const fetchMock = setupJsonFetch();
 
   it.each([
     ['GET', '/api/v1/student/path', () => api.getPathMap()],
@@ -25,8 +15,6 @@ describe('learningPathHttpApi (3.3 kontrakti)', () => {
     ['POST', '/api/v1/student/lessons/l1/complete', () => api.completeLesson('l1')],
   ])('%s %s', async (method, url, call) => {
     await call();
-    const { url: actualUrl, init } = fetchCall(fetchMock, 0);
-    expect(actualUrl).toBe(url);
-    expect(init.method ?? 'GET').toBe(method);
+    expectRequest(fetchMock(), 0, method, url);
   });
 });
