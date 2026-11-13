@@ -9,7 +9,9 @@
 - **Branch:** `feature/03-ilm-yoli` (stacked, 02 ustidan), toza, push qilingan.
 - **2-bosqich:** tayyor (review, testlar yashil) — `main`ga merge faqat ikkala ega ruxsati bilan.
 - **3-modul:** 3.4a UI tayyor. Boltavoyga Q-1…Q-9 yuborilgan, javob yo'q (13-noyabr tekshirildi: Drive'da yangi xat yo'q, git'da yangi commit yo'q).
-- **Keyingi vazifa:** ega bilan kelishib — 3.1 bazani Qo'ziboy oladi (avval Boltavoyga "olaman" xati, 10 daq kutish, uning qoralamasi `docs/tasks/03-3.1-baza.md` asosida, lazy enrollment). Yoki avval 2-bosqich merge.
+- **Ega qarori (13-nov):** hammasi Tech Lead qo'lida; Boltavoy bilan o'zaro kelishamiz, egalardan so'ralmaydi, egaga faqat hisobot.
+- **Taqsimot (Q27):** 3.1–3.3 Boltavoy; 3.4b Markdown renderer + 3.5 sahifalar Qo'ziboy.
+- **Keyingi vazifa:** (1) Boltavoy Q27 ga ok desa yoki 16:08 gacha jim bo'lsa → `main` ni `feature/02-admin-asosi` ga fast-forward + push (force yo'q). (2) 3.4b: `react-markdown`+`remark-gfm` (rassom-dizayner, `components/ui/Markdown`), raw HTML o'chiq, rasm faqat https. (3) 3.5 soxta ma'lumot bilan. B19 (Q-1…Q-9 javob) ~18:00 kutiladi.
 - **Qoida:** token tejash — md fayllar to'liq o'qilmaydi, faqat kerakli bo'lak (grep/tail).
 
 ---
