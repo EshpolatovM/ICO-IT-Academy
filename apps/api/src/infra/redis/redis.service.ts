@@ -93,6 +93,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return this.client.mget(...keys);
   }
 
+  /** Muddatsiz hisoblagichni oshiradi (`INCR`; kalit yo'q bo'lsa — 1). Yangi qiymatni qaytaradi. */
+  increment(key: string): Promise<number> {
+    return this.client.incr(key);
+  }
+
   /**
    * Hisoblagichni atomar oshiradi (`INCR` + `EXPIRE NX`, Lua). Kalit yangi bo'lsa — `ttlSeconds`
    * muddat bilan (oyna birinchi urinishdan boshlanadi, keyingi oshirishlar muddatni uzaytirmaydi).

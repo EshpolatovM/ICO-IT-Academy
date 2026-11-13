@@ -5,12 +5,13 @@ import { ErrorCode } from '@lms/shared';
 import { AppException } from '../../common/exceptions/app.exception.js';
 
 import { Prisma } from './generated/client.js';
+import {
+  PRISMA_FOREIGN_KEY_VIOLATION,
+  PRISMA_RECORD_NOT_FOUND,
+  PRISMA_UNIQUE_VIOLATION,
+} from './prisma-error-codes.js';
 
 import type { ExceptionMapper } from '../../common/filters/exception-mapper.interface.js';
-
-/** Prisma xato kodlari: https://www.prisma.io/docs/orm/reference/error-reference */
-const PRISMA_UNIQUE_VIOLATION = 'P2002';
-const PRISMA_RECORD_NOT_FOUND = 'P2025';
 
 interface AdapterConstraint {
   fields?: unknown;
@@ -32,7 +33,8 @@ function uniqueTarget(meta: Record<string, unknown> | undefined): unknown {
 }
 
 /**
- * Prisma xatolarini domen xatosiga aylantiradi: unique → 409, topilmadi → 404.
+ * Prisma xatolarini domen xatosiga aylantiradi: unique → 409, FK (`P2003`) → 409 `details: null`
+ * (zaxira: aniq sababni servis o'zi beradi), topilmadi → 404.
  * Boshqa Prisma xatolari filter'da 500 bo'ladi (tafsiloti faqat logda).
  */
 @Injectable()
@@ -47,6 +49,9 @@ export class PrismaExceptionMapper implements ExceptionMapper {
         details: { target: uniqueTarget(error.meta) },
         cause: error,
       });
+    }
+    if (error.code === PRISMA_FOREIGN_KEY_VIOLATION) {
+      return new AppException({ code: ErrorCode.CONFLICT, cause: error });
     }
     if (error.code === PRISMA_RECORD_NOT_FOUND) {
       return new AppException({ code: ErrorCode.NOT_FOUND, cause: error });

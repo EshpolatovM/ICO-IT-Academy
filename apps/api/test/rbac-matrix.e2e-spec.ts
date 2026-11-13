@@ -6,6 +6,7 @@ import type { AccountRole } from '@lms/shared';
 import { API, http, TEST_PASSWORD } from './support/auth-fixtures.js';
 import { useE2eContext } from './support/e2e-context.js';
 import { ALL_ACTORS, RbacActors } from './support/rbac-actors.js';
+import { CONTENT_CASES } from './support/rbac-content-cases.js';
 import { GROUP_CASES } from './support/rbac-group-cases.js';
 import {
   accountOnly,
@@ -28,7 +29,7 @@ import type { EndpointCase, RequestSpec } from './support/rbac-matrix.js';
 import type request from 'supertest';
 
 /**
- * RBAC matritsasi — 1-bosqich, 2.2 va 2.3 (docs/01 §2.1, docs/02 §7, docs/12 §1, §2, §16): har bir endpoint × har bir
+ * RBAC matritsasi — 1-bosqich, 2.2, 2.3 va 3.2 (docs/01 §2.1, docs/02 §7, docs/12 §1, §2, §3, §16): har bir endpoint × har bir
  * aktyor → kutilgan status (va xato kodi). Global guard tartibi: autentifikatsiya (401) →
  * `PASSWORD_CHANGE_REQUIRED` (403) → `@Roles` (403) → ota-ona faqat o'qish (403) → `@StudentScope`.
  * Mentor uchun student endpointlari — guruh scope'i orqali (begona student — 404).
@@ -161,7 +162,12 @@ const FOUNDATION_CASES: EndpointCase[] = [
   },
 ];
 
-const CASES: EndpointCase[] = [...FOUNDATION_CASES, ...USER_MANAGEMENT_CASES, ...GROUP_CASES];
+const CASES: EndpointCase[] = [
+  ...FOUNDATION_CASES,
+  ...USER_MANAGEMENT_CASES,
+  ...GROUP_CASES,
+  ...CONTENT_CASES,
+];
 
 /** Muvaffaqiyatli yaratish javobidagi foydalanuvchilar (`id`, `students[].id`) tozalanadi. */
 function trackCreatedUsers(fixtures: AuthFixtures, response: request.Response): void {
@@ -174,6 +180,22 @@ function trackCreatedUsers(fixtures: AuthFixtures, response: request.Response): 
   });
 }
 
+/** Muvaffaqiyatli yaratilgan yo'l yoki ko'nikma tozalanadi. */
+function trackCreatedContent(
+  actors: RbacActors,
+  kind: EndpointCase['createsContent'],
+  id: string | undefined,
+): void {
+  if (id === undefined || kind === undefined) {
+    return;
+  }
+  if (kind === 'path') {
+    actors.content.trackPath(id);
+  } else {
+    actors.content.trackSkill(id);
+  }
+}
+
 const CELLS = CASES.flatMap((testCase) =>
   ALL_ACTORS.map((actor) => ({
     ...testCase,
@@ -182,7 +204,7 @@ const CELLS = CASES.flatMap((testCase) =>
   })),
 );
 
-describe('RBAC matritsasi — 1-bosqich, 2.2 va 2.3 endpointlari (e2e)', () => {
+describe('RBAC matritsasi — 1-bosqich, 2.2, 2.3 va 3.2 endpointlari (e2e)', () => {
   const context = useE2eContext();
   let actors: RbacActors;
 
@@ -208,10 +230,11 @@ describe('RBAC matritsasi — 1-bosqich, 2.2 va 2.3 endpointlari (e2e)', () => {
     if (cell.createsUsers) {
       trackCreatedUsers(context.fixtures, response);
     }
-    const createdGroupId = (response.body as { id?: string } | undefined)?.id;
-    if (cell.createsGroup && createdGroupId) {
-      context.fixtures.trackGroup(createdGroupId);
+    const createdId = (response.body as { id?: string } | undefined)?.id;
+    if (cell.createsGroup && createdId) {
+      context.fixtures.trackGroup(createdId);
     }
+    trackCreatedContent(actors, cell.createsContent, createdId);
 
     const want = expected[kind];
     const body = response.body as { error?: { code?: string } } | undefined;

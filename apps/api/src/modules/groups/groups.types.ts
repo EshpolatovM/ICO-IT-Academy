@@ -1,11 +1,4 @@
-import type {
-  GroupMentorRef,
-  GroupPathRef,
-  GroupRef,
-  GroupStatus,
-  LearningPathListItem,
-  UserStatus,
-} from '@lms/shared';
+import type { GroupMentorRef, GroupPathRef, GroupRef, GroupStatus, UserStatus } from '@lms/shared';
 
 /** Repository'dan chiqadigan yozuvlar (Prisma tiplari tashqariga chiqmaydi). */
 
@@ -63,9 +56,6 @@ export interface ActiveMembershipRecord {
   studentId: string;
   groupId: string;
 }
-
-/** `learning_paths` qisqa yozuvi — API elementi bilan bir xil shakl. */
-export type LearningPathRecord = LearningPathListItem;
 
 export interface MentorGroupRecord {
   id: string;

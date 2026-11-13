@@ -43,8 +43,16 @@ describe('PrismaExceptionMapper', () => {
     expect(mapped?.status).toBe(404);
   });
 
+  it('P2003 (FK) → 409 CONFLICT, details null', () => {
+    const mapped = mapper.map(knownError('P2003'));
+
+    expect(mapped?.code).toBe(ErrorCode.CONFLICT);
+    expect(mapped?.status).toBe(409);
+    expect(mapped?.details).toBeNull();
+  });
+
   it("boshqa Prisma kodlari va Prisma bo'lmagan xatolar tanilmaydi", () => {
-    expect(mapper.map(knownError('P2003'))).toBeUndefined();
+    expect(mapper.map(knownError('P2034'))).toBeUndefined();
     expect(mapper.map(new Error('x'))).toBeUndefined();
   });
 });

@@ -1,13 +1,15 @@
 import { ErrorCode } from '@lms/shared';
+import type { ConflictFieldDetails } from '@lms/shared';
 
 import { AppException } from '../../common/exceptions/app.exception.js';
 
 /** Telefon boshqa akkauntda band (unique `uq_users_phone`) — 409, `details.field = "phone"`. */
 export function phoneTakenException(): AppException {
+  const details: ConflictFieldDetails = { field: 'phone' };
   return new AppException({
     code: ErrorCode.CONFLICT,
     message: 'Bu telefon raqam boshqa akkauntda band',
-    details: { field: 'phone' },
+    details,
   });
 }
 

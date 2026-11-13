@@ -3,11 +3,9 @@ import { ErrorCode, UserStatus } from '@lms/shared';
 import { groupRecord } from '../testing/groups.fixtures.js';
 
 import { GroupDetailsService } from './group-details.service.js';
-import { LearningPathsService } from './learning-paths.service.js';
 
 import type { GroupMembersRepository } from '../repositories/group-members.repository.js';
 import type { GroupsRepository } from '../repositories/groups.repository.js';
-import type { LearningPathsRepository } from '../repositories/learning-paths.repository.js';
 
 const MEMBER = {
   id: 's1',
@@ -52,15 +50,5 @@ describe('GroupDetailsService', () => {
 
   it('requireLockedGroup — qulflangan qatordan yozuv', async () => {
     await expect(setup().requireLockedGroup('g1')).resolves.toMatchObject({ id: 'g1' });
-  });
-});
-
-describe('LearningPathsService', () => {
-  it("yo'llar ro'yxati: id, title, slug, status", async () => {
-    const path = { id: 'p1', title: 'Frontend', slug: 'frontend', status: 'PUBLISHED' };
-    const repository = { listRefs: jest.fn().mockResolvedValue([path]) };
-    const service = new LearningPathsService(repository as unknown as LearningPathsRepository);
-
-    await expect(service.list()).resolves.toEqual({ items: [path] });
   });
 });

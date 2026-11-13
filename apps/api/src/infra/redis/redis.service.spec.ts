@@ -23,6 +23,7 @@ function createFakeClient(status = 'ready') {
     eval: jest.fn().mockResolvedValue(3),
     mget: jest.fn().mockResolvedValue(['a', null]),
     expire: jest.fn().mockResolvedValue(1),
+    incr: jest.fn().mockResolvedValue(5),
     multi: jest.fn(),
     disconnect: jest.fn(),
   };
@@ -98,6 +99,14 @@ describe('RedisService', () => {
 
     expect(client.set).toHaveBeenNthCalledWith(1, 'k', 'v');
     expect(client.set).toHaveBeenNthCalledWith(2, 'k', 'v', 'EX', 60);
+  });
+
+  it('increment: muddatsiz INCR, yangi qiymat qaytadi', async () => {
+    const { client, service } = createService();
+
+    expect(await service.increment('k')).toBe(5);
+    expect(client.incr).toHaveBeenCalledWith('k');
+    expect(client.expire).not.toHaveBeenCalled();
   });
 
   it('incrementWithTtl: bitta atomar Lua skript (INCR + EXPIRE NX)', async () => {

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
+import { LearningPathsRepository } from '../../content/repositories/learning-paths.repository.js';
 import { GroupField } from '../groups.constants.js';
 import { invalidReferenceException, invalidReferencesException } from '../groups.errors.js';
 import { GroupCandidatesRepository } from '../repositories/group-candidates.repository.js';
-import { LearningPathsRepository } from '../repositories/learning-paths.repository.js';
 
 /**
- * Guruh so'rovidagi havolalarni tekshirish: yo'l mavjud, mentor — faol MENTOR, studentlar mavjud.
+ * Guruh so'rovidagi havolalarni tekshirish: yo'l mavjud va `ARCHIVED` emas (R Q-6), mentor — faol MENTOR, studentlar mavjud.
  * Noto'g'ri havola — 400 `VALIDATION_ERROR` (`details[].field` — so'rov maydoni).
  */
 @Injectable()
@@ -17,8 +17,8 @@ export class GroupReferences {
   ) {}
 
   async requirePath(pathId: string): Promise<void> {
-    if (!(await this.paths.exists(pathId))) {
-      throw invalidReferenceException(GroupField.PATH_ID, "Yo'l topilmadi");
+    if (!(await this.paths.isAssignable(pathId))) {
+      throw invalidReferenceException(GroupField.PATH_ID, "Yo'l topilmadi yoki arxivlangan");
     }
   }
 

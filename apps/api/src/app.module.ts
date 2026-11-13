@@ -17,6 +17,7 @@ import { RedisModule } from './infra/redis/redis.module.js';
 import { AdminUsersModule } from './modules/admin-users/admin-users.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard.js';
+import { ContentModule } from './modules/content/content.module.js';
 import { GroupsModule } from './modules/groups/groups.module.js';
 import { MentorScopeModule } from './modules/groups/mentor-scope.module.js';
 import { HealthModule } from './modules/health/health.module.js';
@@ -41,6 +42,7 @@ import type { ExceptionMapper } from './common/filters/exception-mapper.interfac
     PasswordResetModule,
     AdminUsersModule,
     GroupsModule,
+    ContentModule,
     HealthModule,
   ],
   providers: [

@@ -4,6 +4,7 @@ import type { AccountRole } from '@lms/shared';
 import { PrismaService } from '../../src/infra/prisma/prisma.service.js';
 
 import { login } from './auth-fixtures.js';
+import { ContentFixtures } from './content-fixtures.js';
 import {
   exchange,
   issueParentToken,
@@ -60,11 +61,15 @@ const ACCOUNT_ROLE_OF: Readonly<Partial<Record<ActorKind, AccountRole>>> = {
  */
 export class RbacActors {
   private adminToken: string | null = null;
+  /** Kontent nishonlari (yo'l, bo'lim, mavzu, dars, sandiq, ko'nikma) — 3.2. */
+  readonly content: ContentFixtures;
 
   constructor(
     private readonly app: INestApplication<App>,
     private readonly fixtures: AuthFixtures,
-  ) {}
+  ) {
+    this.content = new ContentFixtures(app, fixtures);
+  }
 
   async create(kind: ActorKind): Promise<Actor> {
     if (kind === ActorKind.ANON) {

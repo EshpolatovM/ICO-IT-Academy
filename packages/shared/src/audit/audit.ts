@@ -16,6 +16,13 @@ export const AuditAction = {
   GROUP_MENTOR_ASSIGNED: 'GROUP_MENTOR_ASSIGNED',
   GROUP_MEMBERS_ADDED: 'GROUP_MEMBERS_ADDED',
   GROUP_MEMBER_REMOVED: 'GROUP_MEMBER_REMOVED',
+  /** Kontent (yo'l, bo'lim, mavzu, dars, sandiq, ko'nikma) — 3.2 §7. */
+  CONTENT_CREATED: 'CONTENT_CREATED',
+  CONTENT_UPDATED: 'CONTENT_UPDATED',
+  CONTENT_STATUS_CHANGED: 'CONTENT_STATUS_CHANGED',
+  CONTENT_REORDERED: 'CONTENT_REORDERED',
+  CONTENT_DELETED: 'CONTENT_DELETED',
+  TOPIC_SKILLS_SET: 'TOPIC_SKILLS_SET',
 } as const;
 
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];
@@ -27,6 +34,12 @@ export const AuditEntityType = {
   /** CSV import partiyasi (`entity_id` — partiya id'si, docs/12 §2). */
   STUDENT_IMPORT: 'STUDENT_IMPORT',
   GROUP: 'GROUP',
+  LEARNING_PATH: 'LEARNING_PATH',
+  PATH_SECTION: 'PATH_SECTION',
+  TOPIC: 'TOPIC',
+  LESSON: 'LESSON',
+  PATH_CHEST: 'PATH_CHEST',
+  SKILL: 'SKILL',
 } as const;
 
 export type AuditEntityType = (typeof AuditEntityType)[keyof typeof AuditEntityType];

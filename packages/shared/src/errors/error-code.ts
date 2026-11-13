@@ -52,3 +52,8 @@ export interface ApiErrorBody {
     details: unknown;
   };
 }
+
+/** Unikallik 409 (`CONFLICT`) `details` i: band qiymatli maydon (telefon, slug, ko'nikma nomi). */
+export interface ConflictFieldDetails {
+  field: string;
+}

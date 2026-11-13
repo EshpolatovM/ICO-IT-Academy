@@ -39,6 +39,8 @@ export interface EndpointCase {
   createsUsers?: boolean;
   /** Muvaffaqiyatli javobda yaratilgan guruh (`id`) tozalanadi. */
   createsGroup?: boolean;
+  /** Muvaffaqiyatli javobda yaratilgan kontent (`id`: yo'l yoki ko'nikma) tozalanadi. */
+  createsContent?: 'path' | 'skill';
 }
 
 export const UNAUTHORIZED: Expectation = { status: 401, code: ErrorCode.UNAUTHORIZED };
@@ -76,6 +78,10 @@ export const superAdminOnly = (success: Expectation) =>
 /** SA va A (mentor/student/guruh boshqaruvi, docs/12 §2). */
 export const adminsOnly = (success: Expectation) =>
   row(UNAUTHORIZED, success, success, FORBIDDEN, FORBIDDEN, MCP_BLOCKED, FORBIDDEN);
+
+/** SA A M — kontent o'qish (`GET /admin/paths`, `/tree`; docs/12 §3, M4). */
+export const contentReaders = (success: Expectation) =>
+  row(UNAUTHORIZED, success, success, success, FORBIDDEN, MCP_BLOCKED, FORBIDDEN);
 
 /** Faqat M (mentor sahifasi, docs/12 §12). */
 export const mentorOnly = (success: Expectation) =>

@@ -61,8 +61,15 @@ export class AuthFixtures {
   private readonly createdIds: string[] = [];
   private readonly groupIds: string[] = [];
   private readonly pathIds: string[] = [];
+  /** Foydalanuvchilardan OLDIN bajariladigan tozalashlar (progress/kontent — `users` ga `Restrict`). */
+  private readonly beforeCleanupHooks: (() => Promise<void>)[] = [];
 
   constructor(private readonly app: INestApplication<App>) {}
+
+  /** Qo'shimcha fixture (masalan `ContentFixtures`) o'z yozuvlarini shu yerda tozalaydi. */
+  beforeCleanup(hook: () => Promise<void>): void {
+    this.beforeCleanupHooks.push(hook);
+  }
 
   async createUser(options: CreateUserOptions): Promise<TestUser> {
     const isStudent = options.role === Role.STUDENT;
@@ -121,6 +128,9 @@ export class AuthFixtures {
 
   /** Faqat shu fixture yaratgan foydalanuvchilar, guruhlar va ularga bog'langan yozuvlar o'chiriladi. */
   async cleanup(): Promise<void> {
+    for (const hook of this.beforeCleanupHooks) {
+      await hook();
+    }
     const db = this.prisma().dbIncludingDeleted;
     await deleteTestUsers(db, this.createdIds);
     await deleteTestGroups(db, this.groupIds, this.pathIds);

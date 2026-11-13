@@ -42,7 +42,7 @@ export { ParentAccessAction } from './enums/parent-access-action.js';
 export { Role } from './enums/role.js';
 export { UserStatus } from './enums/user-status.js';
 export { ErrorCode } from './errors/error-code.js';
-export type { ApiErrorBody, FieldErrorDetail } from './errors/error-code.js';
+export type { ApiErrorBody, ConflictFieldDetails, FieldErrorDetail } from './errors/error-code.js';
 export { buildParentLink, parseParentLinkFragment } from './parent/parent-link.js';
 export {
   PARENT_EXCHANGE_MAX_TOKENS,
@@ -158,3 +158,92 @@ export type {
   StudentImportResult,
   StudentListItem,
 } from './users/users.types.js';
+export {
+  CHEST_TITLE_MAX_LENGTH,
+  CONTENT_ICON_MAX_LENGTH,
+  CONTENT_REORDER_MAX,
+  LESSON_CONTENT_MAX_LENGTH,
+  LESSON_EST_MINUTES_MAX,
+  LESSON_TITLE_MAX_LENGTH,
+  LESSON_VIDEO_URL_MAX_LENGTH,
+  LESSON_VIDEO_URL_PROTOCOLS,
+  PATH_DESCRIPTION_MAX_LENGTH,
+  PATH_SLUG_MAX_LENGTH,
+  PATH_SLUG_PATTERN,
+  PATH_TITLE_MAX_LENGTH,
+  SECTION_TITLE_MAX_LENGTH,
+  SKILL_NAME_MAX_LENGTH,
+  SKILL_SEARCH_MAX_LENGTH,
+  TOPIC_SKILLS_MAX,
+  TOPIC_TITLE_MAX_LENGTH,
+} from './content/content.constants.js';
+export { ContentConflictReason } from './content/content-errors.js';
+export type { ContentConflictDetails } from './content/content-errors.js';
+export { isContentVisible } from './content/content-visibility.js';
+export { contentStatusSchema, DUPLICATE_IDS_MESSAGE } from './content/content-schema-helpers.js';
+export {
+  adminPathsQuerySchema,
+  chestRewardSchema,
+  createChestSchema,
+  createLessonSchema,
+  createPathSchema,
+  createSectionSchema,
+  createTopicSchema,
+  PATH_SLUG_MESSAGE,
+  publishPathSchema,
+  reorderLessonsSchema,
+  reorderSectionsSchema,
+  reorderTopicsSchema,
+  REWARD_RANGE_MESSAGE,
+  updateChestSchema,
+  updateLessonSchema,
+  updatePathSchema,
+  updateSectionSchema,
+  updateTopicSchema,
+  VIDEO_URL_PROTOCOL_MESSAGE,
+} from './content/content.schemas.js';
+export type {
+  AdminPathsQuery,
+  ChestReward,
+  CreateChestRequest,
+  CreateLessonRequest,
+  CreatePathRequest,
+  CreateSectionRequest,
+  CreateTopicRequest,
+  PublishPathRequest,
+  ReorderLessonsRequest,
+  ReorderSectionsRequest,
+  ReorderTopicsRequest,
+  UpdateChestRequest,
+  UpdateLessonRequest,
+  UpdatePathRequest,
+  UpdateSectionRequest,
+  UpdateTopicRequest,
+} from './content/content.schemas.js';
+export {
+  createSkillSchema,
+  setTopicSkillsSchema,
+  skillsQuerySchema,
+  updateSkillSchema,
+} from './content/skills.schemas.js';
+export type {
+  CreateSkillRequest,
+  SetTopicSkillsRequest,
+  SkillsQuery,
+  UpdateSkillRequest,
+} from './content/skills.schemas.js';
+export type {
+  AdminChestNode,
+  AdminLesson,
+  AdminLessonNode,
+  AdminPathDetail,
+  AdminPathItem,
+  AdminPathsResponse,
+  AdminPathTree,
+  AdminSectionNode,
+  AdminTopicNode,
+  SkillItem,
+  SkillRef,
+  SkillsResponse,
+  TopicSkillsResponse,
+} from './content/content.types.js';

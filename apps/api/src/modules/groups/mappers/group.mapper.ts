@@ -2,7 +2,6 @@ import type {
   AdminGroupDetail,
   AdminGroupListItem,
   AdminGroupMember,
-  LearningPathListItem,
   MentorGroupItem,
   MentorGroupStudent,
   MentorStudentProfile,
@@ -11,7 +10,6 @@ import type {
 import type {
   GroupMemberRecord,
   GroupRecord,
-  LearningPathRecord,
   MentorGroupRecord,
   MentorStudentProfileRecord,
   MentorStudentRecord,
@@ -28,10 +26,6 @@ export function toDateOnly(date: Date | null): string | null {
 /** `YYYY-MM-DD` → `Date` (UTC yarim tun); `null` (olib tashlash) va `undefined` (berilmagan) saqlanadi. */
 export function fromDateOnly(value: string | null | undefined): Date | null | undefined {
   return typeof value === 'string' ? new Date(`${value}T00:00:00.000Z`) : value;
-}
-
-export function toPathItem(record: LearningPathRecord): LearningPathListItem {
-  return { id: record.id, title: record.title, slug: record.slug, status: record.status };
 }
 
 export function toAdminGroupItem(record: GroupRecord): AdminGroupListItem {

@@ -2,11 +2,11 @@ import { ErrorCode } from '@lms/shared';
 
 import { GroupReferences } from './group-references.service.js';
 
+import type { LearningPathsRepository } from '../../content/repositories/learning-paths.repository.js';
 import type { GroupCandidatesRepository } from '../repositories/group-candidates.repository.js';
-import type { LearningPathsRepository } from '../repositories/learning-paths.repository.js';
 
-function setup({ pathExists = true, mentor = true, students = ['s1'] } = {}) {
-  const paths = { exists: jest.fn().mockResolvedValue(pathExists) };
+function setup({ pathAssignable = true, mentor = true, students = ['s1'] } = {}) {
+  const paths = { isAssignable: jest.fn().mockResolvedValue(pathAssignable) };
   const candidates = {
     isActiveMentor: jest.fn().mockResolvedValue(mentor),
     findStudentIds: jest.fn().mockResolvedValue(students),
@@ -26,8 +26,8 @@ describe('GroupReferences', () => {
     await expect(references.requireStudents(['s1'])).resolves.toBeUndefined();
   });
 
-  it("yo'l yoki faol mentor yo'q — 400 maydon nomi bilan", async () => {
-    const references = setup({ pathExists: false, mentor: false });
+  it("yo'l yo'q yoki ARCHIVED (isAssignable = false), faol mentor yo'q — 400 maydon nomi bilan", async () => {
+    const references = setup({ pathAssignable: false, mentor: false });
 
     await expect(references.requirePath('p1')).rejects.toMatchObject({
       code: ErrorCode.VALIDATION_ERROR,
