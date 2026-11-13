@@ -71,6 +71,10 @@ describe("Student ilm yo'li — xarita, ochish, progress, scope (e2e)", () => {
     const locked = await api.get(`/student/topics/${t2.id}`).expect(403);
     expect((locked.body as { error: { code: string } }).error.code).toBe(ErrorCode.LOCKED);
     await api.post(`/student/lessons/${lessonAt(path, 1, 0)}/start`).expect(403);
+    const lockedComplete = await api
+      .post(`/student/lessons/${lessonAt(path, 0, 1)}/complete`)
+      .expect(403);
+    expect((lockedComplete.body as { error: { code: string } }).error.code).toBe(ErrorCode.LOCKED);
 
     const lesson = (await api.get(`/student/lessons/${lessonAt(path, 0, 0)}`).expect(200))
       .body as StudentLesson;

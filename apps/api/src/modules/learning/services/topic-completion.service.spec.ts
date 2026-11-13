@@ -1,5 +1,6 @@
 import { chainPath, fakeTransaction, snapshot, topic } from '../testing/learning.fixtures.js';
 
+import { PathProgressCalculator } from './path-progress-calculator.js';
 import { PathUnlockCalculator } from './path-unlock-calculator.js';
 import { TopicCompletionService } from './topic-completion.service.js';
 
@@ -37,6 +38,7 @@ function setup({ lessonsCompleted, transitioned = true, topicsCompleted = 0 }: C
     topicProgress as unknown as TopicProgressRepository,
     lessonProgress as unknown as LessonProgressRepository,
     enrollments as unknown as EnrollmentsRepository,
+    new PathProgressCalculator(),
   );
   return { service, transaction, topicProgress, enrollments };
 }

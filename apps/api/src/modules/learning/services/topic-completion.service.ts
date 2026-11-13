@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { LessonStatus, TopicStatus } from '@lms/shared';
+import { TopicStatus } from '@lms/shared';
 
 import { LearningEventName } from '../events/learning.events.js';
 import { EnrollmentsRepository } from '../repositories/enrollments.repository.js';
@@ -8,9 +8,10 @@ import { LessonProgressRepository } from '../repositories/lesson-progress.reposi
 import { TopicProgressRepository } from '../repositories/topic-progress.repository.js';
 
 import { LearningTransaction } from './learning-transaction.service.js';
+import { PathProgressCalculator } from './path-progress-calculator.js';
 
 import type { LearningEvent } from '../events/learning.events.js';
-import type { ProgressSnapshot, StudentPathState, VisibleTopic } from '../learning.types.js';
+import type { StudentPathState, VisibleTopic } from '../learning.types.js';
 
 /** Mavzu yakunlanishini tekshirish uchun kontekst: yo'l, zanjir va mavzu. */
 export interface TopicCompletionTarget {
@@ -34,6 +35,7 @@ export class TopicCompletionService {
     private readonly topicProgress: TopicProgressRepository,
     private readonly lessonProgress: LessonProgressRepository,
     private readonly enrollments: EnrollmentsRepository,
+    private readonly progressCalculator: PathProgressCalculator,
   ) {}
 
   /** 3-modul sharti (4-modulda `pass_threshold` bilan kengaytiriladi). */
@@ -93,7 +95,10 @@ export class TopicCompletionService {
     return state.chain.filter(
       (topic) =>
         state.progress.topics.get(topic.id) !== TopicStatus.COMPLETED &&
-        this.isTopicSatisfied(topic.lessons.length, completedLessons(topic, state.progress)),
+        this.isTopicSatisfied(
+          topic.lessons.length,
+          this.progressCalculator.topicLessons(topic, state.progress).lessonsCompleted,
+        ),
     );
   }
 
@@ -105,6 +110,11 @@ export class TopicCompletionService {
     );
   }
 
+  /**
+   * Poyga: oxirgi mavzular parallel tranzaksiyalarda yakunlansa, har biri boshqasining `COMPLETED`
+   * qatorini ko'rmasligi mumkin — `completed_at` NULL qoladi. Buni keyingi `GET /student/path`
+   * dagi reconcile (`pathCompletionPending`) tuzatadi.
+   */
   private async completePathIfDone(
     studentId: string,
     pathId: string,
@@ -116,10 +126,4 @@ export class TopicCompletionService {
       await this.enrollments.markCompleted(studentId, pathId);
     }
   }
-}
-
-function completedLessons(topic: VisibleTopic, progress: ProgressSnapshot): number {
-  return topic.lessons.filter(
-    (lesson) => progress.lessons.get(lesson.id)?.status === LessonStatus.COMPLETED,
-  ).length;
 }
