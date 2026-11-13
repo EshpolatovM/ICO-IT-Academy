@@ -8,10 +8,10 @@
 - **Yangilandi:** 2026-11-13
 - **Branch:** `feature/03-ilm-yoli` (stacked, 02 ustidan), toza, push qilingan.
 - **2-bosqich:** `main` ga qo'shildi (13-nov 16:09, ff `bc084cc`).
-- **3-modul:** 3.4a UI tayyor. 3.4b Markdown renderer tayyor (`f998fb0`; `components/ui/Markdown`, `lib/safeUrl.ts`; nisbiy linklar matn bo'ladi; `dangerouslySetInnerHTML`/`rehype-raw` ESLint bilan taqiqlangan). Boltavoyga Q-1…Q-9 yuborilgan, javob yo'q (13-noyabr tekshirildi: Drive'da yangi xat yo'q, git'da yangi commit yo'q).
+- **3-modul:** 3.4a UI tayyor. 3.4b Markdown renderer tayyor (`f998fb0`; `components/ui/Markdown`, `lib/safeUrl.ts`; nisbiy linklar matn bo'ladi; `dangerouslySetInnerHTML`/`rehype-raw` ESLint bilan taqiqlangan). 3.5a student sahifalari mock bilan tayyor (`e774819`; real API'ga o'tish: `features/learning-path/api/learning-path.api.ts` da mock→http; tiplar vaqtincha `types/learning-path.types.ts`). Boltavoyga Q-1…Q-9 yuborilgan, javob yo'q (13-noyabr tekshirildi: Drive'da yangi xat yo'q, git'da yangi commit yo'q).
 - **Ega qarori (13-nov):** hammasi Tech Lead qo'lida; Boltavoy bilan o'zaro kelishamiz, egalardan so'ralmaydi, egaga faqat hisobot.
 - **Taqsimot (Q27):** 3.1–3.3 Boltavoy; 3.4b Markdown renderer + 3.5 sahifalar Qo'ziboy.
-- **Keyingi vazifa:** 3.5 sahifalar (birchka-frontend): student `/path`, `/path/topics/[topicId]`, `/path/lessons/[lessonId]`; admin `/admin/paths`, daraxt muharriri, `/admin/lessons/:id` — `docs/tasks/03-3.2`/`03-3.3` kontrakti bo'yicha soxta ma'lumot bilan, api/shared ga tegilmaydi. B20 (Q-1…Q-9 javob) ~18:00 kutiladi.
+- **Keyingi vazifa:** 3.5b admin kontent sahifalari (birchka-frontend): `/admin/paths`, yo'l daraxti muharriri (TreeList, yuqoriga/pastga → `PUT …/order`), `/admin/lessons/:id` Markdown muharriri + preview — `docs/tasks/03-3.2` kontrakti, mock bilan. B20 (Q-1…Q-9 + Q28 javoblari) ~18:00 kutiladi.
 - **Qoida:** token tejash — md fayllar to'liq o'qilmaydi, faqat kerakli bo'lak (grep/tail).
 
 ---

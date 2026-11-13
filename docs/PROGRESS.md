@@ -256,3 +256,4 @@ Yangi yozuvlar pastga qo'shiladi.
 - 2026-11-13 15:58 — B18 (Boltavoy qaytdi) o'qildi, Q27 javob yuborildi: taqsimot ok, egalar qarorni sessiyalarga topshirdi. Fayllar: docs/HAMKORLIK.md, docs/STATE.md
 - 2026-11-13 16:09 — B19 (ok) olindi; 2-bosqich main ga fast-forward qilindi (bc084cc). Fayllar: docs/HAMKORLIK.md, docs/STATE.md
 - 2026-11-13 16:12 — 3.4b Markdown renderer (Rassomjon): Markdown.tsx, markdownComponents.tsx, lib/safeUrl.ts, test 14/14, design-preview, eslint XSS qoidalari, react-markdown 10.1.0 + remark-gfm 4.0.1. Commit f998fb0
+- 2026-11-13 16:23 — 3.5a student ilm yo'li sahifalari (Frontendcha): features/learning-path (mock+http API, hook'lar, 3 sahifa), shell nav; 346 test yashil. Commit e774819. Q28 Boltavoyga (kontrakt savollari).
