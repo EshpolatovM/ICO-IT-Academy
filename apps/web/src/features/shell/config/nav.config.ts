@@ -5,7 +5,8 @@ import type { NavEntry } from '../types/nav.types';
  * (404 emas). Yo'li hujjatda aniqlanmagan bandlar `href`siz — `disabled`.
  */
 export const STUDENT_NAV: readonly NavEntry[] = [
-  { label: "Ilm yo'li", href: '/path' },
+  // Q-11: mavzu va dars sahifalarida ham "Ilm yo'li" faol.
+  { label: "Ilm yo'li", href: '/path', activePrefixes: ['/path/topics', '/path/lessons'] },
   { label: 'Bugungi missiya', href: '/today' },
   { label: 'Takrorlash', href: '/review' },
   { label: 'Liga', href: '/league' },

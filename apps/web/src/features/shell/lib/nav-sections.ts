@@ -33,16 +33,16 @@ function isUnderPath(pathname: string, prefix: string): boolean {
 }
 
 /**
- * Joriy yo'l menyu bandiga tegishlimi. Bosh sahifa — faqat aniq mos kelganda;
- * boshqa bandlar — `href` yoki `activePrefixes` dagi yo'llar va ularning ichki sahifalarida.
+ * Joriy yo'l menyu bandiga tegishlimi. Bosh sahifa — aniq mos kelganda yoki `activePrefixes`
+ * ostida; boshqa bandlar — `href` yoki `activePrefixes` dagi yo'llar va ularning ichki sahifalarida.
  */
 export function isNavEntryActive(entry: NavEntry, pathname: string, homePath: string): boolean {
   if (entry.href === undefined) {
     return false;
   }
+  const extra = entry.activePrefixes ?? [];
   if (entry.href === homePath) {
-    return pathname === homePath;
+    return pathname === homePath || extra.some((prefix) => isUnderPath(pathname, prefix));
   }
-  const prefixes = [entry.href, ...(entry.activePrefixes ?? [])];
-  return prefixes.some((prefix) => isUnderPath(pathname, prefix));
+  return [entry.href, ...extra].some((prefix) => isUnderPath(pathname, prefix));
 }

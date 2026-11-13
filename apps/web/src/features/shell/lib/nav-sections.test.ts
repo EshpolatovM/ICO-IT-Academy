@@ -81,4 +81,17 @@ describe('nav-sections', () => {
       false,
     );
   });
+
+  it("student 'Ilm yo'li' — xarita, mavzu va dars sahifalarida faol (Q-11)", () => {
+    const path = STUDENT_NAV.find((entry) => entry.href === '/path');
+    expect(path).toBeDefined();
+    if (path === undefined) {
+      return;
+    }
+    for (const pathname of ['/path', '/path/topics/t1', '/path/lessons/l1']) {
+      expect(isNavEntryActive(path, pathname, '/path')).toBe(true);
+    }
+    expect(isNavEntryActive(path, '/path/other', '/path')).toBe(false);
+    expect(isNavEntryActive(path, '/today', '/path')).toBe(false);
+  });
 });

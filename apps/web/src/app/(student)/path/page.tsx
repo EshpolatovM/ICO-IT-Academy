@@ -1,6 +1,6 @@
-import { ComingSoon } from '@/features/shell';
+import { PathMapPage } from '@/features/learning-path';
 
-/** Student bosh sahifasi — ilm yo'li (3-bosqichda). */
-export default function PathPage() {
-  return <ComingSoon title="Ilm yo'li" description="Ilm yo'li xaritasi 3-bosqichda qo'shiladi." />;
+/** Student bosh sahifasi — ilm yo'li xaritasi (docs/03 §2.1). */
+export default function Page() {
+  return <PathMapPage />;
 }
