@@ -257,3 +257,11 @@ Yangi yozuvlar pastga qo'shiladi.
 - 2026-11-13 16:09 — B19 (ok) olindi; 2-bosqich main ga fast-forward qilindi (bc084cc). Fayllar: docs/HAMKORLIK.md, docs/STATE.md
 - 2026-11-13 16:12 — 3.4b Markdown renderer (Rassomjon): Markdown.tsx, markdownComponents.tsx, lib/safeUrl.ts, test 14/14, design-preview, eslint XSS qoidalari, react-markdown 10.1.0 + remark-gfm 4.0.1. Commit f998fb0
 - 2026-11-13 16:23 — 3.5a student ilm yo'li sahifalari (Frontendcha): features/learning-path (mock+http API, hook'lar, 3 sahifa), shell nav; 346 test yashil. Commit e774819. Q28 Boltavoyga (kontrakt savollari).
+
+## 2026-11-13 — Boltavoy: 3-modul (3.1–3.3) reja yakuni, Qo'ziboy bilan kelishuv
+- **Nima qilindi:** B18 → Q27 → B19 → B20 xatlari: taqsimot kelishildi (3.1–3.3 Boltavoyda, 3.4b/3.5 Qo'ziboyda), egalar qarorni sessiyalarga topshirdi (2026-11-13), 2-bosqich `main` ga qo'shildi (`origin/main` = `bc084cc`, ff). 3.1 qoralamasi lazy enrollment'ga moslandi va TASDIQLANGAN holatga keldi (usta-baza); 3.2/3.3 ga B-1, B-2, Q-1…Q-9, M-1…M-7 qarorlari kiritildi (oga-backend); Domla review (🔴-1 S-35 teshigi, 🔴-2 3.1 holati, 🟡-1…8, 🟢) — hammasi tuzatildi. B17, Q24–Q27, B19, B20 `docs/boltavoy/xatlar/` ga arxivlandi.
+- **Fayllar:** `docs/tasks/03-3.1-baza.md`, `docs/tasks/03-3.2-admin-kontent-api.md`, `docs/tasks/03-3.3-student-api.md`, `docs/boltavoy/{HOLAT,KONTEKST}.md`, `docs/boltavoy/xatlar/` (7 yangi fayl + README).
+- **Testlar:** faqat hujjatlar o'zgardi, kod va testlarga tegilmadi.
+- **Qarorlar:** S-B1 (`min_read_seconds` 3-modulda yo'q), S-B2 (yakunlangan mavzuga yangi dars — mavzu `COMPLETED` qoladi, dars `AVAILABLE`), S-B5 (seed sandiq xp 50 / coin 30), Z-3 (seed 2 bo'lim / 3 mavzu / 6 dars / 1 sandiq), T-1…T-8 qabul — ikki sessiya kelishuvi bilan (B20).
+- **Muammolar va savollar:** yo'q. docs/12 tuzatishlari implementatsiyadan keyin (3.2 §10.4, 3.3 T-8).
+- **Keyingi qadam:** 3.1 baza implementatsiyasi (usta-baza, `apps/api/prisma/**`, lockfile'ga tegilmaydi), keyin 3.2, 3.3; 2.7 (A) 🟢 va `delete-groups` — shoshilinch emas.

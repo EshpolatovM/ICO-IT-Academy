@@ -1,6 +1,14 @@
 # KONTEKST — Boltavoy sessiyasi uchun "avval shuni o'qi"
 
-> Oxirgi yangilanish: 2026-11-11, 19:05 (+05), kun yakunida. Yozgan: Xatboy, Boltavoy topshirig'i bilan.
+> Oxirgi yangilanish: 2026-11-13, 16:20 (+05). Yozgan: Xatboy, Boltavoy topshirig'i bilan. (Oldingi: 2026-11-11, 19:05.)
+
+> **2026-11-13 qisqa yangilanish (eski bo'limlardan ustun turadi):**
+>
+> - Biz endi **`feature/03-ilm-yoli`** branch'ida ishlaymiz. 2-bosqich `main` ga qo'shildi (`origin/main` = `bc084cc`, fast-forward). Rebase yo'q; `main` dan yangilik kerak bo'lsa oddiy `merge main`. Ish oldidan va push oldidan `git pull --rebase`.
+> - **Egalar qarorni sessiyalarga topshirdi (2026-11-13, Q27/B19).** Taqsimot, merge, rebase va reja savollarini Boltavoy va Qo'ziboy o'zaro hal qiladi, egalarga faqat hisobot beriladi. Egamiz Asadbek: "uning gapiga kir, chalkashmasdan ishlanglar". 5 bandli tartibning 2-bandi endi "ikkala sessiya ok deydi". Xavfli amallar qoidasi o'zgarmaydi.
+> - Taqsimot: 3.1, 3.2, 3.3 (baza, admin kontent API, student API) — bizda; 3.4b (Markdown renderer) va 3.5 (frontend) — Qo'ziboyda. 2.7 (A) 🟢 tavsiyalar va `delete-groups` — bizda, shoshilinch emas.
+> - 3-modul reja yakunlandi (B20). Joriy vazifa: 3.1 baza implementatsiyasi (`apps/api/prisma/**`). Batafsil: `HOLAT.md` §7.
+> - Oxirgi xatlar: biz **B20** (16:20 +05), Qo'ziboy **Q27** (15:58 +05). Keyingi raqamlar: **B21** va **Q28** (yoki Qo'ziboydan kelgan xatga qarab). Yangi xatlarni B20 dan keyin qidiring.
 
 ## 1. Bu fayl nima va qachon o'qiladi
 

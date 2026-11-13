@@ -1,4 +1,4 @@
-# HOLAT (Boltavoy, 2026-11-11 kun yakuni)
+# HOLAT (Boltavoy, 2026-11-13 16:20 +05 — 3-modul reja yakunlandi, 3.1 baza boshlanmoqda)
 
 Avval `docs/boltavoy/KONTEKST.md` ni o'qing.
 
@@ -9,8 +9,8 @@ Avval `docs/boltavoy/KONTEKST.md` ni o'qing.
 3. `docs/HAMKORLIK.md` (Qo'ziboyniki)
 4. Shu fayl (`docs/boltavoy/HOLAT.md`)
 5. `docs/PROGRESS.md` ning oxirgi yozuvlari
-6. Drive papkasi `ICO_IT_Academy_Bus` (id `1NFba5lKcrnqpOJJM_cL8Xf5CUXgDAavW`) dagi yangi xatlar (B16 dan keyingilar)
-7. `git fetch`, so'ng `git pull --rebase` (branch `feature/02-admin-asosi`)
+6. Drive papkasi `ICO_IT_Academy_Bus` (id `1NFba5lKcrnqpOJJM_cL8Xf5CUXgDAavW`) dagi yangi xatlar (B20, 2026-11-13 16:20 +05 dan keyingilar)
+7. `git fetch`, so'ng `git pull --rebase` (branch **`feature/03-ilm-yoli`**; 2026-11-13 dan beri)
 
 Muhit:
 
@@ -42,6 +42,8 @@ Muhit:
 
 ## 4. Kelishuvlar bilan Qo'ziboy
 
+> **2026-11-13 yangilanishi (Q27/B19):** egalar qarorni sessiyalarga topshirdi. Taqsimot, `main` ga merge, rebase va reja savollarini Boltavoy va Qo'ziboy o'zaro hal qiladi, egalarga faqat hisobot beriladi. Egamiz Asadbek: "uning gapiga kir, chalkashmasdan ishlanglar". Shuning uchun quyidagi 2-band endi "ikkala sessiya ok deydi". Xavfli amallar qoidasi o'zgarmaydi (force push yo'q, baza o'chirilmaydi, pullik servis yo'q). Ish branch'i `feature/03-ilm-yoli`, rebase qilinmaydi (pushed branch), `main` dan yangilik kerak bo'lsa oddiy `merge main`.
+
 Ish tartibi (Q14/Q21, 5 band):
 
 1. Vazifani olishdan oldin xat bilan e'lon qilish va "ok" olish.
@@ -70,6 +72,8 @@ Qo'shimcha:
 2-bosqich: 2.1, 2.2, 2.3, 2.4, 2.5a/b/c/d/e/f, 2.5b-2 (`029edc5`), 2.6a — DONE. 2.6b (Qo'ziboy) — ochiq. 2.7 review → merge — TODO.
 
 ## 6. Joriy vazifa: 3-modul (c) reja — QORALAMA
+
+> **2026-11-13 holati: reja YAKUNLANDI.** 3.1 TASDIQLANGAN (lazy enrollment, backfill yo'q), 3.2/3.3 ga B20 qarorlari kiritildi, Domla review topilmalari (🔴-1, 🔴-2, 🟡-1…8, 🟢) tuzatildi, quyidagi egaga savollar (S-B1, S-B2, S-B5, Z-3, T-4) va T-1…T-8 sessiya qarori bilan yopildi (javoblar B20 da: `xatlar/20261113-1620-B20-q1-q9-javoblari-reja-yakuni.md`). Quyidagi matn 2026-11-11 holati, tarix uchun.
 
 Fayllar (commit `8bb89f8`, push qilingan — QORALAMA):
 
@@ -104,7 +108,18 @@ Egaga savollar (javobsiz):
 - Z-3: seed hajmi 3 mavzu / 6 dars.
 - T-4: limit qiymatlari (`LESSON_CONTENT_MAX_LENGTH` va boshqalar).
 
-## 7. Keyingi aniq qadamlar (ertaga)
+## 7. Keyingi aniq qadamlar
+
+### 2026-11-13 dan (amaldagi)
+
+1. **3.1 baza implementatsiyasi** — usta-baza (Bazarboy), vazifa fayli `docs/tasks/03-3.1-baza.md` (TASDIQLANGAN, lazy enrollment). Tegiladigan joy: `apps/api/prisma/**` (schema, migratsiya, seed). Lockfile'ga tegilmaydi. B20 da Qo'ziboyga IN_PROGRESS deb e'lon qilingan.
+2. Keyin **3.2** admin kontent API — oga-backend, `docs/tasks/03-3.2-admin-kontent-api.md`.
+3. Keyin **3.3** student API — oga-backend, `docs/tasks/03-3.3-student-api.md`.
+4. **2.7 (A) 🟢 tavsiyalar** (5 ta, `docs/reviews/02-admin-asosi-review.md`) va `apps/api/test/support/web-e2e-users.ts` ga `delete-groups` buyrug'i — shoshilinch emas.
+
+Har vazifa uchun Qo'ziboyga IN_PROGRESS / READY xati (commit hash bilan). Qo'ziboyda: 3.4b (Markdown renderer) va 3.5 (frontend, soxta ma'lumot bilan, keyin real API).
+
+### 2026-11-11 dagi reja (tarix, bajarilgan)
 
 1. §1 dagi o'qish tartibi va Qo'ziboy STATE.md'dagi "SESSIYA TO'XTADI" bo'limi.
 2. Domla 3-modul rejasining 3 faylini review qiladi; 3.1 dagi enrollment qismi tuzatiladi.
@@ -178,3 +193,24 @@ B = Boltavoy → Qo'ziboy, Q = Qo'ziboy → Boltavoy.
 | 18:44 | B→Q (16)  | kun yakuni hisoboti (yuborildi 18:44:13 +05, Drive id `1rLD5jk0VVL8R1MkHqdPahTtqC69t2IoZ`) |
 
 Xatlarning to'liq matni va indeksi: `docs/boltavoy/xatlar/README.md`. Q23 dan keyin (19:00 +05 holatiga) yangi xat yo'q.
+
+### 2026-11-13, Toshkent vaqti (+05)
+
+| Vaqt  | Yo'nalish | Mazmun |
+| ----- | --------- | ------ |
+| 15:54 | B→Q (18)  | reja bo'yicha holat va taqsimot (QUESTION; yuborildi 15:54:07 +05, Drive id `1OdAgS3dOmLYRrdLYCoEhgB_X9S5JrTSB`). Taklif: 3.1–3.3 Boltavoyda, 3.4/3.5 Qo'ziboyda; B19 (Q-1…Q-9 javoblari) ~18:00. **Qo'ziboy javobi kutilmoqda.** |
+
+| 15:58 | Q→B (27)  | taqsimotga ok, egalar qarorni sessiyalarga topshirdi (ANSWER). Merge'ni Qo'ziboy qiladi (ff, merge commit va force yo'q), rebase kerak emas; 3.1–3.3 bizda, 3.4b va 3.5 unda; bugun `pnpm-lock.yaml` unda; 2.7 (A) 🟢 + `delete-groups` bizda, shoshilinch emas. |
+| 16:04 | B→Q (19)  | Q27 ga to'liq "ok" (REPLY; Drive id `1r8SynJCdLpZNWcPdxNTUkYXm_PyBT4Va`). Egamiz ham tasdiqladi; merge'ga ok; lockfile bugun Qo'ziboyda. |
+| 16:20 | B→Q (20)  | Q-1…Q-9 javoblari va 3-modul reja yakuni (REPLY; yuborildi 16:20:14 +05, Drive id `1yxCHMxRhrYb5UugUM7DywyGfYc1qVL7M`). B-1, B-2 tuzatildi; Q-1…Q-9, M-1…M-7 qarorlari; S-B1, S-B2, S-B5, Z-3, T-1…T-8 yopildi; 3.1 baza IN_PROGRESS (`apps/api/prisma/**`, lockfile'ga tegilmaydi). |
+
+**2026-11-13 voqealari:**
+
+- Egalar qarorni sessiyalarga topshirdi (Q27, B19): endi ikki sessiya o'zaro kelishadi, egalarga faqat hisobot.
+- 2-bosqich `main` ga qo'shildi: `origin/main` = `bc084cc` (fast-forward, Qo'ziboy qildi).
+- 3-modul reja yakunlandi: Bazarboy 3.1 ni lazy enrollment'ga moslab TASDIQLANGAN holatga keltirdi; Backendbek 3.2/3.3 ga B-1, B-2, Q-1…Q-9, M-1…M-7 qarorlarini kiritdi.
+- Domla review: 🔴-1 (S-35 teshigi), 🔴-2 (3.1 holati), 🟡-1…8 va 🟢 — hammasi tuzatildi.
+- Ochiq savollar S-B1, S-B2, S-B5, Z-3, T-1…T-8 sessiya qarori bilan yopildi (qarorlar B20 da).
+- Qo'ziboy `origin/feature/03-ilm-yoli` ga push qildi (16:20 holatiga, bizda hali pull qilinmagan): `efae65e` (B19, main), `f998fb0` (3.4b Markdown renderer + `pnpm-lock.yaml`), `b59b449` (state). Ular `docs/PROGRESS.md` oxiriga ham yozgan, shuning uchun bizning PROGRESS yozuvimiz `pull --rebase` da konflikt berishi mumkin (ikkalasini ham saqlab hal qilinadi).
+
+Drive'da Q27 dan keyin (16:20 +05 holatiga) Qo'ziboydan yangi xat yo'q. B17, Q24–Q27, B19, B20 `xatlar/` ga arxivlandi.
