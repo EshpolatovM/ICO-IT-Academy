@@ -61,6 +61,7 @@ export function CreateGroupForm({ onValid, onCancel }: CreateGroupFormProps) {
           {(control) => (
             <PathSelect
               control={control}
+              excludeArchived
               placeholder="Yo'lni tanlang"
               {...form.register('pathId')}
             />

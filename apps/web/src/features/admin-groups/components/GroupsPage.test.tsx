@@ -182,4 +182,20 @@ describe('GroupsPage', () => {
       startsAt: '2026-12-01',
     });
   });
+
+  it('"Yangi guruh": arxivlangan yo\'l tanlovda chiqmaydi, filtrda esa bor', async () => {
+    const archived = { id: IDS.group, title: "Eski yo'l", slug: 'old', status: 'ARCHIVED' };
+    routeFetch(fetchMock, {
+      ...LOOKUP_ROUTES,
+      'GET /api/v1/admin/paths': () =>
+        jsonResponse(200, { items: [...PATHS_FIXTURE.items, archived] }),
+      [`GET ${LIST_URL}`]: () => jsonResponse(200, pageOf([])),
+    });
+    renderWithQuery(<GroupsPage />);
+    expect(await screen.findByRole('option', { name: "Eski yo'l" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Yangi guruh' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Yangi guruh' });
+    expect(within(dialog).getByRole('option', { name: 'Frontend dasturchi' })).toBeInTheDocument();
+    expect(within(dialog).queryByRole('option', { name: "Eski yo'l" })).not.toBeInTheDocument();
+  });
 });

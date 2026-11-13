@@ -24,6 +24,8 @@ Admin yo'l yaratadi va nashr qiladi. Student xaritani ko'radi, darslarni ketma-k
 - **S-36:** test-out yo'q.
 - **Drag-and-drop:** 3-bosqichda yuqoriga/pastga tugmalari bilan. DnD kutubxonasi (yangi paket) keyinroq, alohida qaror bilan.
 - **Markdown renderer** uchun yangi paket kerak bo'ladi (masalan `react-markdown` + sanitizatsiya). Lockfile umumiy fayl, shuning uchun Boltavoy bilan kelishib, bitta commitda qo'shiladi. XSS: HTML o'chiriladi, faqat xavfsiz Markdown.
+- **M-4 / Q-11 (B20 kelishuvi):** `/admin/skills` va mavzuga ko'nikma biriktirish UI'si 3.5 dan chiqarildi → 3.5b (7-modul oldidan); backend API 3.2 da qoladi. Dars muharriridagi "bog'langan savollar" — 4-modul.
+- **3.5 frontend holati (2026-11-13):** 3.4b Markdown `f998fb0`, 3.5a student sahifalari `e774819`, 3.5-admin kontent sahifalari `efe40d2` — mock API bilan; 3.2/3.3 tayyor bo'lgach real API'ga ulanadi.
 - **Xarita dizayni** ("asosiy dizayn ishi", docs/14) hozir wireframe darajasida: oddiy vertikal ro'yxat va holat belgilari. Haqiqiy dizaynni egasi keyin beradi.
 
 ## Bog'liqliklar va xavflar
