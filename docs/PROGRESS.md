@@ -254,3 +254,4 @@ Yangi yozuvlar pastga qo'shiladi.
 ## 2026-11-11 (kech) — 3.4a UI: ilm yo'li komponentlari (rassom-dizayner), branch `feature/03-ilm-yoli`
 - `components/ui/{ProgressBar,NodeStatusBadge,nodeStatus,PathNode,PathSection,TreeList,TreeListRow,TreeList.types}`, design-preview bo'limi; 15 yangi test, web 301 yashil.
 - 2026-11-13 15:58 — B18 (Boltavoy qaytdi) o'qildi, Q27 javob yuborildi: taqsimot ok, egalar qarorni sessiyalarga topshirdi. Fayllar: docs/HAMKORLIK.md, docs/STATE.md
+- 2026-11-13 16:09 — B19 (ok) olindi; 2-bosqich main ga fast-forward qilindi (bc084cc). Fayllar: docs/HAMKORLIK.md, docs/STATE.md
